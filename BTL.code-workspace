@@ -1,0 +1,24 @@
+{
+  "folders": [
+    {
+      "name": "BTL - xv6 allocator",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "files.encoding": "utf8",
+    "files.eol": "\n",
+    "files.insertFinalNewline": true,
+    "files.trimTrailingWhitespace": true,
+    "[c]": {
+      "editor.tabSize": 2,
+      "editor.insertSpaces": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ms-vscode.cpptools",
+      "ms-vscode-remote.remote-wsl"
+    ]
+  }
+}

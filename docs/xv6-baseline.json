@@ -1,0 +1,17 @@
+{
+  "source_repository": "https://github.com/mit-pdos/xv6-riscv.git",
+  "source_directory": "D:\\2. FullStack\\2026.1\\Hệ điều hành\\Excecise\\4\\xv6-riscv",
+  "source_commit": "06aad25c735fd3159bdfae5680be4eab7b1668b2",
+  "import_date_local": "2026-10-13",
+  "timezone": "Asia/Saigon",
+  "import_method": "Tracked working-tree files; existing BTL .gitignore retained; text newlines normalized to LF",
+  "source_files_imported": 81,
+  "local_content_adjustments_preserved": [
+    {
+      "path": "Makefile",
+      "change": "Quote -ffile-prefix-map argument for paths containing spaces"
+    }
+  ],
+  "generated_outputs_copied": false,
+  "runtime_validation": "Not built or booted in current environment"
+}

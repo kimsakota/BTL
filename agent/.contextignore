@@ -1,0 +1,17 @@
+# Read these only when the task needs the exact transcript or generated evidence.
+agent/history/*.jsonl
+.git/
+tmp/
+__pycache__/
+*.o
+*.d
+*.asm
+*.sym
+kernel/kernel
+mkfs/mkfs
+fs.img
+user/_*
+.env
+.env.*
+*.key
+*.pem

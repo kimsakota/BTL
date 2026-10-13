@@ -1,0 +1,23 @@
+# Generated files from the xv6 Makefile.
+*.o
+*.d
+*.asm
+*.sym
+/kernel/kernel
+/fs.img
+/mkfs/mkfs
+/user/_*
+/.gdbinit
+/compile_commands.json
+/user/usys.S
+/TAGS
+*~
+
+# Local temporary files. Keep research CSVs and manifests versioned.
+/tmp/
+__pycache__/
+.DS_Store
+
+# Local chat snapshots; keep the curated memory and index versioned.
+/agent/history/*.jsonl
+/agent/history/*.jsonl.tmp

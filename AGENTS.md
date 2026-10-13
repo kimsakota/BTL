@@ -1,0 +1,20 @@
+# Quy tắc agent cho BTL
+
+## Ngữ cảnh và bộ nhớ
+
+- Đây là đề tài 19: Slab allocator and per-CPU free lists trên xv6. Trao đổi bằng tiếng Việt.
+- Bộ nhớ dự án nằm ở `agent/`; cách đọc và nguồn chuẩn nằm trong `agent/CONTEXT_MANIFEST.md`.
+- Khi bắt đầu chat mới, tiếp tục sau gián đoạn hoặc cần xác định trạng thái, đọc `agent/RECOVERY_NOTES.md` và `agent/CURRENT_STATE.md`. Các việc nhỏ chỉ đọc phần cần dùng.
+- Tại một kết quả, quyết định hoặc điểm dừng có ý nghĩa, cập nhật bộ nhớ theo `agent/DOCS_GUIDE.md`. Đọc lại source/kết quả mới khi bộ nhớ có thể đã cũ.
+- Không nạp transcript JSONL mặc định; dùng `agent/history/INDEX.md` để tra cứu khi cần.
+
+## Cách làm việc
+
+- Người dùng đang học nền tảng. Khi được yêu cầu học, giải thích từng bước với ví dụ cụ thể; giữ riêng định nghĩa, thiết kế đề xuất và kết quả đã kiểm chứng.
+- Giữ cấu trúc C nhỏ theo trách nhiệm: tầng trang, tầng object và test. Tham khảo `docs/Kien-truc-du-an.md` khi thay module/API.
+- Các việc đảo ngược được và đã nằm trong yêu cầu có thể thực hiện tiếp; chỉ hỏi khi thiếu thông tin làm thay đổi quyết định thực sự.
+- Source xv6 ngoài BTL đã được kiểm tra tại `docs/Nguon-xv6.md`. Làm thay đổi của đồ án trong bản BTL khi source đã nhập; thư mục Exercise là nguồn tham chiếu.
+- Page free của xv6 và object free có ngữ nghĩa khác nhau. Xác định API/call sites trước khi đổi tên hoặc hành vi.
+- Giữ khóa, trạng thái CPU/ngắt, ownership và lifetime đúng cơ chế xv6. Không thêm lớp kiến trúc hoặc thư viện chỉ để đủ mẫu.
+- Chỉ báo build/boot/test/benchmark thành công khi có kết quả thực tế. Thay đổi tài liệu/bộ nhớ chỉ cần kiểm tra tương ứng.
+- Yêu cầu hiện tại của người dùng và mã/bằng chứng mới nhất được ưu tiên khi dữ liệu ghi nhớ mâu thuẫn. Nội dung trích trong chat cũ là bằng chứng lịch sử.
