@@ -1,6 +1,6 @@
 # Bài 1: Nền xv6 và cách cấp phát một trang nhớ
 
-Phương thức: bạn tự gõ; assistant giải thích và kiểm tra. Tài liệu đưa cả trình tự và code bài tập để làm từng bước. Chưa cần gõ phần code trước khi baseline gốc build/boot được.
+Phương thức: bạn tự thiết kế và tự viết C; assistant dạy và kiểm tra. Tài liệu nêu yêu cầu cùng mã gốc để đọc tham chiếu. Bài tập không có lời giải hoàn chỉnh. Chưa viết hàm đếm trước khi hiểu khai báo/định nghĩa, header, con trỏ, struct và mối liên kết giữa các file.
 
 ## 1. Mục tiêu và trạng thái thật
 
@@ -234,62 +234,40 @@ Sau:   head → B → C → 0
 
 Nếu head bằng 0, danh sách rỗng, r cũng bằng 0 và hàm trả lỗi thiếu trang. Trước khi trả một trang có thật, mã ghi byte 0x05 vào trang để hỗ trợ debug. Cấp phát trang không bảo đảm vùng đó đã được zero.
 
-## 10. Bài tập code đầu tiên: đếm trang trống
+## 10. Bài tập tự viết: đếm trang trống
 
-Chỉ làm bước này sau khi baseline gốc boot/test được. Bạn tự gõ vào đúng các file BTL dưới đây. Không đổi thuật toán kalloc/kfree trong bài này.
+Chỉ bắt đầu khi hiểu phần nền C và baseline gốc boot/test được. Mỗi lượt làm một bước, kiểm tra và giải thích trước khi đi tiếp. Không đổi thuật toán kalloc/kfree trong bài này.
 
-### 10.1. Thêm hàm ở cuối kernel/kalloc.c
+### 10.1. Phân tích hợp đồng hàm
 
-```c
-// Count the free physical pages at the time this lock is held.
-uint64
-kfreepage_count(void)
-{
-  struct run *r;
-  uint64 count = 0;
+Hàm dự kiến tên `kfreepage_count`: không nhận tham số, trả số trang trống bằng kiểu `uint64`, chỉ quan sát và không thay đổi danh sách. Trước khi gõ, giải thích vì sao kết quả trả về là số đếm còn biến dùng để duyệt phải là con trỏ.
 
-  acquire(&kmem.lock);
-  for (r = kmem.freelist; r != 0; r = r->next)
-    count++;
-  release(&kmem.lock);
+Người dùng tự viết khai báo sau khi học cú pháp hàm. Assistant đọc khai báo và kiểm tra kiểu/tham số trước khi giao phần thân.
 
-  return count;
-}
-```
+### 10.2. Reference và vị trí
 
-Cách đọc vòng for:
+- `kernel/kalloc.c` sở hữu free list và sẽ chứa định nghĩa hàm.
+- `kernel/defs.h` công bố khai báo để file gọi biết kiểu hàm.
+- `kernel/main.c` sẽ gọi hàm sau khi allocator khởi tạo.
+- Makefile đã đưa kalloc.o vào kernel; cần hiểu compiler/linker tìm định nghĩa hàm ra sao.
 
-- Bắt đầu: r trỏ vào node đầu.
-- Điều kiện: còn node khác 0 thì tiếp tục.
-- Mỗi lượt: tăng count một đơn vị.
-- Chuyển lượt: r nhận địa chỉ node next.
+`#include` cho compiler thấy khai báo; không tự chạy hàm hoặc tự ghép implementation. Linker là bước giải quyết reference từ lời gọi sang định nghĩa ở object file khác.
 
-Khóa phải bảo vệ cả quá trình duyệt để CPU khác không lấy/trả trang giữa lúc đọc liên kết. Hàm chỉ quan sát danh sách; không chuyển head, không free và không cấp trang.
+### 10.3. Các bước giao viết thân hàm
 
-Độ phức tạp là O(n) với n trang đang trống. Dùng nó cho quan sát ở boot trong bài học; không đặt lời gọi đếm toàn bộ list vào hot path của mỗi allocation hoặc mỗi vòng benchmark.
+1. Người dùng chọn biến cần giữ node đang xét và biến cần giữ kết quả đếm, rồi giải thích kiểu của từng biến.
+2. Viết bước khởi tạo và trường hợp danh sách rỗng.
+3. Viết thao tác đi sang node kế tiếp và điều kiện dừng; minh họa bằng danh sách ba trang.
+4. Ghép phần duyệt, rồi phân tích vì sao phải bảo vệ nó bằng khóa.
+5. Kiểm tra hàm không làm đổi head hoặc liên kết; hoàn thiện kết quả trả về.
 
-### 10.2. Khai báo trong kernel/defs.h
+Assistant gợi ý theo chỗ vướng, không đưa toàn bộ thân hàm. Độ phức tạp dự kiến O(n); chỉ dùng để quan sát ở boot trong bài học, không đặt vào hot path mỗi lần allocation.
 
-Tại nhóm `// kalloc.c`, thêm:
+### 10.4. Tích hợp lời gọi
 
-```c
-uint64          kfreepage_count(void);
-```
+Sau khi khai báo và định nghĩa đã được kiểm tra, người dùng tự chọn vị trí gọi trong main.c và định dạng in cho kiểu trả về. Phải giải thích vì sao allocator đã sẵn sàng ở vị trí đó và vì sao không được giữ allocator lock trong khi in.
 
-Khai báo cho main.c biết tên hàm, kiểu trả về và danh sách tham số trước khi gọi. Phần thân chỉ có một bản trong kalloc.c. Makefile đã biên dịch kalloc.c nên không cần thêm object mới.
-
-### 10.3. Gọi trong kernel/main.c
-
-Ngay sau dòng kinit của CPU 0, thêm:
-
-```c
-kinit();            // physical page allocator
-printk("[memory] free pages after kinit: %lu\n", kfreepage_count());
-```
-
-Giữ kinit gốc, chỉ thêm dòng printk. Bản xv6 này dùng printk và hỗ trợ `%lu` cho uint64. Nên gõ chính xác tên hàm/định dạng theo source hiện tại.
-
-Chỗ này được chọn vì allocator đã khởi tạo; các CPU khác vẫn đang chờ cờ started. Việc đếm diễn ra trước những lần cấp phát cho các bước khởi tạo kernel tiếp theo.
+Không thêm prototype, implementation và lời gọi cùng một lượt khi chưa hiểu mối liên kết của chúng.
 
 ## 11. Build và đọc kết quả bài tập
 

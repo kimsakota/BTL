@@ -11,6 +11,9 @@
 ## Cách làm việc
 
 - Người dùng đang học nền tảng. Khi được yêu cầu học, giải thích từng bước với ví dụ cụ thể; giữ riêng định nghĩa, thiết kế đề xuất và kết quả đã kiểm chứng.
+- Người dùng tự thiết kế và tự viết toàn bộ phần C của bài học/đề tài. Không tự thêm hoặc sửa implementation `.c/.h/.S`, và không đưa lời giải hoàn chỉnh để chép, trừ khi người dùng yêu cầu rõ việc đó.
+- Dạy từ thành phần nhỏ cần thiết: kiểu dữ liệu, hàm, khai báo/định nghĩa, header/include, con trỏ, struct, rồi cách compile/link và tích hợp. Với mỗi thành phần, giải thích trách nhiệm, dữ liệu vào/ra, reference/phụ thuộc và lý do liên kết trước khi giao bước tự viết.
+- Giao một bước nhỏ, để người dùng viết, đọc code/diff và đưa gợi ý sửa; người dùng thực hiện sửa. Chỉ cung cấp ví dụ minh họa hẹp hoặc gợi ý tăng dần khi cần, không nhảy tới implementation đầy đủ.
 - Giữ cấu trúc C nhỏ theo trách nhiệm: tầng trang, tầng object và test. Tham khảo `docs/Kien-truc-du-an.md` khi thay module/API.
 - Các việc đảo ngược được và đã nằm trong yêu cầu có thể thực hiện tiếp; chỉ hỏi khi thiếu thông tin làm thay đổi quyết định thực sự.
 - Source xv6 ngoài BTL đã được kiểm tra tại `docs/Nguon-xv6.md`. Làm thay đổi của đồ án trong bản BTL khi source đã nhập; thư mục Exercise là nguồn tham chiếu.

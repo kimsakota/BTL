@@ -11,6 +11,7 @@ Cập nhật: 13/10/2026.
 - Kiểm tra source xv6 ở Exercise, xác nhận phù hợp về mã nguồn.
 - Tích hợp bộ nhớ agent từ project-memory-skill Light và lưu snapshot hai chat liên quan.
 - Người dùng chọn tự gõ code, assistant hướng dẫn/kiểm tra. Đã nhập source riêng vào BTL, tạo lộ trình và Bài 1; Git baseline lưu bằng commit/tag local.
+- Người dùng làm rõ: phải tự thiết kế và viết C, hiểu mọi reference/phụ thuộc. Đã bỏ lời giải hoàn chỉnh của bài tập và đổi sang dạy/giao từng bước nhỏ.
 
 ### Đúng ở hiện tại
 
@@ -21,8 +22,8 @@ Cập nhật: 13/10/2026.
 
 ### Tiếp tục theo nhiệm vụ
 
-- Tiếp tục Bài 1 trong docs/lessons/01-baseline-va-kalloc.md: môi trường → baseline boot/test → người dùng tự gõ hàm đếm trang → assistant đọc diff và kiểm tra.
-- Không tự thêm code bài tập thay người dùng. Chuẩn bị nguồn/tài liệu và kiểm tra vẫn có thể thực hiện trong phạm vi được yêu cầu.
+- File bắt đầu học: docs/lessons/00-ham-header-va-lien-ket.md, trước tiên mục 0 về nguồn code xv6 và phạm vi đề tài, rồi mục 1–3. Sau đó nền C tiếp tục .c/.h/include → compile/link/reference → con trỏ/struct → phần tự viết hàm đếm.
+- Không tự thêm/sửa implementation hoặc cung cấp toàn bộ lời giải để gõ theo. Giao một bước nhỏ, người dùng viết, assistant đọc và gợi ý sửa để người dùng thực hiện.
 - Nếu người dùng muốn kiểm tra bộ nhớ: mở `CURRENT_STATE.md`, `LOGBOOK.md`, `history/INDEX.md`.
 
 ### Nguồn cần tin

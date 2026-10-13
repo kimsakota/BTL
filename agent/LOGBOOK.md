@@ -2,6 +2,27 @@
 
 Cập nhật: 13/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
 
+## L009 - 13/10/2026 - Phân biệt mã xv6 nền và phần tự viết của đề tài
+
+- type: learning-note / observation
+- summary: Người dùng hỏi vì sao kernel/ có nhiều code sẵn và có phải mã quản lý đề tài hay không.
+- explanation: kernel/, user/, mkfs/ và Makefile đến từ xv6 nền; docs/ và agent/ phục vụ tài liệu/bộ nhớ. Đề tài mở rộng quản lý bộ nhớ trong nhân xv6; người dùng tự viết phần mở rộng và tích hợp, sử dụng hệ điều hành nền có sẵn.
+- evidence: docs/Nguon-xv6.md, kernel/kalloc.c và git diff ở kernel/user/mkfs/Makefile không có thay đổi so với baseline local tại lần kiểm tra này.
+- changes: Bổ sung mục 0 vào Bài 0, cập nhật điểm tiếp tục. Không sửa implementation.
+- limitations: Mới giải thích ranh giới mã nền/phần đề tài; chưa kiểm tra người dùng đã nắm. Slab/per-CPU free lists chưa được triển khai; chưa build/boot.
+- next action: Đọc mục 0 trước khi học khai báo/định nghĩa hàm bằng source tham chiếu.
+- should promote to current state?: yes
+
+## L008 - 13/10/2026 - Làm rõ cách dạy và tự viết C
+
+- type: user-decision
+- summary: Người dùng yêu cầu tự viết toàn bộ phần C và hiểu tất cả reference/phụ thuộc, liên kết từng thành phần từ nhỏ đến cần thiết.
+- correction: Đưa một hàm hoàn chỉnh để gõ theo quá sớm không đáp ứng mục tiêu tự thiết kế/hiểu. Assistant nhận lỗi cách hướng dẫn và chuyển sang giao từng bước nhỏ.
+- decision: Assistant giải thích khái niệm, hợp đồng, kiểu dữ liệu, khai báo/định nghĩa, header/include và compile/link; người dùng tự viết và tự sửa. Assistant chỉ đọc/kiểm tra/gợi ý, không sửa implementation hay đưa lời giải toàn bộ nếu chưa được yêu cầu rõ.
+- changes: Cập nhật AGENTS.md, lộ trình và bài tập trong Bài 1; bỏ lời giải hàm đếm và các dòng tích hợp hoàn chỉnh. Chỉ sửa tài liệu/bộ nhớ, không thay mã C.
+- next action: Bắt đầu từ vai trò khai báo trong defs.h, định nghĩa trong kalloc.c và reference từ main.c; học con trỏ/struct rồi mới tự viết từng phần của hàm nhỏ.
+- should promote to current state?: yes
+
 ## L007 - 13/10/2026 - Bắt đầu học và code theo từng bài
 
 - type: user-decision / implementation / learning-note

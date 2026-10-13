@@ -1,8 +1,21 @@
 # Lộ trình vừa học vừa code đề tài 19
 
-Phương thức đã chọn: người dùng tự gõ code; assistant giải thích, đọc diff, kiểm tra và hướng dẫn sửa. Mỗi lượt tập trung một bài hoặc một phần của bài.
+Phương thức đã chọn: người dùng tự thiết kế và tự viết toàn bộ phần C của bài học/đề tài. Assistant dạy, giao yêu cầu nhỏ, đọc diff, kiểm tra và gợi ý sửa; không viết implementation hoặc đưa cả lời giải để người dùng chép. Mỗi lượt tập trung một phần nhỏ.
 
-Mỗi bài có: mục tiêu → lý thuyết → đọc mã → thay đổi nhỏ → chạy kiểm tra → giải thích kết quả. Chỉ chuyển tiếp khi điều kiện của bài trước đã được xác nhận.
+Mỗi phần có: mục tiêu → khái niệm → trách nhiệm và dữ liệu vào/ra → reference/phụ thuộc → yêu cầu tự viết → kiểm tra → giải thích kết quả. Hướng dẫn tăng dần từ câu hỏi hoặc gợi ý, không đưa ngay toàn bộ hàm.
+
+## Nền C phải học trước bài thực hành allocator
+
+Bắt đầu với [Bài 0: hàm, header và liên kết](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/00-ham-header-va-lien-ket.md>). Mỗi lượt đọc một phần, mở source được chỉ dẫn và tự giải thích trước khi viết code.
+
+1. Khai báo biến/kiểu dữ liệu và hàm: tham số, kiểu trả về, scope.
+2. Khai báo khác định nghĩa; `.h` khác `.c`; `#include` có tác dụng gì.
+3. Compiler tạo object file, linker giải quyết reference giữa các file; vai trò Makefile.
+4. Địa chỉ, `&`, con trỏ, `*`, `void *` và phép ép kiểu.
+5. Struct, dấu `.`/`->`, layout và lifetime.
+6. Danh sách liên kết và cách một trang trống chứa node.
+
+Các nội dung này được chia thành lượt nhỏ trước khi yêu cầu tự viết hàm đếm. Source xv6 đã nhập là bản tham chiếu và nền runtime; phần phát triển đề tài do người dùng viết.
 
 | Bài | Nội dung | Sản phẩm tự viết hoặc kiểm chứng |
 |---|---|---|

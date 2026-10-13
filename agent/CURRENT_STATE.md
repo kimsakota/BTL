@@ -4,7 +4,7 @@ Cập nhật: 13/10/2026.
 
 ## Project status
 
-- Giai đoạn: Bài 1, chuẩn bị môi trường và đọc allocator trang gốc.
+- Giai đoạn: Bài 0, nhận diện mã nền xv6 và học nền tảng C; môi trường build chưa sẵn sàng.
 - Mục tiêu: đề tài 19, Slab allocator and per-CPU free lists trên xv6; nối kiến thức từ BaoKhoaHoc/VstHelper.
 - Chủ dự án: người dùng trong chat này.
 - Đối tượng sử dụng: nhóm làm BTL/NCKH sinh viên; thông tin nhân lực và deadline chưa có.
@@ -31,16 +31,16 @@ Cập nhật: 13/10/2026.
 | OP-002 | Giữ cấu trúc nhỏ, chia module C theo trách nhiệm trong xv6 | Người dùng yêu cầu không thừa thãi; khung hiện tại theo hướng này | docs/Kien-truc-du-an.md | Có nhu cầu module độc lập thực tế | 13/10/2026 |
 | OP-003 | Tách sự thật đã kiểm chứng khỏi hướng thiết kế và giả thuyết | Đồ án chưa có implementation/benchmark | DOCS_GUIDE.md | Luôn áp dụng khi ghi kết quả | 13/10/2026 |
 | OP-004 | Dùng tài liệu Light và snapshot local, không chạy memory service nền | Phù hợp yêu cầu thêm thư mục agent cho dự án nhỏ | LOGBOOK.md L006 | Cần hooks/tìm kiếm memory phức tạp | 13/10/2026 |
-| OP-005 | Người dùng tự gõ code; assistant hướng dẫn, đọc diff và kiểm tra | Lựa chọn trực tiếp của người dùng trong lượt bắt đầu học A-Z | LOGBOOK.md L007 | Người dùng đổi cách thực hành | 13/10/2026 |
+| OP-005 | Người dùng tự thiết kế/viết toàn bộ phần C; assistant dạy từng thành phần, giải thích reference và kiểm tra, không đưa lời giải hoàn chỉnh hoặc sửa implementation thay | Người dùng làm rõ mục tiêu hiểu và tự viết, không chỉ gõ theo code mẫu | LOGBOOK.md L008 | Người dùng yêu cầu rõ cách làm khác | 13/10/2026 |
 
 ## Current context
 
 | Area | Current value | Source | Revisit when | Last checked |
 |---|---|---|---|---|
-| Current priority | Bài 1: cài môi trường, build/boot gốc, sau đó tự viết hàm đếm trang trống | docs/lessons/01-baseline-va-kalloc.md | Bài 1 được kiểm tra xong | 13/10/2026 |
+| Current priority | Đọc Bài 0 mục 0 để phân biệt mã nền xv6 với phần đề tài cần tự viết; sau đó mục 1–3 về hàm, khai báo và định nghĩa | docs/lessons/00-ham-header-va-lien-ket.md, LOGBOOK.md L009 | Người dùng đọc và trao đổi phần đầu | 13/10/2026 |
 | Main blocker for build | Chưa có distro WSL và chưa có toolchain Linux được xác nhận | Kiểm tra lại trong L007 | Hoàn tất môi trường | 13/10/2026 |
 | Learning progress | Đã trao đổi định nghĩa allocator/slab/per-CPU lists, metadata, pointer, bitmap, lifecycle và lỗi free | LOGBOOK.md L002 | Sau bài học tiếp theo | 13/10/2026 |
-| Next implementation step | Sau khi baseline boot/test: người dùng tự thêm kfreepage_count, prototype và lời gọi printk theo Bài 1 | docs/lessons/01-baseline-va-kalloc.md | Code đã gõ và kiểm tra | 13/10/2026 |
+| Next implementation step | Khi đủ nền C và baseline boot/test, giao hợp đồng hàm nhỏ để người dùng tự viết khai báo trước; kiểm tra rồi giao từng phần thân và tích hợp | docs/lessons/01-baseline-va-kalloc.md | Bước tự viết được kiểm tra | 13/10/2026 |
 
 ## Current constraints
 
