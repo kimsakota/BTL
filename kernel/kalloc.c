@@ -19,8 +19,8 @@ struct run {
 };
 
 struct {
-  struct spinlock lock;
-  struct run *freelist;
+  struct spinlock lock; // Khóa bảo vệ freelist khi nhiều CPU truy cập cùng lúc
+  struct run *freelist; 
 } kmem;
 
 void

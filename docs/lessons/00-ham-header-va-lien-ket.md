@@ -29,6 +29,16 @@ Một hàm có tên, có thể nhận dữ liệu qua tham số, thực hiện c
 
 Hàm kalloc của xv6 có nhiệm vụ lấy một trang trống. Không cần người gọi truyền kích thước vì allocator này cấp một trang cố định. Kết quả là địa chỉ trang, hoặc 0 nếu không lấy được trang.
 
+| Hợp đồng của kalloc | Ý nghĩa |
+|---|---|
+| Trách nhiệm | Cấp một trang bộ nhớ 4096 byte |
+| Tham số | Không nhận tham số; kích thước trang đã cố định |
+| Kết quả | Con trỏ tới trang được cấp; con trỏ rỗng khi không còn trang để cấp |
+| Dữ liệu phụ thuộc | Danh sách trang trống đã được khởi tạo trong kernel |
+| Thay đổi trạng thái | Khi lấy được trang, loại trang đó khỏi danh sách trống |
+
+Không nhận tham số không có nghĩa là hàm không dùng dữ liệu nào: kalloc vẫn dùng trạng thái allocator có sẵn trong kernel. Kết quả là vị trí của vùng nhớ được cấp, không phải con số 4096 hay bản sao dữ liệu của trang.
+
 ## 2. Khai báo: cho compiler biết cách gọi
 
 Mở [defs.h, dòng 60](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/defs.h:60>). Đây là một khai báo đã có trong source tham chiếu:
@@ -45,6 +55,8 @@ void* kalloc(void);
 | ; | Kết thúc khai báo, chưa có phần thân |
 
 Hai chữ void có vai trò khác nhau: void đi cùng dấu * trong kiểu trả về tạo kiểu pointer; void trong danh sách tham số thể hiện không có tham số.
+
+Phân biệt ba cách dùng: int ở vị trí kiểu kết quả là trả một số nguyên; void ở vị trí đó là không trả giá trị; void* ở vị trí đó là trả con trỏ tổng quát. Với void*, chưa thể dereference trực tiếp để đọc một giá trị có kiểu cụ thể; phần này sẽ được học riêng khi học con trỏ.
 
 Khai báo giúp compiler kiểm tra cách dùng hàm. Nó không chứa thao tác lấy trang và không tự tạo một hàm có thể chạy.
 
@@ -93,4 +105,12 @@ Sau mục 1–3, trả lời bằng lời của bạn:
 2. File nào chứa công việc thực tế của kalloc?
 3. Hai chữ void trong khai báo đang diễn tả điều gì?
 
-Assistant sẽ đọc câu trả lời và giải thích chỗ còn vướng. Sau đó mới tiếp tục include và compile/link, rồi đến bài tự viết khai báo. Tài liệu này không chứa lời giải cho hàm mới của đề tài.
+## 8. Bài tập nhỏ: tự viết một khai báo
+
+Đây là bài tập cú pháp, chưa phải API đã chốt cho đề tài. Tự viết đúng một dòng khai báo cho một hàm có tên dem_trang_trong, không nhận tham số và trả kết quả kiểu int. Chỉ viết khai báo, không viết thân hàm và không thêm vào source kernel. Gửi dòng bạn viết trong chat để assistant kiểm tra.
+
+Sau khi kiểm tra cách đọc và viết khai báo, tiếp tục include và compile/link, rồi nền con trỏ/struct trước bài implementation. Tài liệu này không chứa lời giải cho hàm mới của đề tài.
+
+## 9. Bài học tiếp theo
+
+Khi đọc xong bài này, tiếp tục [Bài 1: Bộ nhớ, con trỏ, struct và allocator trang xv6](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/01-baseline-va-kalloc.md>). Bài 1 có kiến thức đầy đủ theo từng phần và các bài tập nhỏ để bạn tự viết; không cần chờ một lượt giải thích lại Lesson 0 nếu bạn đã đọc xong.

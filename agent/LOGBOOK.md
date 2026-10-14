@@ -1,6 +1,31 @@
 # Nhật ký dự án
 
-Cập nhật: 13/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
+Cập nhật: 14/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
+
+## L011 - 14/10/2026 - Soạn Lesson 1 đầy đủ sau Lesson 0
+
+- type: user-decision / documentation
+- summary: Người dùng xác nhận đọc xong Lesson 0; yêu cầu nghiên cứu và tạo bài Lesson 1 Markdown đầy đủ, giải thích chi tiết từng phần. Không tiếp tục giữ bài học ở khai báo hàm Lesson 0.
+- result: Viết lại/mở rộng file Lesson 1 hiện có, giữ đường dẫn 01-baseline-va-kalloc.md để các liên kết cũ tiếp tục dùng. Nội dung gồm byte/địa chỉ, kiểu/typedef/ABI, pointer/&/*, cast/sizeof/bước pointer, struct/./->, list/metadata, source map và từng hàm allocator gốc, ownership/khóa, môi trường/baseline, bài nhỏ A–E và hàm đếm theo chặng.
+- sources: Source BTL và Makefile thực tế; MIT xv6 book/tools, WG14 N1570, RISC-V psABI, GCC Standards/Pointer Arithmetic, Microsoft WSL. Nguồn và phạm vi được ghi trong mục 15 của Lesson 1.
+- operating preference: Cung cấp tài liệu đủ cả bài khi chuyển lesson; việc tự code vẫn chia từng bước nhỏ, assistant chỉ giải thích/kiểm tra/gợi ý.
+- changes: Lesson 1, liên kết tiếp tục từ Lesson 0, README/lộ trình và bộ nhớ. Không thêm/sửa C/header/assembly/Makefile.
+- validation: Kiểm tra Markdown/code fences, thứ tự 16 mục 0–15, 44 liên kết local và giới hạn số dòng source trong các tài liệu liên quan; git diff --check phần tài liệu đạt. Diff kernel/user/mkfs/Makefile sau soạn bài giống snapshot trước, giữ nguyên thay đổi chú thích của người dùng.
+- limitations: Đã đọc xong Bài 0 là lời xác nhận của người dùng, không phải kiểm tra thành thạo; chưa có bài làm Lesson 1, chưa build/boot/test và chưa kiểm tra lại môi trường cài đặt.
+- next action: Người dùng đọc Lesson 1 theo chặng, gửi bài nhỏ đang làm; assistant đọc và hướng dẫn tiếp theo điểm thực tế.
+- should promote to current state?: yes
+
+## L010 - 14/10/2026 - Tiếp tục hợp đồng hàm và khai báo C
+
+- type: learning-note / observation
+- summary: Người dùng yêu cầu tiếp tục kiến thức sau phần phân biệt mã xv6 và phần đề tài.
+- covered topics: Trách nhiệm, tham số, kết quả và trạng thái phụ thuộc của kalloc; khai báo ở defs.h, định nghĩa ở kalloc.c; phân biệt void, void* và (void).
+- exercise: Tự viết một dòng khai báo cho hàm dem_trang_trong, không nhận tham số, trả int; gửi trong chat. Đây là bài tập cú pháp, không phải API đề tài đã chốt, không thêm vào source.
+- source checked: git diff kernel/defs.h và kernel/kalloc.c chỉ có chú thích/khoảng trắng; phần allocator chưa đổi. Không sửa các thay đổi đó thay người dùng.
+- changes: Bổ sung hợp đồng hàm và bài tập vào Bài 0, cập nhật điểm tiếp tục/bộ nhớ.
+- limitations: Chưa có bài làm để đánh giá mức độ hiểu; không kiểm tra lại môi trường hoặc chạy build/boot/test trong lượt này.
+- next action: Kiểm tra một dòng khai báo do người dùng tự viết, rồi giải thích header/include và compile/link.
+- should promote to current state?: yes
 
 ## L009 - 13/10/2026 - Phân biệt mã xv6 nền và phần tự viết của đề tài
 

@@ -17,9 +17,11 @@ Bắt đầu với [Bài 0: hàm, header và liên kết](<D:/2. FullStack/2026.
 
 Các nội dung này được chia thành lượt nhỏ trước khi yêu cầu tự viết hàm đếm. Source xv6 đã nhập là bản tham chiếu và nền runtime; phần phát triển đề tài do người dùng viết.
 
+Sau Bài 0, đọc [Bài 1: bộ nhớ, con trỏ, struct và allocator trang](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/01-baseline-va-kalloc.md>). Bài 1 đã được mở rộng ngày 14/10/2026 thành tài liệu đầy đủ theo từng chặng; phần nền C nằm trước phần chạy baseline và tự viết hàm đếm.
+
 | Bài | Nội dung | Sản phẩm tự viết hoặc kiểm chứng |
 |---|---|---|
-| 1 | Chuẩn bị baseline, build/boot; đọc allocator trang; đếm trang trống | xv6 gốc chạy được và hàm kfreepage_count |
+| 1 | Bộ nhớ, kiểu, con trỏ/cast/sizeof, struct, free list, ownership; đọc allocator gốc; baseline và hàm đếm | Các bài nhỏ tự viết/vẽ, xv6 gốc chạy được và hàm kfreepage_count do người dùng viết |
 | 2 | Race condition, spinlock, critical section, CPU ID và ngắt | Giải thích được vì sao thay freelist phải có khóa |
 | 3 | Free list riêng cho từng CPU | Local allocate/free, invariant trang thuộc một nơi |
 | 4 | Stealing đơn giản, lô một trang | CPU thiếu trang lấy được từ CPU khác, tránh giữ hai khóa |
@@ -38,9 +40,10 @@ Các bài 1–11 là đường tới phần bắt buộc. Bài 12 là phần m�
 ## Tiến độ hiện tại
 
 - Bản source riêng đã nhập vào BTL; metadata nguồn ở `docs/xv6-baseline.json`.
-- Kernel vẫn dùng allocator gốc; code bài tập chưa được gõ.
-- Bài 1 đang ở bước chuẩn bị môi trường: chưa có distro WSL và chưa xác nhận build/boot.
-- Bài học chi tiết: `docs/lessons/01-baseline-va-kalloc.md`.
+- Người dùng xác nhận đã đọc xong Bài 0; tiếp tục Bài 1, không yêu cầu lặp lại bài trước.
+- Kernel vẫn dùng thuật toán allocator gốc; diff kiểm tra 14/10 chỉ có chú thích/khoảng trắng ở defs.h và kalloc.c. Chưa có implementation hàm đếm.
+- Bài 1 đã soạn đủ kiến thức, source reference, bài tập từng chặng và hướng dẫn môi trường. Chưa có kết quả build/boot; lần kiểm tra WSL 13/10 chưa có distro, chưa kiểm tra lại môi trường trong lượt soạn bài.
+- Bài học chi tiết: [Bài 1](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/01-baseline-va-kalloc.md>).
 
 ## Cách gửi để kiểm tra
 

@@ -1,6 +1,6 @@
 # Điểm tiếp tục
 
-Cập nhật: 13/10/2026.
+Cập nhật: 14/10/2026.
 
 ## Checkpoint mới nhất
 
@@ -12,17 +12,20 @@ Cập nhật: 13/10/2026.
 - Tích hợp bộ nhớ agent từ project-memory-skill Light và lưu snapshot hai chat liên quan.
 - Người dùng chọn tự gõ code, assistant hướng dẫn/kiểm tra. Đã nhập source riêng vào BTL, tạo lộ trình và Bài 1; Git baseline lưu bằng commit/tag local.
 - Người dùng làm rõ: phải tự thiết kế và viết C, hiểu mọi reference/phụ thuộc. Đã bỏ lời giải hoàn chỉnh của bài tập và đổi sang dạy/giao từng bước nhỏ.
+- Người dùng xác nhận đã đọc xong Lesson 0 và yêu cầu bài kế tiếp đầy đủ trong Markdown. Đã viết lại/mở rộng Lesson 1 có nghiên cứu nguồn chính, lý thuyết chi tiết, source map và bài tập từng chặng; không sửa implementation.
 
 ### Đúng ở hiện tại
 
 - Root BTL có source kernel/Makefile và Git repo local, tag nền xv6-baseline.
 - Chưa triển khai slab/per-CPU lists hoặc chạy benchmark.
 - Source tham chiếu: `D:\2. FullStack\2026.1\Hệ điều hành\Excecise\4\xv6-riscv`, commit `06aad25c735fd3159bdfae5680be4eab7b1668b2`.
-- Đã kiểm tra lại: vẫn chưa có distro WSL. Chưa build/boot/test tại BTL; code bài tập chưa được gõ.
+- Môi trường lần kiểm tra 13/10/2026 chưa có distro WSL; chưa kiểm tra lại ngày 14/10. Chưa có kết quả build/boot/test tại BTL.
+- Kiểm tra diff 14/10: defs.h và kalloc.c có thêm chú thích/khoảng trắng, chưa đổi phần xử lý allocator.
 
 ### Tiếp tục theo nhiệm vụ
 
-- File bắt đầu học: docs/lessons/00-ham-header-va-lien-ket.md, trước tiên mục 0 về nguồn code xv6 và phạm vi đề tài, rồi mục 1–3. Sau đó nền C tiếp tục .c/.h/include → compile/link/reference → con trỏ/struct → phần tự viết hàm đếm.
+- File học hiện tại: docs/lessons/01-baseline-va-kalloc.md, bản mở rộng 14/10/2026. Người dùng đã đọc xong Lesson 0; không bắt đọc lại. Bài 1 đi theo byte/địa chỉ/kiểu → pointer/cast/sizeof → struct/list/metadata → source allocator → ownership/khóa → baseline → tự viết hàm đếm. Có chặng A–D và bài nhỏ A–E.
+- Bước thực hành đầu tiên nếu chưa làm: bài nhỏ A mục 3.4 trong chat. Sau đó theo chặng tương ứng; chỉ kiểm tra mức độ hiểu khi có câu trả lời/bài làm, không suy ra thành thạo từ việc đọc.
 - Không tự thêm/sửa implementation hoặc cung cấp toàn bộ lời giải để gõ theo. Giao một bước nhỏ, người dùng viết, assistant đọc và gợi ý sửa để người dùng thực hiện.
 - Nếu người dùng muốn kiểm tra bộ nhớ: mở `CURRENT_STATE.md`, `LOGBOOK.md`, `history/INDEX.md`.
 

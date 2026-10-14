@@ -1,10 +1,10 @@
 # Trạng thái hiện tại
 
-Cập nhật: 13/10/2026.
+Cập nhật: 14/10/2026.
 
 ## Project status
 
-- Giai đoạn: Bài 0, nhận diện mã nền xv6 và học nền tảng C; môi trường build chưa sẵn sàng.
+- Giai đoạn: Người dùng xác nhận đã đọc xong Bài 0; đã soạn Bài 1 đầy đủ, tiếp tục nền C/bộ nhớ và allocator trang. Chưa có kết quả runtime.
 - Mục tiêu: đề tài 19, Slab allocator and per-CPU free lists trên xv6; nối kiến thức từ BaoKhoaHoc/VstHelper.
 - Chủ dự án: người dùng trong chat này.
 - Đối tượng sử dụng: nhóm làm BTL/NCKH sinh viên; thông tin nhân lực và deadline chưa có.
@@ -18,7 +18,7 @@ Cập nhật: 13/10/2026.
 | CST-003 | Source xv6 phù hợp nằm ở thư mục Exercise được người dùng cung cấp | Cao | docs/Nguon-xv6.md | Import hoặc đổi baseline | 13/10/2026 |
 | CST-004 | Baseline nguồn được kiểm tra là commit 06aad25c735fd3159bdfae5680be4eab7b1668b2 của mit-pdos/xv6-riscv | Cao | docs/Nguon-xv6.md | HEAD nguồn thay đổi | 13/10/2026 |
 | CST-005 | Source đó dùng free list trang chung, PGSIZE=4096, NCPU=8; chưa có slab/stealing trong phần đã kiểm tra | Cao | docs/Nguon-xv6.md và kernel nguồn | Thay allocator hoặc phiên bản | 13/10/2026 |
-| CST-006 | Đã nhập 81 file source/cấu hình xv6 vào BTL; chưa sửa thuật toán allocator hoặc chạy benchmark | Cao | docs/xv6-baseline.json, cây file tại root BTL | Bắt đầu viết code bài tập | 13/10/2026 |
+| CST-006 | Đã nhập 81 file source/cấu hình xv6 vào BTL; kernel/defs.h và kernel/kalloc.c có thêm chú thích/khoảng trắng, chưa đổi thuật toán allocator | Cao | docs/xv6-baseline.json, git diff kernel/defs.h và kernel/kalloc.c | Bắt đầu viết implementation | 14/10/2026 |
 | CST-007 | Lần kiểm tra môi trường cho thấy chưa có distro WSL; chưa xác nhận build/boot hiện tại | Cao tại thời điểm kiểm tra | README.md, LOGBOOK.md L004 | Trước build/run hoặc sau cài môi trường | 13/10/2026 |
 | CST-008 | Bộ nhớ project-memory Light được tích hợp ở agent/, nối qua AGENTS.md | Cao | agent/README.md và các file bộ nhớ | Đổi bộ khung memory | 13/10/2026 |
 | CST-009 | Git repo local đã khởi tạo ở BTL, branch main; baseline được lưu bằng commit và tag xv6-baseline | Cao | Git repo BTL và LOGBOOK.md L007 | Thay nền source | 13/10/2026 |
@@ -32,15 +32,16 @@ Cập nhật: 13/10/2026.
 | OP-003 | Tách sự thật đã kiểm chứng khỏi hướng thiết kế và giả thuyết | Đồ án chưa có implementation/benchmark | DOCS_GUIDE.md | Luôn áp dụng khi ghi kết quả | 13/10/2026 |
 | OP-004 | Dùng tài liệu Light và snapshot local, không chạy memory service nền | Phù hợp yêu cầu thêm thư mục agent cho dự án nhỏ | LOGBOOK.md L006 | Cần hooks/tìm kiếm memory phức tạp | 13/10/2026 |
 | OP-005 | Người dùng tự thiết kế/viết toàn bộ phần C; assistant dạy từng thành phần, giải thích reference và kiểm tra, không đưa lời giải hoàn chỉnh hoặc sửa implementation thay | Người dùng làm rõ mục tiêu hiểu và tự viết, không chỉ gõ theo code mẫu | LOGBOOK.md L008 | Người dùng yêu cầu rõ cách làm khác | 13/10/2026 |
+| OP-006 | Khi chuyển bài, soạn Markdown đầy đủ kiến thức và chi tiết từng phần; thực hành chia chặng nhỏ, không giữ người dùng ở Lesson 0 khi họ đã xác nhận đọc xong | Người dùng yêu cầu tạo Lesson 1 đầy đủ, có nghiên cứu và source reference | LOGBOOK.md L011 | Người dùng đổi cách học | 14/10/2026 |
 
 ## Current context
 
 | Area | Current value | Source | Revisit when | Last checked |
 |---|---|---|---|---|
-| Current priority | Đọc Bài 0 mục 0 để phân biệt mã nền xv6 với phần đề tài cần tự viết; sau đó mục 1–3 về hàm, khai báo và định nghĩa | docs/lessons/00-ham-header-va-lien-ket.md, LOGBOOK.md L009 | Người dùng đọc và trao đổi phần đầu | 13/10/2026 |
+| Current priority | Đọc Bài 1 theo chặng A–D; bắt đầu nền byte/địa chỉ/kiểu và con trỏ, bài nhỏ A mục 3.4 nếu chưa tự làm. Người dùng đã xác nhận đọc xong Lesson 0 | docs/lessons/01-baseline-va-kalloc.md, LOGBOOK.md L011 | Người dùng gửi bài hoặc yêu cầu bài tiếp theo | 14/10/2026 |
 | Main blocker for build | Chưa có distro WSL và chưa có toolchain Linux được xác nhận | Kiểm tra lại trong L007 | Hoàn tất môi trường | 13/10/2026 |
-| Learning progress | Đã trao đổi định nghĩa allocator/slab/per-CPU lists, metadata, pointer, bitmap, lifecycle và lỗi free | LOGBOOK.md L002 | Sau bài học tiếp theo | 13/10/2026 |
-| Next implementation step | Khi đủ nền C và baseline boot/test, giao hợp đồng hàm nhỏ để người dùng tự viết khai báo trước; kiểm tra rồi giao từng phần thân và tích hợp | docs/lessons/01-baseline-va-kalloc.md | Bước tự viết được kiểm tra | 13/10/2026 |
+| Learning progress | Người dùng xác nhận đã đọc xong Bài 0. Bài 1 đầy đủ đã soạn, chưa nhận bài làm để đánh giá các chặng. Không đồng nhất đọc xong với đã chạy code hoặc thành thạo | LOGBOOK.md L011 | Sau bài học tiếp theo | 14/10/2026 |
+| Next implementation step | Sau nền C và baseline boot/test, người dùng tự viết khai báo hàm đếm, biến/vòng duyệt, khóa, rồi tự nối defs.h/kalloc.c/main.c theo mục 13; kiểm tra từng phần | docs/lessons/01-baseline-va-kalloc.md | Bước tự viết được kiểm tra | 14/10/2026 |
 
 ## Current constraints
 

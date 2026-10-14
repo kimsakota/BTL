@@ -57,7 +57,7 @@ void            itrunc(struct inode*);
 void            ireclaim(int);
 
 // kalloc.c
-void*           kalloc(void);
+void*           kalloc(void); // Allocates one 4096-byte page of physical memory.   
 void            kfree(void *);
 void            kinit(void);
 

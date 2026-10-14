@@ -18,7 +18,8 @@ Giữ cây thư mục tiêu chuẩn của xv6 tại root BTL: `kernel/`, `user/`
 - [Workspace VS Code](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/BTL.code-workspace>).
 - [Bộ nhớ agent và lịch sử làm việc](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/agent/README.md>).
 - [Lộ trình vừa học vừa code](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Lo-trinh-hoc.md>).
-- [Bài 1: baseline và allocator trang](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/01-baseline-va-kalloc.md>).
+- [Bài 0: hàm, header và liên kết](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/00-ham-header-va-lien-ket.md>).
+- [Bài 1: bộ nhớ, con trỏ, struct và allocator trang xv6](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/01-baseline-va-kalloc.md>).
 
 Các đường dẫn trên trỏ đến workspace hiện tại. Khi chuyển dự án sang vị trí khác, dùng các file cùng tên trong `docs/`.
 
