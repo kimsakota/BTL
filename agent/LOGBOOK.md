@@ -1,6 +1,30 @@
 # Nhật ký dự án
 
-Cập nhật: 14/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
+Cập nhật: 15/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
+
+## L013 - 15/10/2026 - Gợi ý chú thích và nhắc commit sau từng phần code
+
+- type: user-decision / documentation
+- summary: Người dùng yêu cầu thêm quy tắc: với phần hướng dẫn có sửa code, sau khi xong một phần người dùng sẽ commit lên GitHub; assistant thêm gợi ý chú thích và lời nhắc.
+- decision: Mỗi checkpoint code có ý nghĩa nêu thay đổi/kiểm tra thật, gợi ý chú thích giải thích lý do và hợp đồng, đề xuất commit message phù hợp, chỉ rõ file/hunk và nhắc tự commit local rồi push remote. Kể cả sửa chú thích source cũng thuộc quy tắc; bài chỉ làm trên giấy/chat chưa thay file không có mốc commit code.
+- ownership: Người dùng tự viết chú thích/code và tự stage/commit/push. Assistant chỉ hướng dẫn/nhắc, không thực hiện Git write/publish khi chưa có yêu cầu rõ.
+- changes: AGENTS.md, quyết định OP-007, recovery, mục chốt phần code trong lộ trình và phần gợi ý chú thích/commit của Lesson 1/2.
+- limitations: Lượt này chỉ lưu quy tắc/cập nhật tài liệu, không sửa C và không stage/commit/push.
+- next action: Áp dụng quy tắc khi kiểm tra một phần code do người dùng hoàn thành hoặc soạn lesson có phần tự viết.
+- should promote to current state?: yes
+
+## L012 - 15/10/2026 - Tạo Lesson 2 về đồng bộ, CPU và ngắt
+
+- type: documentation / observation
+- summary: Người dùng yêu cầu tạo bài tiếp theo sau Lesson 1; giữ cách soạn Markdown đầy đủ và hướng dẫn tự viết từng phần.
+- result: Tạo docs/lessons/02-race-spinlock-va-cpu.md với race/lost update, critical section/invariant, atomic/spinlock/acquire-release, ordering/volatile, ngắt/CSRRC, noff/intena có mức lồng, cpuid/mycpu/migration, deadlock/lock order, định hướng per-CPU và helper quan sát tự viết. Có bảng, sơ đồ, bài phân tích A–F, source map và nguồn nghiên cứu.
+- sources: spinlock.c/.h, proc.c/.h, riscv.h, start.c, trap.c, kalloc.c, main.c, sleeplock.c và Makefile trong BTL; MIT xv6 book/lock lab, GCC atomics/volatile, WG14 N1570 và RISC-V ISA.
+- source observations: push_off dùng rc_sstatus đọc/xóa SIE; diff source hiện tại ở kalloc.c/proc.h chỉ thêm chú thích. user/kalloctest.c và kernel/kcsan.c không có; không áp lệnh test lab như đã sẵn sàng tại BTL.
+- changes: Lesson 2, liên kết từ Lesson 1/README/lộ trình và bộ nhớ. Không sửa implementation hoặc thư mục .vs/.
+- validation: Kiểm tra 7 tài liệu, 73 liên kết local/số dòng, code fences, thứ tự mục 0–15 và 6 đoạn source atomic/push_off/holding/mycpu; git diff --check tài liệu đạt. Diff kernel/user/mkfs/Makefile sau soạn bài giống snapshot đầu lượt, giữ nguyên các thay đổi của người dùng.
+- limitations: Chưa có bài làm/helper mới hoặc kết quả build/boot/test; không kiểm tra lại cài môi trường. Yêu cầu tạo bài tiếp theo không tự xác nhận đã hoàn thành runtime Lesson 1.
+- next action: Người dùng đọc Lesson 2 theo chặng, gửi bài đang làm hoặc yêu cầu Lesson 3; kiểm tra/dạy theo điểm thực tế, giữ quyền tự viết C của người dùng.
+- should promote to current state?: yes
 
 ## L011 - 14/10/2026 - Soạn Lesson 1 đầy đủ sau Lesson 0
 

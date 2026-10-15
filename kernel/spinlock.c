@@ -19,7 +19,7 @@ initlock(struct spinlock *lk, char *name)
 // Acquire the lock.
 // Loops (spins) until the lock is acquired.
 void
-acquire(struct spinlock *lk)
+acquire(struct spinlock *lk) 
 {
   push_off(); // disable interrupts to avoid deadlock.
   if (holding(lk))

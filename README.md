@@ -20,6 +20,7 @@ Giữ cây thư mục tiêu chuẩn của xv6 tại root BTL: `kernel/`, `user/`
 - [Lộ trình vừa học vừa code](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Lo-trinh-hoc.md>).
 - [Bài 0: hàm, header và liên kết](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/00-ham-header-va-lien-ket.md>).
 - [Bài 1: bộ nhớ, con trỏ, struct và allocator trang xv6](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/01-baseline-va-kalloc.md>).
+- [Bài 2: race condition, spinlock, CPU ID và trạng thái ngắt](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/02-race-spinlock-va-cpu.md>).
 
 Các đường dẫn trên trỏ đến workspace hiện tại. Khi chuyển dự án sang vị trí khác, dùng các file cùng tên trong `docs/`.
 

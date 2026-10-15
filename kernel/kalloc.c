@@ -26,8 +26,8 @@ struct {
 void
 kinit()
 {
-  initlock(&kmem.lock, "kmem");
-  freerange(end, (void *)PHYSTOP);
+  initlock(&kmem.lock, "kmem"); // Khởi tạo khóa 
+  freerange(end, (void *)PHYSTOP); // Khởi tạo các page free  
 }
 
 void
@@ -56,10 +56,10 @@ kfree(void *pa)
 
   r = (struct run *)pa;
 
-  acquire(&kmem.lock);
+  acquire(&kmem.lock); // Yêu cầu quyền truy cập vào kmem.lock để đảm bảo rằng không có CPU nào khác đang truy cập vào freelist cùng lúc  
   r->next = kmem.freelist;
   kmem.freelist = r;
-  release(&kmem.lock);
+  release(&kmem.lock); // Giải phóng quyền truy cập vào kmem.lock để cho phép các CPU khác truy cập vào freelist
 }
 
 // Allocate one 4096-byte page of physical memory.

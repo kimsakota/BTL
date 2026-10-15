@@ -21,3 +21,5 @@ __pycache__/
 # Local chat snapshots; keep the curated memory and index versioned.
 /agent/history/*.jsonl
 /agent/history/*.jsonl.tmp
+
+.vs/

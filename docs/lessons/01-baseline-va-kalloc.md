@@ -1135,6 +1135,21 @@ số trang = (PHYSTOP - PGROUNDUP(địa chỉ end)) / PGSIZE
 
 Một số đếm đúng lúc boot và quick tests pass là bằng chứng cho phạm vi đó; chưa chứng minh correctness của slab/per-CPU lists trên nhiều CPU.
 
+### 13.9. Gợi ý chú thích và nhắc commit khi chốt phần code
+
+Khi bạn hoàn thành một phần có thay đổi source, assistant sẽ đọc phần đó, gợi ý chú thích và nhắc commit/push theo [quy trình chốt phần code](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Lo-trinh-hoc.md>).
+
+Với hàm đếm, các ý cần được bạn tự chú thích khi phù hợp:
+
+- Hàm chỉ quan sát số trang trống, không lấy/trả trang hoặc sửa head/next.
+- Giữ khóa suốt lần duyệt vì CPU khác có thể lấy một node rồi ghi đè nội dung trang.
+- Kết quả là snapshot; số trang có thể đổi sau khi hàm trả về.
+- Caller in sau khi đã thả allocator lock; điểm gọi quyết định số liệu là sau kinit hay sau các bước khởi tạo khác.
+
+**Mốc gợi ý:** sau khi hàm đếm, khai báo và caller đã được bạn tích hợp, giải thích và kiểm tra, gợi ý message là `feat(memory): add free-page counting`. Nếu mốc hiện tại chỉ thêm chú thích, dùng message phản ánh đúng việc thêm chú thích.
+
+**Nhắc bạn:** xem diff và kết quả kiểm tra của phần vừa làm, tự stage đúng file/hunk, commit local rồi push lên GitHub. Ghi rõ kiểm tra nào đã chạy hoặc chưa chạy. Các file dự kiến cho bài hàm đếm là kalloc.c, defs.h và main.c; đối chiếu diff thật trước khi chọn.
+
 ## 14. Tự kiểm tra, tiêu chí hoàn thành và phần tiếp theo
 
 ### 14.1. Câu hỏi theo từng nhóm
@@ -1177,7 +1192,7 @@ Không cần trả lời tất cả trong một lượt. Chọn nhóm tương �
 
 ### 14.3. Bước học sau
 
-Bài 2 sẽ tập trung vào race condition, critical section, spinlock, trạng thái ngắt và CPU ID. Sau khi hiểu những cơ chế đó mới triển khai free list theo CPU và stealing.
+Tiếp tục [Bài 2: Race condition, spinlock, CPU ID và trạng thái ngắt](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/02-race-spinlock-va-cpu.md>). Bài 2 đi sâu critical section, atomic/order và push_off/pop_off. Sau khi hiểu những cơ chế đó mới triển khai free list theo CPU và stealing.
 
 Trong Bài 1, giữ allocator gốc để hiểu rõ điểm xuất phát. Slab và per-CPU lists còn là phần bạn sẽ thiết kế/viết trong các bài tiếp theo.
 
