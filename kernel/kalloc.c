@@ -74,7 +74,7 @@ kalloc(void)
 {
   struct run *r;
 
-  // Giữ khóa khi nối trang trả về vào freelist 
+  // Giữ khóa khi nối trang trả về vào freelist
   acquire(&kmem.lock);
   r = kmem.freelist;
   if (r)
