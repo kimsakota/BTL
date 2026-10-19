@@ -60,6 +60,7 @@ void            ireclaim(int);
 void*           kalloc(void); // Allocates one 4096-byte page of physical memory.   
 void            kfree(void *);
 void            kinit(void);
+uint64          kfreepage_count(void); // Returns the number of free pages in the physical memory.
 
 // log.c
 void            initlog(int, struct superblock*);

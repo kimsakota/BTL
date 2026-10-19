@@ -1095,7 +1095,7 @@ Kiểm tra source ngày 15/10/2026: allocator vẫn là một list/lock chung. T
 
 Lượt soạn bài chỉ sửa tài liệu/bộ nhớ. Chưa kiểm tra lại cài đặt môi trường và chưa build/boot/test; kết quả kiểm tra WSL gần nhất trong bộ nhớ là 13/10/2026.
 
-### 14.4. Chuẩn bị Lesson 3
+### 14.4. Tiếp tục Lesson 3
 
 Bài tiếp theo sẽ hướng dẫn **thiết kế và tự viết free list riêng theo CPU**:
 
@@ -1105,7 +1105,7 @@ Bài tiếp theo sẽ hướng dẫn **thiết kế và tự viết free list ri
 - Giữ API lấy/trả trang với ownership rõ.
 - Xác định tình huống local hết trang trước khi học stealing đầy đủ.
 
-Những câu hỏi này cần Lesson 1 về list và Lesson 2 về đồng bộ. Bạn tự viết code từng phần; assistant kiểm tra/gợi ý. Lesson 3 chưa được tạo trong lượt này.
+Những câu hỏi này cần Lesson 1 về list và Lesson 2 về đồng bộ. Bạn tự viết code từng phần; assistant kiểm tra/gợi ý. Tiếp tục [Lesson 3: Thiết kế và tự viết free list theo CPU](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/03-per-cpu-free-lists.md>), đã soạn ngày 17/10/2026, gồm hai mốc thực hành và phần chú thích/commit.
 
 ## 15. Nguồn nghiên cứu và phạm vi kiểm chứng
 

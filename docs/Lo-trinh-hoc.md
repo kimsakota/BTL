@@ -65,11 +65,13 @@ Sau Bài 0, đọc [Bài 1: bộ nhớ, con trỏ, struct và allocator trang](<
 
 Tiếp theo là [Bài 2: race condition, spinlock, CPU ID và trạng thái ngắt](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/02-race-spinlock-va-cpu.md>), soạn ngày 15/10/2026. Bài có code tham chiếu, bảng noff/intena, bài phân tích A–F và một helper quan sát do người dùng tự viết khi môi trường sẵn sàng.
 
+[Bài 3: thiết kế và tự viết free list theo CPU](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/03-per-cpu-free-lists.md>) được soạn ngày 17/10/2026. M1 đổi state thành mảng pool nhưng vẫn dùng pool 0 để giữ hành vi chung; M2 thêm local path, chưa stealing, kiểm chứng trong phạm vi CPUS=1. Bài cập nhật hàm đếm đang có, kèm gợi ý chú thích và mốc commit/push. Lesson 4 bổ sung remote allocation trước khi đặt tiêu chí nhiều CPU.
+
 | Bài | Nội dung | Sản phẩm tự viết hoặc kiểm chứng |
 |---|---|---|
 | 1 | Bộ nhớ, kiểu, con trỏ/cast/sizeof, struct, free list, ownership; đọc allocator gốc; baseline và hàm đếm | Các bài nhỏ tự viết/vẽ, xv6 gốc chạy được và hàm kfreepage_count do người dùng viết |
 | 2 | Race/critical section, atomic/acquire-release, spinlock, push_off/pop_off, CPU ID và deadlock | Bảng diễn tiến race/khóa/noff-intena, giải thích vùng ổn định CPU, helper quan sát nếu tự thực hành |
-| 3 | Free list riêng cho từng CPU | Local allocate/free, invariant trang thuộc một nơi |
+| 3 | Mảng pool, init mọi khóa, local allocate/free, count qua các pool | M1 giữ pool 0; M2 local-only CPUS=1; invariant/guard đúng và giới hạn chưa stealing rõ |
 | 4 | Stealing đơn giản, lô một trang | CPU thiếu trang lấy được từ CPU khác, tránh giữ hai khóa |
 | 5 | Kiểm thử tầng trang | Bảo toàn trang, OOM, nhiều CPU, lỗi pointer |
 | 6 | Slab đầu tiên: một trang, một kích thước object | Metadata, layout, bitmap và cấp/trả slot |
@@ -86,10 +88,10 @@ Các bài 1–11 là đường tới phần bắt buộc. Bài 12 là phần m�
 ## Tiến độ hiện tại
 
 - Bản source riêng đã nhập vào BTL; metadata nguồn ở `docs/xv6-baseline.json`.
-- Người dùng xác nhận đã đọc xong Bài 0; Bài 1 đã soạn và hiện yêu cầu tạo tiếp Bài 2. Chưa có bài làm/output để đánh giá hoàn thành thực hành Bài 1.
-- Kernel vẫn dùng thuật toán allocator gốc; diff kiểm tra 15/10 ở kalloc.c và proc.h chỉ thêm chú thích. Chưa có implementation hàm đếm/per-CPU/slab.
-- Bài 1 và Bài 2 đã soạn đầy đủ, chia kiến thức và bài tập theo chặng. Chưa có kết quả build/boot; lần kiểm tra WSL 13/10 chưa có distro, chưa kiểm tra lại môi trường trong lượt soạn bài.
-- Bài học tiếp theo đã tạo: [Bài 2](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/02-race-spinlock-va-cpu.md>).
+- Đã soạn Lesson 0–3. Không suy ra hoàn thành code/test của bài trước chỉ từ việc yêu cầu bài tiếp theo.
+- Source 17/10 đã có hàm đếm trang, prototype defs.h và caller sau kinit trong main.c. Allocator vẫn một list/lock chung; chưa có per-CPU/slab.
+- Chưa có kết quả build/boot/test được đối chiếu; lần kiểm tra WSL 13/10 chưa có distro, chưa kiểm tra lại môi trường trong lượt soạn bài.
+- Bài học mới nhất: [Bài 3](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/03-per-cpu-free-lists.md>).
 
 ## Cách gửi để kiểm tra
 

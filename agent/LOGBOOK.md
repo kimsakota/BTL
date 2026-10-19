@@ -1,6 +1,38 @@
 # Nhật ký dự án
 
-Cập nhật: 15/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
+Cập nhật: 19/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
+
+## L015 - 19/10/2026 - Nghiên cứu quy trình nhóm 26118 và báo cáo tuần
+
+- type: user-context / research / documentation
+- summary: Người dùng xác nhận tên Linh, muốn tham gia nhiều/hiểu toàn bộ và chia phần riêng cho ba thành viên như cách làm việc thực tế; cung cấp ảnh đề tài, thông báo, template PDF và sample PDF.
+- facts: Mã 26118, đề tài 19; Nguyễn Kim Linh 20233495, Lê Trần Hiếu Minh 20233528, Nguyễn An Khánh 20224019. Báo cáo ít nhất mỗi tuần, cùng thread môn học, mọi người có đóng góp, nối TODO trước và cho phép sai khác 25%; template có năm phần, summary 200–300 từ.
+- user clarification: Trong lúc nghiên cứu, Linh xác nhận tuần này mới bắt đầu dự án nhóm, phần đang học là học trước. W1 theo lịch là 19–25/10/2026; không gộp Lesson/code/tài liệu chuẩn bị cá nhân thành kết quả nhóm W01. Đã tách task khởi động K01–K04 khỏi TODO W2 N01–N04 có điều kiện đầu vào.
+- method: Đọc chat được chỉ định qua read_thread; đọc memory/kiến trúc/source/Git/CI; trích và render hai PDF; xem ảnh; kiểm tra tài liệu chính MIT lock lab, Bonwick/USENIX, GitHub Flow/Projects/CODEOWNERS và QEMU MTTCG.
+- observation: Source vẫn list/lock chung với kfreepage_count/prototype/caller; chưa perCPU/slab. Không có user/kalloctest.c hoặc kernel/kcsan.c. CI file có nhưng không kiểm chứng pipeline. Baseline tag e287830, HEAD c829ab9, working tree có thay đổi từ trước; remote kimsakota/BTL.
+- proposal: Một repo/ba clone, nhánh ngắn theo task, API nhỏ, PR/review chéo. Linh page/buffer/tích hợp, Minh slab/file, Khánh test/inode; Linh học toàn luồng bằng review/teach-back/reproduce. Slab phát triển trên page gốc để song song; ba client chính file/inode/buf, pipe thử trước. Chưa được nhóm chốt phân công.
+- outputs: docs/Quy-trinh-nhom-26118.md; docs/Ke-hoach-va-backlog-26118.md; docs/bao-cao/README.md; bản nháp W01 Markdown/PDF; mẫu task/PR local .github; liên kết README và bộ nhớ.
+- report status: PDF ba trang, summary 251 từ theo whitespace; kiểm tra lại bản render sau khi cập nhật bối cảnh khởi động. Ngày from/to thực tế, đóng góp thực Minh/Khánh, xác nhận phần của Linh và URL design/board còn thiếu; nhãn DRAFT rõ ràng, không nộp thay nhóm. Không lấy tiến độ/test/công cụ nhóm mẫu làm dữ kiện nhóm này.
+- validation: Kiểm tra 10 Markdown, 21 liên kết local, code fences và đối chiếu ID K01–K04/N01–N04; summary 251 từ, PDF đủ mục/MSSV, ba trang, text bounds hợp lệ; xem cả ba PNG bản cuối. git diff --check tài liệu đạt. Diff kernel/user/mkfs/Makefile giống đầu lượt và SHA256 kalloc.c/defs.h/main.c/Makefile giữ nguyên. Không chạy build/boot/test/benchmark.
+- limitations: Đã biết tuần khởi động nhưng chưa biết giờ nộp chính thức/hạn cuối kỳ; đề xuất tổng hợp nội bộ 24/10 chỉ là lịch nhóm. W01 còn là khung chờ đầu ra cuối tuần. Công thức sai khác 25% chưa do giảng viên xác nhận; không tự gán phần trăm tiến độ. Mẫu/plan không chứng minh ba thành viên đã đóng góp.
+- actions not performed: Không sửa implementation C/h/S/Makefile, không stage/commit/push, không tạo board/issue/PR hoặc gửi tin/báo cáo ra ngoài.
+- next action: Nhận kỳ/hạn và contributions thật, chỉnh bản nháp theo đúng thời gian; hoặc tiếp tục tự code Lesson 3 khi Linh quay lại học.
+- should promote to current state?: yes, chỉ thông tin nhóm/yêu cầu/đầu ra, phân công giữ nhãn đề xuất.
+
+## L014 - 17/10/2026 - Tạo Lesson 3 về free list theo CPU
+
+- type: documentation / observation
+- summary: Người dùng yêu cầu file Markdown Lesson 3; giữ cách dạy đầy đủ, tự viết C, gợi ý chú thích và nhắc commit/push từng phần.
+- source update: Kalloc.c đã có kfreepage_count với lock bao vòng duyệt, defs.h có prototype, main.c gọi/in ngay sau kinit. Đây là bằng chứng source, chưa xác nhận runtime; thay kết luận cũ chưa có hàm đếm.
+- result: Tạo docs/lessons/03-per-cpu-free-lists.md với pool/mảng struct, lifetime tên khóa, init trước freerange, ownership/invariant, guard/local free-alloc, count nhiều pool và bản đồ reference. Có bài A–I và mốc M0/M1/M2 để người dùng tự code/check/commit.
+- design for lesson: M1 đổi state thành mảng nhưng giữ pool 0 chung. M2 local-only chưa stealing, chỉ đặt tiêu chí CPUS=1; local-empty không là global OOM. Lesson 4 thêm remote allocation trước kiểm chứng nhiều CPU.
+- count semantics: Giữ một khóa mỗi lần quét pool. Boot yên cho tổng giải thích theo end/PHYSTOP; runtime không coi tổng nhiều thời điểm là snapshot đồng thời. Chưa thêm counter chung hoặc giữ đồng thời nhiều khóa.
+- sources: Source BTL/Makefile và kiến trúc, MIT lock lab/xv6 book, WG14 N1570. Thiết kế M1/M2 là hướng dẫn cho BTL, không phải implementation đã nhập.
+- changes: Lesson 3, liên kết từ Lesson 2/README/lộ trình và bộ nhớ; không sửa C/header/assembly/Makefile, không stage/commit/push.
+- validation: Kiểm tra 7 tài liệu, 68 liên kết local/số dòng, code fences, thứ tự mục 0–15 và 3 điểm source của hàm đếm/khai báo/caller; git diff --check tài liệu đạt. Diff kernel/user/mkfs/Makefile sau soạn bài giống snapshot đầu lượt, giữ nguyên phần C người dùng đã viết.
+- limitations: Chưa kiểm tra lại cài môi trường; chưa build/boot/test. Chưa có source per-CPU/slab. Việc tạo tài liệu không tự hoàn thành các mốc code.
+- next action: Người dùng kiểm tra/chốt hàm đếm nếu chưa làm, rồi tự viết pool/mảng và lần lượt M1/M2; assistant kiểm tra, gợi ý chú thích/message và nhắc tự commit/push.
+- should promote to current state?: yes
 
 ## L013 - 15/10/2026 - Gợi ý chú thích và nhắc commit sau từng phần code
 
