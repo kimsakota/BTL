@@ -2,6 +2,53 @@
 
 Cập nhật: 19/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
 
+## L027 - 19/10/2026 - Chuẩn bị VstHelper để chia sẻ trong BTL
+
+- type: user-request / observation / preparation
+- request: Linh muốn up thư mục VstHelper và hỏi nên tạo branch hay đưa thẳng main. Hướng dẫn nhánh mới codex/reference-vsthelper rồi PR, giữ quy trình main đã bảo vệ; chốt phần docs hiện tại trong PR #2 trước khi tạo nhánh mới từ main đã cập nhật.
+- source: VstHelper là repo Git riêng, origin https://github.com/kimsakota/ShiftSort.git, HEAD7236e72f83c2b780bf37fa42c9cf601d3d6db35c trên master; có modified và untracked thực tế. Không coi remote/HEAD là toàn bộ nội dung working tree.
+- prepared: Tạo references/VstHelper gồm 43 file nguồn/tài liệu (1.213.206 byte), thêm README và SNAPSHOT.json ghi remote, commit nền, trạng thái dirty, danh mục và SHA-256 nguồn tại lúc chụp. Bao gồm thay đổi/file mới không bị ignore, loại Git/IDE/build/user settings và file phụ trợ TeX. Đây là snapshot tham khảo C#, không tích hợp vào build xv6; số liệu/tài liệu nguồn không tự là kết quả đo BTL.
+- preservation: Repo gốc và Git history giữ nguyên, kiểm tra HEAD/status và hash 43 file đều không đổi. Bổ sung /VstHelper/ vào .gitignore của BTL để giữ clone riêng ở local; bản chia sẻ là references/VstHelper không có nested .git. Checksum snapshot là byte trước Git EOL filters.
+- validation: So SHA-256 43 file source/copy, xác nhận không có .git/.vs/bin/obj trong snapshot, original .git còn và status nguyên. Không build/test C# hoặc xv6; chưa stage/commit/push/merge.
+- remaining: Cần Linh tự chốt 19 Markdown workflow đang sửa trên PR #2, rồi main fetch/pull và nhánh riêng chỉ commit .gitignore + references/VstHelper. Mời Minh/Khánh và board vẫn là phần workflow còn tiếp; không quay lại giao C.
+
+## L026 - 19/10/2026 - Hoàn thiện hướng dẫn cộng tác ba người theo yêu cầu Linh
+
+- type: user-correction / research / documentation
+- request: Linh đang cần hướng dẫn GitHub cho cả nhóm, chưa muốn quay lại Lesson 3. Cần thêm Minh/Khánh, đăng lesson để mọi người đọc, lộ trình và cách nhận/làm/review việc. Assistant đã chuyển sang bài C quá sớm; sửa ưu tiên theo yêu cầu này.
+- live evidence: Repo public, main mặc định. PR #2 còn open/not merged, headff8a36a. Local codex/docs-main-workflow cùng origin; trước sửa chỉ VstHelper untracked. Connector list collaborators/invitations trả INVALID_ARGUMENT vì endpoint không hỗ trợ; chưa có bằng chứng list quyền. Không gán đã mời/accept; đã hỏi username/profile của hai bạn qua async, chưa đoán tài khoản.
+- research: Đọc GitHub Docs về personal collaborators, quyền repo cá nhân, clone bằng Desktop, GitHub flow, PR review, relative links, Issues/Project và quyền Project riêng. Repo public đọc lesson được ngay; cộng tác ghi cần invitation được accept; Project cá nhân có quyền riêng. Khi có người khác sẵn sàng review mới tăng approvals từ 0 lên 1.
+- deliverables: Sổ tay GitHub nhóm với thao tác mời/clone/đăng lesson, một task từ issue đến PR/merge, board và K01–K04; mục lục Lesson 0–3; sửa 94 link nội bộ trong 6 Markdown thành tương đối và #L cho dòng source. Cập nhật README/CONTRIBUTING/templates, kế hoạch/quy trình và bộ nhớ. Không tạo Lesson 4 hoặc sửa C/h/S/Makefile/workflow.
+- validation: Đã kiểm tra 19 Markdown thay đổi/mới, 146 relative links tồn tại, code fences cân bằng và không còn link nội bộ kiểu root ổ D: trong nhóm file; git diff --check đạt. Không chạy build/test vì chỉ sửa tài liệu.
+- status: Các nội dung mới còn local, chưa tự commit/push, gửi lời mời, tạo/assign issue hoặc board. Các owner/module/lịch trong sổ tay vẫn là đề xuất chờ nhóm nhận; không nhận công việc học trước là đóng góp của Minh/Khánh.
+- next action: Có đúng username thì hướng dẫn mời/accept; hai bạn clone và thử một PR ghi chú riêng; chốt board/task và reviewer. Tài liệu mới cần người dùng tự chọn commit/push qua Desktop; không tạo chuỗi commit chỉ để ghi lại mỗi click.
+
+## L025 - 19/10/2026 - Xác nhận bảo vệ main đã đủ hai check bắt buộc
+
+- type: observation / validation / guidance
+- verified: Ruleset main-workflow id25416827 active, target ~DEFAULT_BRANCH, bypass rỗng. Required status checks đã có linux và macos, cả hai integration_id15368; strict_required_status_checks_policy=false. PR vẫn 0 approvals, resolve conversations; deletion/non_fast_forward/linear history giữ bật. Cấu hình bảo vệ main cho giai đoạn solo đã hoàn thành, chưa phải nhóm đã thêm thành viên hoặc tạo board/issues.
+- local: main cùng origin/main ở lần đọc; 4 file docs/memory modified, kalloc.c có chú thích Linh thêm, VstHelper untracked. Không sửa C hoặc thao tác Git ghi thay người dùng.
+- next step: Linh tạo nhánh codex/docs-main-workflow từ main trong Desktop, commit riêng CURRENT_STATE/LOGBOOK/RECOVERY_NOTES và docs/Thiet-lap-GitHub-26118.md với message docs: record verified main workflow; bỏ chọn kalloc.c/VstHelper. Push và mở PR theo quy trình vừa thiết lập. Sau đó quay lại Lesson 3 P02, không mở rộng thêm thủ tục Git không cần thiết.
+- documentation: Chốt lại recovery notes ngắn; các trạng thái trước vẫn ở logbook theo ngày. Chỉ thay tài liệu, kiểm tra whitespace đúng 4 file; chưa stage/commit/push/merge hoặc test implementation.
+
+## L024 - 19/10/2026 - Ruleset đã bật, còn thiếu hai check CI
+
+- type: observation / guidance
+- verified: GitHub có branch ruleset main-workflow id25416827, enforcement active, target ~DEFAULT_BRANCH, bypass rỗng. Rules deletion, non_fast_forward, required_linear_history bật. PR required_approving_review_count=0, required_review_thread_resolution=true, không require code owner/last-push approval.
+- gap: required_status_checks rule tồn tại nhưng required_status_checks=[]; strict=false. Chưa được kết luận PR bị chặn theo kết quả linux/macos. Cần Linh Add checks hai tên đã có thật rồi Save changes và đọc lại.
+- local: main53872b8 đồng bộ origin; 4 file docs/memory còn modified từ cập nhật trước. Diff kalloc.c mới chỉ thêm một chú thích trước acquire trong kalloc, không đổi logic; không sửa/format C thay Linh hoặc biến chỉnh chú thích thành điều kiện thiết lập. VstHelper vẫn untracked.
+- next action: Hướng dẫn bổ sung checks trong ruleset hiện có, không tạo ruleset trùng; kiểm tra lại cấu hình sau người dùng lưu. Chưa tự thay Settings hoặc stage/commit/push.
+
+## L023 - 19/10/2026 - PR đã merge, main đồng bộ và CI đạt
+
+- type: observation / validation / guidance
+- user actions: Linh commit/push 11 file tài liệu thành 2df489d, squash merge PR #1, chuyển GitHub Desktop sang main rồi Pull origin. Hộp thoại Switch branch được hướng dẫn Bring my changes to main sau khi xác nhận chỉ VstHelper/ untracked.
+- verified Git: PR #1 merged=true lúc 06:55 UTC; squash commit 53872b8895e82f7baa453c077a0a5255b7310c79, title chore: add page-count diagnostics and team workflow. Local main cùng origin/main; trước cập nhật bộ nhớ chỉ VstHelper/ untracked, không còn tracked diff.
+- verified CI: Run PR39210447048 tại 2df489d success. Run main39212699734 tại 53872b8 completed/success; jobs linux và macos success. Linux qua format/build/usertests/crash, macos qua build kernel/fs.img. Không chạy build/test local, chưa có per-CPU/slab/benchmark.
+- verified settings: Chỉ squash bật; main.protected=false và rulesets=[] sau merge. Không suy ra đã bật protection chỉ vì main có CI xanh.
+- next action: Hướng dẫn Linh tự tạo branch ruleset main-workflow, target main/default branch, enforcement Active; yêu cầu PR với 0 approvals khi solo, require checks linux/macos, giải quyết conversations, linear history, chặn force push/xóa. Chưa áp dụng cấu hình; kiểm tra lại server khi Linh báo xong.
+- changes: Cập nhật CURRENT_STATE, RECOVERY_NOTES và tài liệu thiết lập theo mốc đã kiểm chứng; chưa commit các cập nhật này. Không sửa implementation hoặc tự stage/commit/push/merge/Settings.
+
 ## L022 - 19/10/2026 - CI thành công và chốt tài liệu chuẩn bị bằng Desktop
 
 - type: observation / validation / guidance

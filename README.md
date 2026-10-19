@@ -2,11 +2,20 @@
 
 Đề tài 19, mã dự án 26118, môn Hệ điều hành. Nhóm: Nguyễn Kim Linh (20233495), Lê Trần Hiếu Minh (20233528), Nguyễn An Khánh (20224019).
 
+## Bắt đầu làm việc nhóm
+
+- [Hướng dẫn cho Minh và Khánh: clone, nhận việc, PR/review và báo tiến độ](docs/Huong-dan-thanh-vien.md).
+- [Sổ tay GitHub: mời thành viên, clone, đăng lesson, giao việc và review](docs/So-tay-GitHub-nhom.md).
+- [Mục lục Lesson 0–3 để cả nhóm đọc](docs/lessons/README.md).
+- [Backlog và đầu ra W1 cho từng người](docs/Ke-hoach-va-backlog-26118.md).
+
+Repo public nên mọi người có thể đọc tài liệu đã có trên main ngay. Ảnh Linh cung cấp ngày 19/10 đã hiển thị hai tài khoản với nhãn Collaborator. Bước tiếp theo là mỗi bạn clone, nhận việc và thử push nhánh/PR/review; quyền board và việc tăng approvals cần kiểm tra riêng.
+
 ## Trạng thái
 
 Đã nhập mã xv6 riêng vào root BTL từ source Exercise, commit nền `06aad25c735fd3159bdfae5680be4eab7b1668b2`, giữ sửa đổi Makefile xử lý đường dẫn có dấu cách. Kiểm tra source ngày 19/10/2026: allocator vẫn dùng một list/lock chung; đã có hàm kfreepage_count, khai báo và lời gọi sau kinit. Chưa triển khai slab/per-CPU lists.
 
-Kiểm tra GitHub ngày 19/10: [PR #1](https://github.com/kimsakota/BTL/pull/1) đã nhận commit sửa format `58be186`, chưa merge. [Run của PR](https://github.com/kimsakota/BTL/actions/runs/39209117349) đã completed/success: Linux qua format, build kernel/fs.img, usertests và crash test; macOS build thành công. Đây là kiểm tra baseline hiện tại, chưa có per-CPU/slab hoặc benchmark. Chi tiết cấu hình đề xuất ở [kiểm tra GitHub](docs/Thiet-lap-GitHub-26118.md).
+Kiểm tra GitHub ngày 19/10: [PR #1](https://github.com/kimsakota/BTL/pull/1) đã squash merge thành `53872b8`. [CI trên main](https://github.com/kimsakota/BTL/actions/runs/39212699734) completed/success: Linux qua format, build kernel/fs.img, usertests và crash test; macOS build thành công. Main yêu cầu PR và checks linux/macos, đang 0 approvals khi solo. Đây là kiểm tra baseline, chưa có per-CPU/slab hoặc benchmark. Chi tiết ở [kiểm tra GitHub](docs/Thiet-lap-GitHub-26118.md).
 
 Đã chuẩn bị quy trình nhóm ba người, backlog và báo cáo W01 dạng nháp theo PDF mẫu. Linh xác nhận tuần 19–25/10/2026 mới khởi động dự án nhóm; bài học/code thử trước đó là chuẩn bị cá nhân. Phân công là đề xuất; ngày chốt báo cáo, deadline cuối kỳ và đóng góp Minh/Khánh chưa được xác nhận. Linh muốn tham gia sâu và hiểu toàn bộ hệ thống.
 
@@ -33,7 +42,7 @@ Giữ cây thư mục tiêu chuẩn của xv6 tại root BTL: `kernel/`, `user/`
 - [Bài 2: race condition, spinlock, CPU ID và trạng thái ngắt](docs/lessons/02-race-spinlock-va-cpu.md).
 - [Bài 3: thiết kế và tự viết free list theo CPU](docs/lessons/03-per-cpu-free-lists.md).
 
-Các liên kết trên dùng đường dẫn tương đối để mở được từ GitHub hoặc clone ở máy khác. Một số bài học cũ vẫn còn đường dẫn local; việc đổi các liên kết đó được theo dõi trong tài liệu kiểm tra GitHub.
+Các liên kết nội bộ trong README, Lesson 0–3 và lộ trình đã được đổi sang đường dẫn tương đối để mở từ GitHub hoặc clone ở máy khác. Đường dẫn terminal minh họa trong bài vẫn cần đổi theo thư mục clone của từng người. Các thay đổi tài liệu chỉ xuất hiện trên main sau khi người dùng commit/push và merge PR.
 
 ## Mở và chạy sau khi hoàn tất thiết lập
 

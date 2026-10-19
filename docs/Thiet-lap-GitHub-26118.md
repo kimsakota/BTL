@@ -1,10 +1,14 @@
 # Kiểm tra và thiết lập GitHub cho dự án 26118
 
-Kiểm tra ngày 19/10/2026 trên [kimsakota/BTL](https://github.com/kimsakota/BTL), dùng plugin GitHub và đối chiếu Git local. Linh xác nhận hiện chưa thêm cộng tác viên. Các bảng cấu hình dưới đây là **phương án đề xuất**, chưa được ghi lên Settings của GitHub.
+Kiểm tra ngày 19/10/2026 trên [kimsakota/BTL](https://github.com/kimsakota/BTL), dùng plugin GitHub và đối chiếu Git local. Cập nhật sau đó: ảnh Linh cung cấp đã hiển thị hai tài khoản với nhãn Collaborator. Cấu hình solo đã áp dụng và kiểm tra lại được ghi ở phần cập nhật bên dưới; clone/push/review của từng bạn và quyền board chưa được xác nhận.
+
+**Bảo vệ main không thay thế việc đưa cả nhóm vào làm.** Hai tài khoản đã có trong danh sách Collaborator theo ảnh mới; tiếp tục clone, đăng lesson để đọc chung, nhận task và review. Minh/Khánh bắt đầu tại [hướng dẫn thành viên](Huong-dan-thanh-vien.md); Linh xem thêm [sổ tay GitHub nhóm](So-tay-GitHub-nhom.md). Connector không hỗ trợ hai endpoint list collaborators/invitations ở lần thử trước; trạng thái thành viên cập nhật dựa trên ảnh, không phải kết quả API.
 
 ## 1 Kết quả kiểm tra thực tế
 
-Bảng dưới là snapshot lần audit đầu. Cập nhật tiếp ngày 19/10: chỉ squash merge còn bật; Linh đã cài clang-format 21.1.8, commit/push sửa format thành `58be186`. [CI mới](https://github.com/kimsakota/BTL/actions/runs/39209117349) đã completed/success với Linux format/build/usertests/crash và macOS build đều đạt. PR #1 chưa merge. Các setting khác trong bảng chưa được đọc lại sau bước General; thông tin lỗi format bên dưới mô tả run cũ để tra cứu nguyên nhân.
+Bảng dưới là snapshot lần audit đầu. **Cập nhật ngày 19/10:** Linh đã commit tài liệu thành `2df489d`, squash merge [PR #1](https://github.com/kimsakota/BTL/pull/1) thành `53872b8` và đồng bộ GitHub Desktop về `main`. [CI trên main](https://github.com/kimsakota/BTL/actions/runs/39212699734) completed/success: `linux` qua format/build/usertests/crash, `macos` qua build. Repo chỉ cho squash merge. Linh đã cài clang-format 21.1.8; thông tin lỗi format và PR đang mở trong bảng bên dưới chỉ mô tả lịch sử audit để tra cứu.
+
+**Bảo vệ main đã xác nhận:** `main-workflow` id `25416827` đã **active**, target default branch, bypass rỗng; PR với 0 approvals, resolve conversations, linear history và chặn xóa/force push. Required checks đã có **`linux`** và **`macos`**, cả hai integration ID `15368`; strict up-to-date tắt. Danh sách checks từng trống ở bước tạo ban đầu, nhưng Linh đã thêm và agent đọc lại được. Đây là lần đọc setting trước ảnh Collaborator; chưa đọc lại approvals hoặc xác nhận board/issues sau khi thêm hai bạn.
 
 | Hạng mục | Kết quả quan sát | Ý nghĩa |
 |---|---|---|
@@ -60,7 +64,7 @@ Chọn cách merge chỉ làm gọn các thay đổi tiếp theo; không tự đ
 
 ## 4 Bảo vệ main theo hai giai đoạn
 
-Trong Settings → Rules → Rulesets, dự kiến tạo branch ruleset tên `main-workflow`, target `main`, enforcement Active sau khi kiểm tra cấu hình. Bắt đầu với các ràng buộc sau; chưa có ruleset nào được tạo ở lượt này.
+Trong Settings → Rules → Rulesets, Linh đã tạo branch ruleset `main-workflow`, target default branch `main`, enforcement **Active**. Cột solo bên dưới đã áp dụng và đọc lại; cột nhóm là đề xuất khi có reviewer thực sự.
 
 | Quy tắc | Hiện chỉ Linh | Khi Minh hoặc Khánh đã tham gia và có thể review |
 |---|---|---|
@@ -69,12 +73,14 @@ Trong Settings → Rules → Rulesets, dự kiến tạo branch ruleset tên `ma
 | Giải quyết review conversations | Bật | Bật |
 | Linear history | Bật với cách squash đã chọn | Giữ bật |
 | Chặn force push và xóa main | Bật | Bật |
-| Required CI checks | Chọn sau khi xác nhận tên job và chạy ổn định | Giữ các check đã xác nhận |
+| Required CI checks | Đã bắt buộc `linux` và `macos`, có run đạt trên main | Giữ các check đã xác nhận |
 | Code owner approval | Chưa dùng | Chỉ bật khi có CODEOWNERS đúng tài khoản/quyền và không gây kẹt review |
 
 Không yêu cầu một approval từ người khác khi repo chỉ có tác giả PR. Assistant đọc code không phải một GitHub approving review hợp lệ thay cho thành viên. Ở giai đoạn một người, vẫn tự kiểm tra diff, chạy kiểm tra thực và ghi PR đầy đủ; không gọi đó là review độc lập.
 
 Khi có reviewer, có thể bật dismiss stale approvals khi code thay đổi sau review. Chọn check chính xác từ các run thật, tránh nhập tên check dự định nhưng workflow chưa tạo. GitHub cho phép yêu cầu PR mà không bắt buộc approving review. [GitHub rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets).
+
+Tên check hiện đã kiểm chứng trên main là **`linux`** và **`macos`**, cả hai đạt ở run `39212699734` và đã được thêm vào required checks của ruleset. Enforcement **Active**, target **Include default branch**, Required approvals **0**, Bypass list rỗng, Restrict updates tắt. Cấu hình đã đọc lại sau khi Linh lưu. Linh làm task trên nhánh riêng rồi mở PR; khi thay workflow phải đối chiếu lại tên required checks để tránh chờ một tên không còn được tạo.
 
 Không bật bắt buộc CI đang hỏng trước khi có kế hoạch sửa và chứng minh nó chạy được. Sau khi CI đạt, bật checks để PR chưa đạt không được merge; việc làm đẹp lịch sử không thay thế tiêu chí chất lượng code.
 
@@ -133,7 +139,7 @@ Issue cần các trường ID, owner, đầu ra, phụ thuộc, tuần, acceptan
 
 Tag `xv6-baseline` cần được Linh tự push khi muốn chia sẻ mốc nền; kiểm tra tag trỏ đúng commit trước. Lượt audit không push tag. `VstHelper/` có Git riêng: nếu chỉ là mã tham khảo, đề xuất để ở ngoài checkout BTL; nếu thật sự muốn version dependency thì quyết định riêng về submodule. Không stage toàn bộ `VstHelper/` theo thói quen `git add .`.
 
-README đã được chuẩn bị lại link tương đối để vào được từ GitHub/clone khác. Các bài học vẫn còn link đường dẫn máy cũ; một lần quét trước khi chỉnh README ghi nhận 108 lần khớp root BTL trong 7 Markdown. Nên có task đổi nốt các link trong bài học, giữ nguồn ngoài repo được ghi rõ là tham khảo local thay vì link giả dùng chung.
+README và mục lục đã có link tương đối. Lượt hoàn thiện cộng tác đã đổi **94 link nội bộ trong 6 file** (Lesson 0–3, lộ trình học và kiến trúc) từ root ổ D: sang link tương đối; các line suffix của link source đổi thành #L để mở trên GitHub. Con số 108 lần khớp root ở lần quét cũ gồm cả chuỗi đường dẫn minh họa, không chỉ link. Đường dẫn lệnh chạy cần thay theo clone của từng người; nguồn ngoài repo vẫn ghi là nguồn local. Các sửa đổi mới này còn ở máy, chưa được tự commit/push.
 
 ## 7 Thứ tự thực hiện đề xuất
 
@@ -142,7 +148,7 @@ README đã được chuẩn bị lại link tương đối để vào được 
 | 1 | Giữ checkpoint PR #1 và xác định scope sẽ bàn giao | Rõ phần code, bài học, quy trình; không mất nội dung |
 | 2 | Linh sửa format C; task CI tách check và thu log | CI cho thấy build/test thực sự chạy, kết quả được đọc |
 | 3 | Tách phần bàn giao và chốt templates/CONTRIBUTING/link dùng chung | PR nhỏ đúng scope, mô tả/trạng thái nhất quán với source |
-| 4 | Chọn squash và ruleset main theo giai đoạn một người | PR bắt buộc, không tự khóa bởi yêu cầu reviewer chưa tồn tại |
+| 4 | Chọn squash và ruleset main theo giai đoạn một người — đã áp dụng | PR bắt buộc, 0 approvals, required checks linux/macos |
 | 5 | Chia sẻ tag baseline, tạo issues/board cho W1 | Mọi task có ID/đầu ra và link để báo cáo |
 | 6 | Thêm Minh/Khánh khi sẵn sàng; bật 1 review | Cả hai clone/build và review được một task nhỏ |
 

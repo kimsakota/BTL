@@ -2,7 +2,7 @@
 
 Ngày biên soạn và đối chiếu source: 15/10/2026.
 
-Bài này tiếp nối [Bài 1: Bộ nhớ, con trỏ, struct và allocator trang](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/01-baseline-va-kalloc.md>). Bài 1 giải thích một trang được lấy/trả ra sao; Bài 2 giải thích cách giữ những thao tác đó đúng khi có nhiều CPU hoặc một đoạn code bị ngắt giữa chừng.
+Bài này tiếp nối [Bài 1: Bộ nhớ, con trỏ, struct và allocator trang](<01-baseline-va-kalloc.md>). Bài 1 giải thích một trang được lấy/trả ra sao; Bài 2 giải thích cách giữ những thao tác đó đúng khi có nhiều CPU hoặc một đoạn code bị ngắt giữa chừng.
 
 Bạn tự thiết kế, tự viết và tự sửa toàn bộ C của bài tập/đề tài. Tài liệu có đoạn **mã đang có trong xv6 để đọc tham chiếu**, bảng mô phỏng và yêu cầu tự viết. Không có implementation đầy đủ của per-CPU allocator hoặc stealing để chép.
 
@@ -248,7 +248,7 @@ Hàm đếm chỉ đọc nhưng cần bảo vệ thời gian duyệt vì các no
 
 ### 4.1. Đọc struct spinlock
 
-Mở [spinlock.h](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.h>):
+Mở [spinlock.h](<../../kernel/spinlock.h>):
 
 ```c
 struct spinlock {
@@ -270,7 +270,7 @@ Trường cpu không thay thế locked và thao tác atomic để quyết địn
 
 ### 4.2. Initlock chỉ khởi tạo đối tượng khóa
 
-Mở [initlock](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.c:12>). Source gán tên, đặt locked = 0 và cpu = 0.
+Mở [initlock](<../../kernel/spinlock.c#L12>). Source gán tên, đặt locked = 0 và cpu = 0.
 
 Initlock không giữ khóa. Nó cần được gọi trước khi đối tượng khóa được các CPU dùng. Không khởi tạo lại một khóa đang có người giữ/chờ; làm vậy phá trạng thái quản lý.
 
@@ -343,7 +343,7 @@ flowchart TD
 
 ### 5.2. Acquire làm bốn việc theo thứ tự
 
-Mở [acquire, dòng 22](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.c:22>):
+Mở [acquire, dòng 22](<../../kernel/spinlock.c#L22>):
 
 1. Gọi push_off trước khi chạm trạng thái CPU/ownership.
 2. Nếu holding(lk) đúng thì panic: CPU này đang giữ chính khóa đó.
@@ -354,7 +354,7 @@ Chờ khóa cũng nằm trong vùng ngắt tắt. Nếu gọi push_off sau khi �
 
 ### 5.3. Holding kiểm tra CPU, không nhận PID
 
-Mở [holding](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.c:81>):
+Mở [holding](<../../kernel/spinlock.c#L81>):
 
 ```c
 r = (lk->locked && lk->cpu == mycpu());
@@ -380,7 +380,7 @@ Cần phân biệt:
 
 ### 5.5. Release phải thả khóa đúng quyền
 
-Mở [release, dòng 46](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.c:46>):
+Mở [release, dòng 46](<../../kernel/spinlock.c#L46>):
 
 1. Kiểm tra holding(lk); sai thì panic.
 2. Đặt lk->cpu thành pointer rỗng.
@@ -449,7 +449,7 @@ Hai CPU vẫn có thể cùng đọc giá trị cũ của một volatile counter
 
 ### 6.4. Một ví dụ thật từ main.c
 
-Mở [main.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/main.c:7>): source có biến started được đánh dấu volatile, nhưng CPU khởi tạo công bố bằng atomic store release và CPU khác chờ bằng atomic load acquire.
+Mở [main.c](<../../kernel/main.c#L7>): source có biến started được đánh dấu volatile, nhưng CPU khởi tạo công bố bằng atomic store release và CPU khác chờ bằng atomic load acquire.
 
 Điều giúp đồng bộ bước khởi tạo là giao thức atomic/order thực sự trong code. Không được bỏ hai thao tác atomic vì thấy biến đã có chữ volatile.
 
@@ -461,7 +461,7 @@ Mở [main.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/main.c:7>): 
 
 Interrupt là sự kiện khiến CPU chuyển tới đường xử lý phù hợp. Timer interrupt giúp hệ điều hành có cơ hội điều phối tiến trình.
 
-Trong [kerneltrap](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/trap.c:137>), khi xác định timer interrupt và đang có tiến trình, source có đường gọi yield. Xem đoạn này để nối interrupt với scheduler; chưa cần học toàn bộ trap assembly.
+Trong [kerneltrap](<../../kernel/trap.c#L137>), khi xác định timer interrupt và đang có tiến trình, source có đường gọi yield. Xem đoạn này để nối interrupt với scheduler; chưa cần học toàn bộ trap assembly.
 
 Ví dụ:
 
@@ -502,7 +502,7 @@ Ví dụ là cách hiểu lý do tắt ngắt, không khẳng định interrupt 
 
 ### 7.4. Đọc sstatus và SSTATUS_SIE
 
-Mở [riscv.h, dòng 47](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/riscv.h:47>):
+Mở [riscv.h, dòng 47](<../../kernel/riscv.h#L47>):
 
 ```c
 #define SSTATUS_SIE (1L << 1)
@@ -516,7 +516,7 @@ Intr_get đọc sstatus rồi kiểm tra bit SIE, trả 0 hoặc 1. Intr_off xó
 
 ### 7.5. Rc_sstatus đọc trạng thái cũ và xóa bit
 
-Bản BTL có wrapper [rc_sstatus](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/riscv.h:77>) dùng lệnh CSRRC.
+Bản BTL có wrapper [rc_sstatus](<../../kernel/riscv.h#L77>) dùng lệnh CSRRC.
 
 Với rc_sstatus(SSTATUS_SIE), ý nghĩa cần dùng là:
 
@@ -535,7 +535,7 @@ Một số bản xv6/tài liệu cũ viết push_off bằng intr_get rồi intr_
 
 ### 8.1. Hai trường trong struct cpu
 
-Mở [proc.h, dòng 22](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/proc.h:22>):
+Mở [proc.h, dòng 22](<../../kernel/proc.h#L22>):
 
 | Trường | Vai trò trong đoạn allocator ngắn của bài |
 |---|---|
@@ -550,7 +550,7 @@ Trạng thái noff/intena được lưu theo struct cpu. Ở các đường sche
 
 ### 8.2. Đọc từng phần push_off
 
-Mở [push_off, dòng 93](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.c:93>). Các dòng gốc:
+Mở [push_off, dòng 93](<../../kernel/spinlock.c#L93>). Các dòng gốc:
 
 ```c
 uint64 flags = rc_sstatus(SSTATUS_SIE);
@@ -591,7 +591,7 @@ Chỉ dùng cặp này chưa bảo vệ được free list khỏi CPU khác. N�
 
 ### 8.4. Đọc pop_off theo thứ tự kiểm tra
 
-Mở [pop_off, dòng 106](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.c:106>):
+Mở [pop_off, dòng 106](<../../kernel/spinlock.c#L106>):
 
 1. Lấy struct cpu hiện tại; ngắt phải đang tắt.
 2. Nếu intr_get cho thấy ngắt bật, panic.
@@ -667,9 +667,9 @@ Mỗi acquire đã có một push. Bạn không tự thêm pop chỉ vì thấy 
 
 ### 9.1. Cpu ID được lấy từ đâu?
 
-Mở [start.c, dòng 48](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/start.c:48>): boot đọc hartid và ghi vào thanh ghi tp của hart.
+Mở [start.c, dòng 48](<../../kernel/start.c#L48>): boot đọc hartid và ghi vào thanh ghi tp của hart.
 
-Trong kernel, [r_tp ở riscv.h](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/riscv.h:341>) đọc tp. [Cpuid ở proc.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/proc.c:65>) lấy giá trị đó làm ID.
+Trong kernel, [r_tp ở riscv.h](<../../kernel/riscv.h#L341>) đọc tp. [Cpuid ở proc.c](<../../kernel/proc.c#L65>) lấy giá trị đó làm ID.
 
 ```text
 Boot của hart
@@ -683,7 +683,7 @@ Tp của kernel được xv6 quản lý khi đi qua user/kernel; không được
 
 ### 9.2. Mycpu chọn phần tử theo ID hiện tại
 
-Đoạn gốc ở [proc.c, dòng 74](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/proc.c:74>):
+Đoạn gốc ở [proc.c, dòng 74](<../../kernel/proc.c#L74>):
 
 ```c
 int id = cpuid();
@@ -743,7 +743,7 @@ Nếu ngắt đã tắt sẵn, một số đường boot/trap có thể gọi cp
 
 ### 9.6. Đọc myproc để thấy một mẫu lấy snapshot
 
-Mở [myproc](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/proc.c:83>). Source:
+Mở [myproc](<../../kernel/proc.c#L83>). Source:
 
 - Mở guard.
 - Lấy mycpu.
@@ -818,7 +818,7 @@ Scheduler của xv6 có giao thức riêng quanh p->lock và context switch. Kh�
 | Trong interrupt handler | Cần đúng quy tắc và đoạn ngắn | Không dùng đường ngủ tùy ý |
 | Có thể thay cho nhau bằng đổi tên hàm? | Không | Không |
 
-Source BTL có [sleeplock.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/sleeplock.c>), dùng sleep_prepare rồi sleep theo API hiện tại. Không chép mẫu sleep(chan, lock) từ bản xv6 khác vào bài này.
+Source BTL có [sleeplock.c](<../../kernel/sleeplock.c>), dùng sleep_prepare rồi sleep theo API hiện tại. Không chép mẫu sleep(chan, lock) từ bản xv6 khác vào bài này.
 
 ### 10.6. Log có thể làm thay đổi vấn đề đang đo
 
@@ -883,7 +883,7 @@ Khi triển khai, cần phân biệt ít nhất:
 
 Một trang không được ở đồng thời hai pool; trang đã cấp không được xuất hiện như trang trống; trạng thái chuyển cần có một chủ quản lý rõ ràng.
 
-NCPU = 8 trong [param.h](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/param.h:2>) là giới hạn bố trí state; CPUS khi chạy QEMU chọn số CPU thực tế. Chúng không đồng nghĩa “mọi phần tử của mảng luôn có một CPU đang chạy”.
+NCPU = 8 trong [param.h](<../../kernel/param.h#L2>) là giới hạn bố trí state; CPUS khi chạy QEMU chọn số CPU thực tế. Chúng không đồng nghĩa “mọi phần tử của mảng luôn có một CPU đang chạy”.
 
 ### 11.5. Nguồn lab dùng để tham khảo yêu cầu
 
@@ -897,18 +897,18 @@ Bản BTL hiện không có user/kalloctest.c hoặc kernel/kcsan.c sau kiểm t
 
 | Thứ tự | File/vị trí | Điều cần tìm |
 |---|---|---|
-| 1 | [kalloc.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/kalloc.c:59>) | Critical section và dữ liệu được bảo vệ |
-| 2 | [spinlock.h](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.h>) | locked/name/cpu |
-| 3 | [spinlock.c: initlock](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.c:12>) | Khởi tạo khóa |
-| 4 | [spinlock.c: acquire](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.c:22>) | push, kiểm tra holding, atomic exchange, CPU chủ |
-| 5 | [spinlock.c: release/holding](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.c:46>) | Quyền thả khóa, store release, pop |
-| 6 | [proc.h: struct cpu](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/proc.h:22>) | noff và intena |
-| 7 | [spinlock.c: push/pop](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.c:93>) | Bảo vệ có lồng và trạng thái ngắt ban đầu |
-| 8 | [riscv.h: rc_sstatus](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/riscv.h:77>) | Đọc/xóa SIE |
-| 9 | [riscv.h: intr_get/r_tp](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/riscv.h:324>) | Đọc bit ngắt và ID từ tp |
-| 10 | [proc.c: cpuid/mycpu/myproc](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/proc.c:65>) | CPU hiện tại khác pointer tiến trình |
-| 11 | [trap.c: kerneltrap](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/trap.c:137>) | Timer dẫn tới yield |
-| 12 | [proc.c: scheduler/sched](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/proc.c:429>) | Context switch có giao thức riêng |
+| 1 | [kalloc.c](<../../kernel/kalloc.c#L59>) | Critical section và dữ liệu được bảo vệ |
+| 2 | [spinlock.h](<../../kernel/spinlock.h>) | locked/name/cpu |
+| 3 | [spinlock.c: initlock](<../../kernel/spinlock.c#L12>) | Khởi tạo khóa |
+| 4 | [spinlock.c: acquire](<../../kernel/spinlock.c#L22>) | push, kiểm tra holding, atomic exchange, CPU chủ |
+| 5 | [spinlock.c: release/holding](<../../kernel/spinlock.c#L46>) | Quyền thả khóa, store release, pop |
+| 6 | [proc.h: struct cpu](<../../kernel/proc.h#L22>) | noff và intena |
+| 7 | [spinlock.c: push/pop](<../../kernel/spinlock.c#L93>) | Bảo vệ có lồng và trạng thái ngắt ban đầu |
+| 8 | [riscv.h: rc_sstatus](<../../kernel/riscv.h#L77>) | Đọc/xóa SIE |
+| 9 | [riscv.h: intr_get/r_tp](<../../kernel/riscv.h#L324>) | Đọc bit ngắt và ID từ tp |
+| 10 | [proc.c: cpuid/mycpu/myproc](<../../kernel/proc.c#L65>) | CPU hiện tại khác pointer tiến trình |
+| 11 | [trap.c: kerneltrap](<../../kernel/trap.c#L137>) | Timer dẫn tới yield |
+| 12 | [proc.c: scheduler/sched](<../../kernel/proc.c#L429>) | Context switch có giao thức riêng |
 
 Dòng có thể thay đổi khi bạn thêm chú thích/code. Tìm theo tên hàm nếu số dòng dịch chuyển.
 
@@ -1056,7 +1056,7 @@ Gợi ý tập trung vào lý do và hợp đồng, tránh chỉ diễn lại �
 
 **Mốc gợi ý:** khi helper và điểm gọi đã được bạn tích hợp, giải thích và kiểm tra, gợi ý message là `feat(kernel): add interrupt-state observation helper`. Nếu phần vừa làm chỉ là ghi chú hoặc một phần nhỏ khác, message cần phản ánh đúng diff đó.
 
-**Nhắc bạn:** đọc diff, ghi kết quả kiểm tra thật, tự stage đúng file/hunk của mốc, commit local rồi push lên GitHub. Dùng [quy trình chốt phần code](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Lo-trinh-hoc.md>) và đúng các file bạn đã chọn đặt helper/caller. Các bài A–F chỉ làm trên giấy chưa tạo thay đổi source thì chưa có mốc commit code.
+**Nhắc bạn:** đọc diff, ghi kết quả kiểm tra thật, tự stage đúng file/hunk của mốc, commit local rồi push lên GitHub. Dùng [quy trình chốt phần code](<../Lo-trinh-hoc.md>) và đúng các file bạn đã chọn đặt helper/caller. Các bài A–F chỉ làm trên giấy chưa tạo thay đổi source thì chưa có mốc commit code.
 
 ## 14. Câu hỏi, tiêu chí hoàn thành và Lesson 3
 
@@ -1105,13 +1105,13 @@ Bài tiếp theo sẽ hướng dẫn **thiết kế và tự viết free list ri
 - Giữ API lấy/trả trang với ownership rõ.
 - Xác định tình huống local hết trang trước khi học stealing đầy đủ.
 
-Những câu hỏi này cần Lesson 1 về list và Lesson 2 về đồng bộ. Bạn tự viết code từng phần; assistant kiểm tra/gợi ý. Tiếp tục [Lesson 3: Thiết kế và tự viết free list theo CPU](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/03-per-cpu-free-lists.md>), đã soạn ngày 17/10/2026, gồm hai mốc thực hành và phần chú thích/commit.
+Những câu hỏi này cần Lesson 1 về list và Lesson 2 về đồng bộ. Bạn tự viết code từng phần; assistant kiểm tra/gợi ý. Tiếp tục [Lesson 3: Thiết kế và tự viết free list theo CPU](<03-per-cpu-free-lists.md>), đã soạn ngày 17/10/2026, gồm hai mốc thực hành và phần chú thích/commit.
 
 ## 15. Nguồn nghiên cứu và phạm vi kiểm chứng
 
 | Nguồn | Dùng để đối chiếu |
 |---|---|
-| [Source xv6 của BTL](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Nguon-xv6.md>) | Phiên bản nền và quy tắc bám source |
+| [Source xv6 của BTL](<../Nguon-xv6.md>) | Phiên bản nền và quy tắc bám source |
 | [MIT xv6 book: Locking](https://mit-pdos.github.io/xv6-riscv-book/lock.html) | Concurrency, invariant, locking và deadlock |
 | [MIT xv6 book: Scheduling](https://mit-pdos.github.io/xv6-riscv-book/sched.html) | CPU/tiến trình, cpuid/mycpu và migration |
 | [MIT lock lab](https://pdos.csail.mit.edu/6.1810/2025/labs/lock.html) | Mục tiêu per-CPU page lists, stealing và điều kiện dùng cpuid |

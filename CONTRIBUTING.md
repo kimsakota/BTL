@@ -2,6 +2,8 @@
 
 Hướng dẫn đề xuất cho giai đoạn Linh chuẩn bị repo và sau đó làm nhóm ba người. Trạng thái thiết lập thực tế và checklist nằm trong [kiểm tra GitHub](docs/Thiet-lap-GitHub-26118.md).
 
+Minh và Khánh bắt đầu tại [hướng dẫn thành viên](docs/Huong-dan-thanh-vien.md): clone riêng, làm PR thử, nhận issue, review và báo tiến độ. [Sổ tay GitHub của nhóm](docs/So-tay-GitHub-nhom.md) có thêm phần thiết lập thành viên, board và đăng lesson. [Mục lục lesson](docs/lessons/README.md) là chỗ đọc chung; ghi chú học không tự thay thế task có owner và đầu ra.
+
 ## Luồng một công việc
 
 ```mermaid
@@ -28,7 +30,7 @@ Các bước Git ghi ở đây do thành viên thực hiện. Assistant không t
 
 ## Review khi chỉ có một người và khi có nhóm
 
-Hiện Linh chưa thêm cộng tác viên, nên dùng PR để tự kiểm tra scope/diff/log, với số approval bắt buộc bằng 0. Đây là tự kiểm tra, chưa phải review độc lập. Assistant không được tính như một thành viên đã approve trên GitHub.
+Ảnh Linh cung cấp ngày 19/10 đã hiển thị hai tài khoản với nhãn Collaborator. Lần đọc ruleset trước đó ghi số approval bắt buộc bằng 0 cho giai đoạn solo; chưa kiểm tra lại setting sau ảnh này. Mỗi người cần thử clone/push/PR và review; sau khi có reviewer sẵn sàng, Linh tăng required approvals lên 1. Assistant không được tính như một thành viên đã approve trên GitHub.
 
 Khi Minh/Khánh tham gia và đã có quyền review phù hợp, mỗi PR cần một người khác tác giả review trước merge. Linh review các tầng để hiểu toàn bộ; PR của Linh do Minh hoặc Khánh review. Kết quả thuật toán vẫn cần test, không chỉ approval.
 
@@ -47,7 +49,7 @@ Mẫu PR ghi rõ: vấn đề, hành vi sau thay đổi, API/caller, ownership/k
 
 ## Chú thích và kiểm tra
 
-Chú thích giải thích lý do/invariant, ai sở hữu dữ liệu, lúc nào được free và khóa hoặc guard CPU/ngắt cần giữ. Đặt chú thích dài trên dòng riêng để dễ đọc và thuận formatter. Tôn trọng `.clang-format` và `.gitattributes` hiện có.
+Chú thích là gợi ý khi giúp hiểu quyết định; không là điều kiện bắt buộc hoặc việc phải làm thêm để chốt một mốc đã đạt. Với code, vẫn giữ invariant/ownership/khóa đúng và tuân theo formatter; tài liệu chỉ cần review nội dung và link phù hợp. Tôn trọng `.clang-format` và `.gitattributes` hiện có.
 
 Trước chốt phần code, xem diff, tự chạy kiểm tra phù hợp và ghi kết quả thật. Build thành công không đồng nghĩa đã boot/test; test chức năng không đồng nghĩa có kết quả benchmark. Sau một mốc có ý nghĩa, tác giả tự commit rồi push với message đúng phạm vi.
 

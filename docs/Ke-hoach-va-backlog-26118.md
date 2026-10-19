@@ -2,11 +2,13 @@
 
 Ngày: 19/10/2026. **Phân công/lịch mốc dự kiến, chờ nhóm thống nhất và bổ sung hạn cuối kỳ.** Linh xác nhận tuần này mới khởi động nhóm: W1 là 19–25/10/2026. Phần Linh đang học là chuẩn bị cá nhân trước dự án. Phụ trách đề xuất: Linh tầng trang/tích hợp, Minh slab/file, Khánh test/inode. Chi tiết hợp đồng nằm trong [quy trình nhóm](Quy-trinh-nhom-26118.md).
 
+Thứ tự khởi động thực tế: **mời/accept cả hai bạn → mỗi người clone và đọc tài liệu → nhận K01–K04 trên board → thử một PR/review → phát triển theo mốc**. Xem [sổ tay GitHub](So-tay-GitHub-nhom.md) để thao tác bằng Desktop/web. Đây là việc cộng tác phải hoàn tất, không tự coi là xong vì đã bật bảo vệ main.
+
 ## Các mốc có đầu ra kiểm tra được
 
 | Mốc | Điều kiện nghiệm thu | Trạng thái đã đối chiếu 19/10 |
 |---|---|---|
-| M0 Baseline | Cả ba có môi trường, cùng revision; build/boot và test nền có log | Source/tài liệu có; chưa có log runtime đối chiếu |
+| M0 Baseline | Cả ba có môi trường, cùng revision; build/boot và test nền có log | CI main53872b8 đã đạt; môi trường/log local của cả ba chưa đủ xác nhận |
 | M1 Trang | Per-CPU + stealing; page invariants và test nhiều CPU | Chưa triển khai |
 | M2 Object | Slab nhiều class, OOM/alignment/reuse và statistics/dump | Chưa triển khai |
 | M3 Client | Ba cấu trúc file/inode/buf cấp động với lifetime đúng; regression | Chưa triển khai |

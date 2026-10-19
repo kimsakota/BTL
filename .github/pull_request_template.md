@@ -10,7 +10,7 @@ API và caller bị ảnh hưởng:
 
 Ownership, lifetime, failure path, khóa/ngắt:
 
-Chú thích giải thích quyết định đã bổ sung:
+Nếu chỉ sửa tài liệu, các mục API/ownership không liên quan có thể ghi “không áp dụng”.
 
 ## Kiểm tra
 

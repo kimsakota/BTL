@@ -2,7 +2,7 @@
 
 Ngày biên soạn và đối chiếu source: 17/10/2026.
 
-Bài này tiếp nối [Lesson 2: Race condition, spinlock, CPU ID và trạng thái ngắt](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/02-race-spinlock-va-cpu.md>). Bây giờ bạn dùng kiến thức con trỏ/list và đồng bộ để thay cấu trúc quản lý trang.
+Bài này tiếp nối [Lesson 2: Race condition, spinlock, CPU ID và trạng thái ngắt](<02-race-spinlock-va-cpu.md>). Bây giờ bạn dùng kiến thức con trỏ/list và đồng bộ để thay cấu trúc quản lý trang.
 
 Bạn tự thiết kế và tự viết toàn bộ C. Tài liệu giải thích mô hình, reference, yêu cầu từng bước và cách kiểm tra; không chứa bản kalloc/kfree per-CPU hoàn chỉnh để chép. Các đoạn C nhỏ là ví dụ cú pháp hoặc mã tham chiếu hiện có.
 
@@ -51,10 +51,10 @@ Kiểm tra ngày 17/10/2026 cho thấy:
 
 | Thành phần | Hiện có |
 |---|---|
-| [kalloc.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/kalloc.c>) | Một biến kmem với một lock và một freelist |
-| [kfreepage_count](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/kalloc.c:86>) | Hàm đếm dùng biến duyệt local, giữ kmem.lock suốt vòng duyệt |
-| [defs.h](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/defs.h:63>) | Đã có khai báo hàm đếm |
-| [main.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/main.c:20>) | Đã gọi/in số trang ngay sau kinit, trước kvminit |
+| [kalloc.c](<../../kernel/kalloc.c>) | Một biến kmem với một lock và một freelist |
+| [kfreepage_count](<../../kernel/kalloc.c#L86>) | Hàm đếm dùng biến duyệt local, giữ kmem.lock suốt vòng duyệt |
+| [defs.h](<../../kernel/defs.h#L63>) | Đã có khai báo hàm đếm |
+| [main.c](<../../kernel/main.c#L20>) | Đã gọi/in số trang ngay sau kinit, trước kvminit |
 | Thuật toán cấp/trả trang | Vẫn dùng free list chung gốc |
 | Slab/per-CPU lists | Chưa có implementation trong source được kiểm tra |
 
@@ -128,7 +128,7 @@ Không dùng lock của pool 0 để bảo vệ list 1 trong một hàm, rồi d
 
 ### 2.3. Giữ state ở module sở hữu nó
 
-Theo [kiến trúc dự án](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Kien-truc-du-an.md>), tầng trang nằm trong kalloc.c.
+Theo [kiến trúc dự án](<../Kien-truc-du-an.md>), tầng trang nằm trong kalloc.c.
 
 - Struct pool và mảng pool thuộc nội bộ module.
 - Caller tiếp tục gọi API qua defs.h.
@@ -213,7 +213,7 @@ Phép lấy phần tử mảng được xác định theo kiểu phần tử; kh
 
 ### 3.4. NCPU khác số CPU đang chạy
 
-[NCPU trong param.h](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/param.h:2>) hiện bằng 8: giới hạn số CPU/state mà kernel bố trí.
+[NCPU trong param.h](<../../kernel/param.h#L2>) hiện bằng 8: giới hạn số CPU/state mà kernel bố trí.
 
 CPUS trong lệnh Make chọn số hart QEMU chạy. Trong cấu hình QEMU/xv6 này, CPU ID dùng làm chỉ số phải ở miền hợp lệ từ 0 đến NCPU - 1. Không sửa một ID sai bằng cách tự lấy modulo rồi coi là hợp lệ.
 
@@ -347,7 +347,7 @@ Bạn giữ các quy tắc baseline:
 
 ### 5.5. Khi boot, trang ban đầu vào đâu?
 
-[Main.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/main.c:19>) gọi kinit trên CPU 0. Nếu freerange gọi kfree và kfree dùng pool của CPU hiện tại, các trang ban đầu sẽ được thêm vào pool 0.
+[Main.c](<../../kernel/main.c#L19>) gọi kinit trên CPU 0. Nếu freerange gọi kfree và kfree dùng pool của CPU hiện tại, các trang ban đầu sẽ được thêm vào pool 0.
 
 ```text
 Sau kinit trong thiết kế M2:
@@ -659,12 +659,12 @@ Theo source hiện tại:
 
 | Nơi | Lý do |
 |---|---|
-| [defs.h](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/defs.h:59>) | API page/hàm đếm không đổi chữ ký trong bài |
-| [main.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/main.c:19>) | Thứ tự kinit rồi đếm rồi kvminit vẫn hợp lý |
-| [vm.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/vm.c:228>) | Caller lấy/trả trang qua API, không cần biết mảng pool |
-| [proc.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/proc.c:65>) | Dùng cpuid hiện có, không sửa cơ chế CPU ID |
-| [spinlock.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.c:22>) | Tái sử dụng đồng bộ xv6, không viết lại khóa |
-| [Makefile](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/Makefile:10>) | Kalloc.o đã được link; dùng CPUS ở dòng lệnh khi test |
+| [defs.h](<../../kernel/defs.h#L59>) | API page/hàm đếm không đổi chữ ký trong bài |
+| [main.c](<../../kernel/main.c#L19>) | Thứ tự kinit rồi đếm rồi kvminit vẫn hợp lý |
+| [vm.c](<../../kernel/vm.c#L228>) | Caller lấy/trả trang qua API, không cần biết mảng pool |
+| [proc.c](<../../kernel/proc.c#L65>) | Dùng cpuid hiện có, không sửa cơ chế CPU ID |
+| [spinlock.c](<../../kernel/spinlock.c#L22>) | Tái sử dụng đồng bộ xv6, không viết lại khóa |
+| [Makefile](<../../Makefile#L10>) | Kalloc.o đã được link; dùng CPUS ở dòng lệnh khi test |
 
 Nếu bạn đổi chữ ký thật, cần rà toàn bộ khai báo/call site. Bài này giữ API nhỏ để tập trung vào allocator state.
 
@@ -681,7 +681,7 @@ Nếu bạn đổi chữ ký thật, cần rà toàn bộ khai báo/call site. B
 
 ## 11. Hướng dẫn tự code theo mốc và nhắc commit
 
-Áp dụng [quy trình chốt phần code](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Lo-trinh-hoc.md>): tự viết → giải thích → đọc diff/kiểm tra → bổ sung chú thích → tự commit rồi push GitHub.
+Áp dụng [quy trình chốt phần code](<../Lo-trinh-hoc.md>): tự viết → giải thích → đọc diff/kiểm tra → bổ sung chú thích → tự commit rồi push GitHub.
 
 Mỗi bước nhỏ có thể gửi riêng để kiểm tra. Một mốc commit là tập thay đổi có ý nghĩa đã ghép nhất quán; không coi phần đang sửa dở, còn reference sai, là mốc hoàn thành.
 
@@ -983,14 +983,14 @@ Các câu hỏi tiếp theo:
 
 | Nguồn | Dùng để đối chiếu |
 |---|---|
-| [Nguồn xv6 của BTL](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Nguon-xv6.md>) | Nền source và cách dùng bản BTL |
-| [Kiến trúc dự án](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Kien-truc-du-an.md>) | State tầng trang ở kalloc.c, API nhỏ và module theo trách nhiệm |
+| [Nguồn xv6 của BTL](<../Nguon-xv6.md>) | Nền source và cách dùng bản BTL |
+| [Kiến trúc dự án](<../Kien-truc-du-an.md>) | State tầng trang ở kalloc.c, API nhỏ và module theo trách nhiệm |
 | [MIT lock lab](https://pdos.csail.mit.edu/6.1810/2025/labs/lock.html) | Hướng per-CPU lists/khóa/stealing, boot pool và điều kiện cpuid |
 | [MIT xv6 book: Locking](https://mit-pdos.github.io/xv6-riscv-book/lock.html) | Critical section, invariant và tranh chấp |
 | [MIT xv6 book: Scheduling](https://mit-pdos.github.io/xv6-riscv-book/sched.html) | CPU ID, mycpu và migration |
 | [MIT xv6 book: Page tables](https://mit-pdos.github.io/xv6-riscv-book/mem.html) | Tầng cấp trang và vùng RAM kernel |
 | [WG14 N1570](https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf) | §6.2.4 lifetime, §6.5.2.1 mảng, §6.7.6.2 khai báo mảng |
-| [Quy trình chú thích/commit](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Lo-trinh-hoc.md>) | Người dùng tự viết, tự commit/push sau từng phần |
+| [Quy trình chú thích/commit](<../Lo-trinh-hoc.md>) | Người dùng tự viết, tự commit/push sau từng phần |
 
 Source local quyết định chữ ký/call site đang có. Thiết kế M1/M2, bài tập và các bảng ownership là nội dung hướng dẫn soạn cho BTL; không phải kết quả chạy hoặc một triển khai upstream đã được nhập.
 
