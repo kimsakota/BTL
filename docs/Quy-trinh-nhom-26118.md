@@ -29,9 +29,9 @@ Kiểm tra trực tiếp ngày 19/10/2026:
 - Workspace đã có xv6, tài liệu nghiên cứu, kiến trúc, Lesson 0–3 và remote `https://github.com/kimsakota/BTL.git`.
 - Tag `xv6-baseline` trỏ đến `e287830021e09be802e783970e2481bfa6942968`; HEAD local là `c829ab9932a6865936e4922cabd3280b3d121284`. HEAD và working tree không đồng nhất vì đang có thay đổi chưa commit.
 - `kernel/kalloc.c` vẫn có một `kmem.lock` và một free list. Đã có `kfreepage_count`, khai báo tại `defs.h` và caller sau `kinit` trong `main.c`.
-- Chưa có implementation per-CPU hoặc slab trong phần source khảo sát. Chưa có kết quả build/boot/test/benchmark được đối chiếu ở lượt này.
+- Chưa có implementation per-CPU hoặc slab trong phần source khảo sát. Kiểm tra GitHub tiếp ngày 19/10: job macOS của PR #1 build kernel/fs.img thành công; Linux fail ở format nên build/test phía sau bị skipped. Chưa xác nhận runtime/benchmark; xem [kiểm tra GitHub](Thiet-lap-GitHub-26118.md).
 - Không có `user/kalloctest.c` và `kernel/kcsan.c` của MIT lock-lab trong bản BTL. Không ghi các công cụ đó là test đã sẵn có.
-- Có `.github/workflows/test.yml` từ codebase; việc file CI tồn tại không chứng minh pipeline hiện chạy thành công. Cần xác nhận runner, action, dependency và log thật trước khi dùng làm điều kiện merge.
+- Có `.github/workflows/test.yml`; đã đọc job/log thật và xác định lỗi format. Tách format khỏi build/test là hướng đề xuất, chưa sửa workflow. Hiện Linh chưa thêm cộng tác viên vào GitHub.
 
 Các sản phẩm được chuẩn bị với trợ giúp của assistant cần được từng tác giả đọc, kiểm tra và giải thích. File tồn tại không tự chứng minh mọi thành viên đã tham gia hoặc nội dung đã được nhóm chốt.
 
@@ -120,6 +120,8 @@ Mọi thay đổi API phải sửa tài liệu hợp đồng, liệt kê caller 
 ## 5 Quy trình một task từ đầu tới cuối
 
 Áp dụng cách làm dựa trên nhánh và pull request của [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow), giản lược cho nhóm ba người.
+
+**Giai đoạn chuẩn bị một người:** Linh chưa thêm cộng tác viên, nên dùng PR/tự kiểm tra và không bật bắt buộc một approval từ người khác. Các bước review chéo dưới đây áp dụng khi đã có Minh/Khánh tham gia review; assistant không thay một GitHub approving review của thành viên. Xem [CONTRIBUTING](../CONTRIBUTING.md).
 
 1. **Ghi issue/task.** Có ID, owner, đầu ra, phụ thuộc, tiêu chí nghiệm thu và tuần dự kiến. Giữ mỗi task đủ nhỏ cho một kết quả có thể review trong khoảng 1–2 buổi; task khó tách thành bước thiết kế rồi bước code.
 2. **Thống nhất hợp đồng.** Viết đầu vào/đầu ra, reference, init/lifetime, ownership, failure path và khóa/ngắt. Reviewer kiểm tra ý tưởng trước khi tác giả viết phần lớn code.

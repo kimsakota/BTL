@@ -4,6 +4,29 @@ Cập nhật: 19/10/2026.
 
 ## Checkpoint mới nhất
 
+- Cập nhật sau khi Linh báo CI xong: run39209117349 đã completed/success, cả Linux (format/build/usertests/crash) và macOS success tại head58be186. PR #1 còn mở, 2 commits/20 files, chưa merge. Bước Desktop tiếp theo: bỏ chọn VstHelper, commit riêng 11 file docs/quy trình (gồm memory, templates, AGENTS, README, CONTRIBUTING và hướng dẫn), rồi Push origin. Chỉ các docs cần chốt; source format đã commit/push và CI baseline đạt. Không tự thao tác Git ghi/merge. Chưa có perCPU/slab/benchmark.
+
+- Mới nhất sau bấm Push origin: đã xác nhận remote và PR #1 nhận 58be186, local/origin 0/0; PR mở, 2 commit/20 file. Desktop Fetch origin và 12 Changes còn lại là bình thường vì các file đó chưa commit. Run PR mới 39209117349: Linux format + build success, usertests đang chạy, crash pending; macOS job success. Không kết luận toàn CI/runtime đã pass. Khi tiếp tục đọc trạng thái run mới trước hướng dẫn merge; không yêu cầu push lại hoặc commit 12 file chỉ để tab Changes biến mất.
+
+- Ưu tiên mới nhất: Linh yêu cầu hướng dẫn GitHub Desktop, đã lưu AGENTS/OP-009. Ảnh UI và Git xác nhận commit 58be186 style(kernel): fix formatting đã chứa đúng 5 file, local ahead origin 1; bước tiếp bấm Push origin phía trên. Tab Changes còn 12 file tài liệu/VstHelper ngoài commit; không dùng nút Commit 12 files để push commit format. Chưa xác nhận push/CI mới. Không tự thao tác Git ghi thay người dùng; không quay lại yêu cầu chỉnh chú thích.
+
+### Tiếp tục sau bước General ngày 19/10
+
+- Mới nhất sau “Đã format”: git diff đúng 5 file bio.c/kalloc.c/main.c/spinlock.c/string.c; chỉ định dạng, chưa thấy đổi logic. git diff --check và clang-format --dry-run --Werror trên kernel/user/mkfs đạt. Chú thích dài của acquire/release trong kfree vẫn ở cuối dòng nên formatter tách lời gọi; gợi ý chuyển lên dòng riêng. Index chưa stage gì; hướng dẫn Linh tự stage/commit/push đúng 5 file này, giữ docs/VstHelper ngoài commit format. Chưa chạy build/test hoặc xác nhận CI mới.
+- Mới nhất: Linh báo cài formatter xong; kiểm tra trực tiếp `wsl --exec clang-format --version` thấy Ubuntu clang-format 21.1.8 (6ubuntu1). Chưa có diff C mới, chưa chạy format/build/test. Bước tiếp Linh tự đưa chú thích dài lên dòng riêng, chạy make fmt và báo để assistant đọc diff trước commit format riêng.
+- Đã đọc lại GitHub: squash bật, merge commit/rebase tắt; chưa kiểm tra lại các setting khác. CI chưa có run mới và source format chưa đổi.
+- Môi trường local đã khác lần 13/10: WSL2 có Ubuntu 26.04.1, make/RISC-V GCC/QEMU tìm thấy; thiếu clang-format. CI đã dùng gói clang-format 21.1.6. Bước nhỏ tiếp theo hướng dẫn Linh cài formatter trong Ubuntu, tự chỉnh chú thích dài/format, gửi diff để review trước khi chốt commit riêng. Không tự sửa C hoặc cài công cụ thay người dùng trong lượt này.
+- Cài clang-format vướng cache APT lỗi: Linh chạy apt update chỉ Hit, index resolute/universe Packages vẫn 0 byte. InRelease yêu cầu bản giải nén 76.792.699 byte; HEAD HTTPS Packages.xz trả 200 và 15.960.824 byte. Nguồn universe đã bật, không cần thêm kho. Bước hướng dẫn tiếp: Linh xóa đúng file index rỗng /var/lib/apt/lists/archive.ubuntu.com_ubuntu_dists_resolute_universe_binary-amd64_Packages rồi apt update/policy để tải lại. Chưa xóa cache/cài gói thay người dùng; sudo -n yêu cầu xác thực tương tác.
+
+### Kiểm tra GitHub tiếp ngày 19/10
+
+- Linh yêu cầu kiểm tra repo/quy trình/commit; hiện chưa thêm cộng tác viên. Đã dùng plugin GitHub kiểm tra live kimsakota/BTL và đối chiếu local. Local đang ở codex/linh-review-existing-changes@7a61ccf, cùng origin; main@c829ab9 có 4 commit; PR #1 đang mở, 17 file. Tài liệu/code chuẩn bị đã được checkpoint lên nhánh trước lượt audit này, không còn là toàn bộ thay đổi chưa commit như checkpoint trước.
+- Lịch sử thẳng nhưng có 2 commit tên dấu chấm và scope trộn. Đề xuất giữ main, áp dụng task/PR/squash từ đây và tách checkpoint nếu bàn giao; chưa rewrite/force push/commit/merge. Tag xv6-baseline chỉ local, origin chưa có tag. VstHelper/ untracked có Git riêng, không tự stage.
+- Bằng chứng mới thay nhận định chưa đối chiếu CI: run 39202934361, macOS build kernel/fs.img thành công trên PR merge ref; Linux format fail ở bio.c/kalloc.c/main.c/spinlock.c/string.c nên build/usertests/crash skipped. Chưa có runtime/benchmark. Không tự format/sửa C thay Linh.
+- Main.protected=false và rulesets=[]; merge commit/squash/rebase đều bật, auto-delete branch tắt. Settings đề xuất: squash, PR vào main, 0 required approvals khi solo → 1 khi có reviewer, require CI sau khi ổn định. Chưa áp dụng settings hoặc mời ai.
+- Đã chuẩn bị docs/Thiet-lap-GitHub-26118.md và CONTRIBUTING.md; sửa link README thành tương đối, templates solo/team và cập nhật quy trình/bộ nhớ. Chưa commit/push; chưa sửa workflow/C/h/S/Makefile. PR #1 đã attach vào chat để tham chiếu.
+- Khi tiếp tục, đọc checklist GitHub; nếu người dùng muốn tách/commit/push/đổi settings thì xác định yêu cầu cụ thể đã được cho phép. Việc học và báo cáo W1 phía dưới vẫn giữ bối cảnh chuẩn bị cá nhân/nhóm.
+
 ### Tổ chức nhóm và báo cáo ngày 19/10
 
 - Người dùng là Nguyễn Kim Linh 20233495; nhóm 26118 còn Lê Trần Hiếu Minh 20233528 và Nguyễn An Khánh 20224019. Số đề tài trong workspace là 19, không phải mã điền báo cáo.
@@ -11,8 +34,8 @@ Cập nhật: 19/10/2026.
 - Linh xác nhận tuần này mới khởi động nhóm (19–25/10/2026); Lesson/code thử trước là học trước cá nhân, không tính mặc định là kết quả nhóm W01. Plan có K01–K04 cho W1, N01–N04 là TODO W2 có điều kiện; đề xuất tổng hợp nội bộ 24/10, chưa phải giờ nộp chính thức.
 - Đã đọc chat được tham chiếu bằng read_thread, ảnh và hai PDF local; báo cáo nháp có đủ năm mục và summary 251 từ. File Markdown/PDF tại docs/bao-cao/26118-Progress-Report-W01-DRAFT.*; chưa sẵn sàng nộp vì thiếu ngày from/to thực tế, đóng góp thực của hai bạn, URL design/board và xác nhận nội dung của Linh.
 - Thông báo yêu cầu ít nhất một báo cáo mỗi tuần; >14 ngày là mất báo cáo, không phải chu kỳ nộp cho phép. Sai khác 25% chưa rõ cách tính, tài liệu chỉ đưa quy ước nội bộ. Hạn cuối kỳ/giờ nộp chính thức còn thiếu.
-- Source 19/10 vẫn single-list có hàm đếm, chưa per-CPU/slab; không có kalloctest.c/kcsan.c của MIT lab. Chưa build/boot/test/benchmark, không sửa C/h/S/Makefile, không tự stage/commit/push hay gửi báo cáo.
-- Có mẫu task/PR trong .github để nhóm dùng sau khi tự push; chưa tạo issue/board/PR từ xa. Bước tiếp theo theo yêu cầu mới: chốt dữ kiện báo cáo hoặc quay lại Lesson 3 dưới đây.
+- Ở lượt soạn quy trình trước audit GitHub: source vẫn single-list có hàm đếm, chưa per-CPU/slab; không có kalloctest.c/kcsan.c MIT lab, chưa đối chiếu build/boot/test. Bằng chứng CI mới xem mục kiểm tra GitHub ở trên.
+- Mẫu task/PR đã có trong nhánh checkpoint PR #1, chưa vào main. Bước theo yêu cầu báo cáo: chốt dữ kiện W01 hoặc quay lại Lesson 3 dưới đây.
 
 ### Đã làm
 

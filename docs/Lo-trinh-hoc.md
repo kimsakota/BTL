@@ -6,6 +6,8 @@ Mỗi phần có: mục tiêu → khái niệm → trách nhiệm và dữ liệ
 
 ## Chốt một phần code: chú thích và commit
 
+Ưu tiên cập nhật 19/10/2026: Linh không muốn tập trung vào chú thích. Các mục gợi ý chú thích bên dưới là tùy nhu cầu, không là điều kiện bắt buộc hoặc lý do trì hoãn phần code đã kiểm tra đạt. Vẫn giữ việc nêu diff, kết quả kiểm tra thật và người dùng tự commit/push.
+
 Quy tắc người dùng bổ sung ngày 15/10/2026: khi một phần hướng dẫn có thay đổi code đã hoàn thành, người dùng sẽ commit rồi push lên GitHub. Phần chỉ phân tích trên giấy/trong chat chưa thay file không tạo mốc commit code. Sửa chú thích trong source cũng là thay đổi cần được ghi nhận.
 
 Mỗi mốc code có đủ các phần sau:

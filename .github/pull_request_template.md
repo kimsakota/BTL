@@ -23,5 +23,7 @@ Revision / log / dữ liệu thô:
 ## Bàn giao
 
 - [ ] Phạm vi đúng một task hoặc giải thích phụ thuộc
-- [ ] Có reviewer khác tác giả
+- [ ] Đã tự kiểm tra diff và bằng chứng; khi có cộng tác viên, đã nhận review từ người khác tác giả
 - [ ] Kết quả sẽ nối vào TODO báo cáo bằng cùng ID
+
+Giai đoạn chỉ Linh: chưa yêu cầu một approval từ người khác; ghi rõ đây là tự kiểm tra. Khi nhóm có reviewer, áp dụng review chéo theo CONTRIBUTING.md. Assistant review không thay một GitHub approval của thành viên.

@@ -14,9 +14,10 @@
 - Người dùng tự thiết kế và tự viết toàn bộ phần C của bài học/đề tài. Không tự thêm hoặc sửa implementation `.c/.h/.S`, và không đưa lời giải hoàn chỉnh để chép, trừ khi người dùng yêu cầu rõ việc đó.
 - Dạy từ thành phần nhỏ cần thiết: kiểu dữ liệu, hàm, khai báo/định nghĩa, header/include, con trỏ, struct, rồi cách compile/link và tích hợp. Với mỗi thành phần, giải thích trách nhiệm, dữ liệu vào/ra, reference/phụ thuộc và lý do liên kết trước khi giao bước tự viết.
 - Giao một bước nhỏ, để người dùng viết, đọc code/diff và đưa gợi ý sửa; người dùng thực hiện sửa. Chỉ cung cấp ví dụ minh họa hẹp hoặc gợi ý tăng dần khi cần, không nhảy tới implementation đầy đủ.
-- Với mỗi phần hướng dẫn có thay đổi code, kể cả chú thích, khi hoàn thành một phần có ý nghĩa phải gợi ý chú thích để người dùng tự viết: trách nhiệm, lý do, invariant, ownership, lifetime, khóa hoặc trạng thái CPU/ngắt khi liên quan. Chú thích cần giúp hiểu quyết định, không chỉ diễn lại câu lệnh.
+- Không đặt chú thích code thành yêu cầu bắt buộc hoặc lý do trì hoãn một mốc đã kiểm tra đạt. Chỉ gợi ý ngắn khi giúp hiểu quyết định kỹ thuật quan trọng hoặc khi người dùng yêu cầu; ưu tiên nhiệm vụ đang làm.
 - Cuối phần code đã hoàn thành, nêu thay đổi và các kiểm tra thực tế, chỉ rõ file/phần thuộc mốc đó, đề xuất commit message phù hợp và nhắc người dùng tự commit rồi push lên GitHub. Ghi rõ kiểm tra chưa chạy nếu có; không tuyên bố test thành công thay người dùng.
 - Commit/push do người dùng thực hiện. Chỉ hướng dẫn và nhắc, không tự stage/commit/push nếu chưa được người dùng yêu cầu rõ thao tác đó. Quy trình chốt phần code nằm trong docs/Lo-trinh-hoc.md.
+- Khi hướng dẫn người dùng thao tác Git, ưu tiên GitHub Desktop với tên nút và vị trí cụ thể. Chỉ chuyển sang lệnh terminal khi người dùng yêu cầu hoặc thao tác cần thiết không có trong Desktop; giải thích ngắn lý do.
 - Giữ cấu trúc C nhỏ theo trách nhiệm: tầng trang, tầng object và test. Tham khảo `docs/Kien-truc-du-an.md` khi thay module/API.
 - Các việc đảo ngược được và đã nằm trong yêu cầu có thể thực hiện tiếp; chỉ hỏi khi thiếu thông tin làm thay đổi quyết định thực sự.
 - Source xv6 ngoài BTL đã được kiểm tra tại `docs/Nguon-xv6.md`. Làm thay đổi của đồ án trong bản BTL khi source đã nhập; thư mục Exercise là nguồn tham chiếu.
