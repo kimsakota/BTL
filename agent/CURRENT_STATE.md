@@ -4,7 +4,7 @@ Cập nhật: 19/10/2026.
 
 ## Project status
 
-- Giai đoạn: Đã soạn Lesson 0–3, quy trình nhóm/báo cáo và kiểm tra GitHub. Source đã có hàm đếm trang; Lesson 3 hướng dẫn tự đổi state/local path theo CPU. CI macOS đã build kernel/fs.img; chưa có kết quả runtime được đối chiếu.
+- Giai đoạn: PR #1 đã squash merge; baseline main53872b8 có Lesson 0–3, quy trình, templates và hàm đếm trang; CI qua format/build/usertests/crash. Bảo vệ main cho giai đoạn solo đã cấu hình và đọc lại đúng, gồm required checks linux/macos. Chưa triển khai per-CPU/slab.
 - Mục tiêu: đề tài 19, Slab allocator and per-CPU free lists trên xv6; nối kiến thức từ BaoKhoaHoc/VstHelper.
 - Người dùng trong chat này: Nguyễn Kim Linh; muốn làm nhiều và hiểu toàn bộ dự án.
 - Nhóm dự án 26118: Nguyễn Kim Linh 20233495, Lê Trần Hiếu Minh 20233528, Nguyễn An Khánh 20224019. Đã có nhân lực; chưa xác nhận deadline, quỹ giờ và phân công với hai bạn.
@@ -18,15 +18,15 @@ Cập nhật: 19/10/2026.
 | CST-003 | Source xv6 phù hợp nằm ở thư mục Exercise được người dùng cung cấp | Cao | docs/Nguon-xv6.md | Import hoặc đổi baseline | 13/10/2026 |
 | CST-004 | Baseline nguồn được kiểm tra là commit 06aad25c735fd3159bdfae5680be4eab7b1668b2 của mit-pdos/xv6-riscv | Cao | docs/Nguon-xv6.md | HEAD nguồn thay đổi | 13/10/2026 |
 | CST-005 | Source đó dùng free list trang chung, PGSIZE=4096, NCPU=8; chưa có slab/stealing trong phần đã kiểm tra | Cao | docs/Nguon-xv6.md và kernel nguồn | Thay allocator hoặc phiên bản | 13/10/2026 |
-| CST-006 | Allocator vẫn một list/lock chung, có kfreepage_count/prototype/caller. Chưa có per-CPU/slab. CI của checkpoint 58be186 đã qua usertests/crash; chưa có benchmark hoặc test đặc thù cho allocator mới | Cao về source và CI baseline | source hiện tại; GitHub run39209117349; L022 | Source/test mới | 19/10/2026 |
+| CST-006 | Allocator vẫn một list/lock chung, có kfreepage_count/prototype/caller. Chưa có per-CPU/slab. CI main53872b8 đã qua usertests/crash; chưa có benchmark hoặc test đặc thù cho allocator mới | Cao về source và CI baseline | source hiện tại; GitHub run39212699734; L023 | Source/test mới | 19/10/2026 |
 | CST-007 | WSL có Ubuntu 26.04.1 LTS, version 2; Make/RISC-V GCC/QEMU đã tìm thấy. Linh đã cài clang-format, kiểm tra trực tiếp thấy Ubuntu clang-format 21.1.8. Chưa build/boot/test local trong lượt kiểm tra | Cao về phát hiện công cụ | wsl/os-release/command -v và clang-format --version; L017 | Công cụ đổi hoặc trước build/run | 19/10/2026 |
 | CST-008 | Bộ nhớ project-memory Light được tích hợp ở agent/, nối qua AGENTS.md | Cao | agent/README.md và các file bộ nhớ | Đổi bộ khung memory | 13/10/2026 |
 | CST-009 | Git repo BTL có default branch origin/main và tag xv6-baseline local; tag chưa được push lên origin ở lần kiểm tra 19/10 | Cao | Git local, GitHub API ref và git ls-remote --tags origin; L016 | Push tag hoặc đổi nền source | 19/10/2026 |
 | CST-010 | Mã dự án 26118, số đề tài 19; nhóm gồm Linh 20233495, Minh 20233528, Khánh 20224019; người dùng là Linh | Cao | Ảnh và yêu cầu trực tiếp 19/10; LOGBOOK L015 | Người dùng đính chính | 19/10/2026 |
-| CST-011 | Run39209117349 tại head58be186 đã completed/success: Linux format/build/usertests/crash success; macOS build/job success. Chưa có per-CPU/slab hoặc benchmark; không có kalloctest.c/kcsan.c MIT lab trong BTL | Cao tại lúc kiểm tra | GitHub run và jobs; L022 | Source/run mới | 19/10/2026 |
+| CST-011 | Run main39212699734 tại head53872b8 đã completed/success: linux format/build/usertests/crash success; macos build/job success. Run PR39210447048 tại head2df489d cũng success. Chưa có per-CPU/slab hoặc benchmark; không có kalloctest.c/kcsan.c MIT lab trong BTL | Cao tại lúc kiểm tra | GitHub run và jobs; L023 | Source/run mới | 19/10/2026 |
 | CST-012 | Tuần 19–25/10/2026 mới khởi động nhóm; phần Linh đang học là học trước/chuẩn bị cá nhân, không tự tính là kết quả nhóm W01 | Cao | Người dùng trả lời trực tiếp ngày 19/10; LOGBOOK L015 | Người dùng đính chính hoặc có kết quả W01 thật | 19/10/2026 |
-| CST-013 | Nhánh review local/origin đều 58be186, ahead/behind 0/0; PR #1 head đã nhận commit format, còn mở/chưa merge, tổng 2 commit/20 file. Main vẫn c829ab9. Tài liệu và VstHelper còn ngoài commit | Cao tại lúc kiểm tra | Plugin GitHub và Git local; L021 | Nhánh/PR/working tree thay đổi | 19/10/2026 |
-| CST-014 | Repo public, main.protected=false/rulesets rỗng ở lần audit; kiểm tra tiếp sau bước General thấy chỉ squash merge còn bật, merge commit/rebase tắt. Chưa đọc lại auto-delete và rulesets sau bước này; Linh chưa thêm cộng tác viên | Cao về trường đã đọc | Plugin GitHub và yêu cầu trực tiếp; L016–L017 | Cấu hình/thành viên đổi | 19/10/2026 |
+| CST-013 | PR #1 đã squash merge thành 53872b8895e82f7baa453c077a0a5255b7310c79; local đang main, cùng origin/main ở lần đọc. Có 4 file tài liệu/bộ nhớ modified chưa commit, một dòng chú thích Linh thêm trong kalloc.c và VstHelper/ untracked | Cao tại lúc kiểm tra | Git local; L025 | Nhánh/PR/working tree thay đổi | 19/10/2026 |
+| CST-014 | Ruleset main-workflow id25416827 active, target default branch main, bypass rỗng; chặn xóa/force push, linear history, PR với 0 approvals và resolve conversations. Required checks đã có linux và macos, integration_id15368 cho cả hai; strict=false. Repo chỉ cho squash ở lần đọc trước; chưa thêm cộng tác viên | Cao về trường đã đọc | Plugin GitHub ruleset detail; L025 | Cấu hình/thành viên đổi | 19/10/2026 |
 
 ## Active operating decisions
 
@@ -46,10 +46,10 @@ Cập nhật: 19/10/2026.
 
 | Area | Current value | Source | Revisit when | Last checked |
 |---|---|---|---|---|
-| Current priority | CI checkpoint đã xanh hoàn toàn, PR #1 còn mở. Hướng dẫn Desktop bỏ tick VstHelper, commit riêng 11 file tài liệu/quy trình còn lại và push. Sau đó review PR/config trước hướng dẫn squash merge; không tự stage/commit/push/merge | LOGBOOK L022; Git và GitHub | Sau commit/push tài liệu hoặc người dùng đổi bước | 19/10/2026 |
-| Build và runtime | Local chỉ xác nhận style, chưa chạy local build/test. CI run39209117349 completed/success: Linux format/build/usertests/crash đều success; macOS build success. Kết quả gắn với head58be186 và PR merge ref7e9ea622, chưa phải source perCPU/slab hay benchmark | Plugin GitHub run/jobs; L022 | Source/run mới hoặc thực hành local | 19/10/2026 |
-| Learning progress | Đã xác nhận đọc xong Lesson 0; Lesson 1–3 đã soạn. Code hàm đếm đã có nhưng chưa xác nhận build/boot/test; không đồng nhất source với thực hành đã pass | LOGBOOK.md L011–L014, source hiện tại | Sau bài học tiếp theo | 17/10/2026 |
-| Next implementation step | Kiểm tra/chốt hàm đếm nếu chưa làm. Người dùng tự khai báo pool/mảng, ghép M1 giữ pool 0 và count; kiểm tra rồi tự viết M2 local path. Không sửa C hoặc commit/push thay | docs/lessons/03-per-cpu-free-lists.md mục 11 | Bước tự viết được kiểm tra | 17/10/2026 |
+| Current priority | Cấu hình bảo vệ main cho solo đã xác nhận đủ. Chốt riêng 4 file docs/memory trên nhánh codex/docs-main-workflow bằng GitHub Desktop; không gộp kalloc.c/VstHelper vào commit tài liệu. Sau PR tài liệu, quay lại Lesson 3 P02 theo chặng nhỏ. Không tự stage/commit/push/Settings | LOGBOOK L025; Git và GitHub | Sau chốt tài liệu hoặc người dùng đổi bước | 19/10/2026 |
+| Build và runtime | Local chỉ xác nhận style, chưa chạy local build/test. CI main39212699734 tại 53872b8 completed/success: linux format/build/usertests/crash và macos build đạt. Đây là baseline có hàm đếm trang, chưa phải perCPU/slab hoặc benchmark | Plugin GitHub run/jobs; L023 | Source/run mới hoặc thực hành local | 19/10/2026 |
+| Learning progress | Đã xác nhận đọc xong Lesson 0; Lesson 1–3 đã soạn. Hàm đếm đã vào main và CI baseline đạt; chưa suy ra Linh đã hoàn thành các bài thực hành khác | LOGBOOK L011–L014, L023; source và CI | Sau bài học tiếp theo | 19/10/2026 |
+| Next implementation step | Sau chuẩn bị GitHub, Linh tự khai báo pool/mảng, ghép M1 giữ pool 0 và count; kiểm tra rồi tự viết M2 local path. Không sửa C hoặc commit/push thay | docs/lessons/03-per-cpu-free-lists.md mục 11; L023 | Bước tự viết được kiểm tra | 19/10/2026 |
 
 ## Current constraints
 

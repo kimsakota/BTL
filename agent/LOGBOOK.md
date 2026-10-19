@@ -2,6 +2,32 @@
 
 Cập nhật: 19/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
 
+## L025 - 19/10/2026 - Xác nhận bảo vệ main đã đủ hai check bắt buộc
+
+- type: observation / validation / guidance
+- verified: Ruleset main-workflow id25416827 active, target ~DEFAULT_BRANCH, bypass rỗng. Required status checks đã có linux và macos, cả hai integration_id15368; strict_required_status_checks_policy=false. PR vẫn 0 approvals, resolve conversations; deletion/non_fast_forward/linear history giữ bật. Cấu hình bảo vệ main cho giai đoạn solo đã hoàn thành, chưa phải nhóm đã thêm thành viên hoặc tạo board/issues.
+- local: main cùng origin/main ở lần đọc; 4 file docs/memory modified, kalloc.c có chú thích Linh thêm, VstHelper untracked. Không sửa C hoặc thao tác Git ghi thay người dùng.
+- next step: Linh tạo nhánh codex/docs-main-workflow từ main trong Desktop, commit riêng CURRENT_STATE/LOGBOOK/RECOVERY_NOTES và docs/Thiet-lap-GitHub-26118.md với message docs: record verified main workflow; bỏ chọn kalloc.c/VstHelper. Push và mở PR theo quy trình vừa thiết lập. Sau đó quay lại Lesson 3 P02, không mở rộng thêm thủ tục Git không cần thiết.
+- documentation: Chốt lại recovery notes ngắn; các trạng thái trước vẫn ở logbook theo ngày. Chỉ thay tài liệu, kiểm tra whitespace đúng 4 file; chưa stage/commit/push/merge hoặc test implementation.
+
+## L024 - 19/10/2026 - Ruleset đã bật, còn thiếu hai check CI
+
+- type: observation / guidance
+- verified: GitHub có branch ruleset main-workflow id25416827, enforcement active, target ~DEFAULT_BRANCH, bypass rỗng. Rules deletion, non_fast_forward, required_linear_history bật. PR required_approving_review_count=0, required_review_thread_resolution=true, không require code owner/last-push approval.
+- gap: required_status_checks rule tồn tại nhưng required_status_checks=[]; strict=false. Chưa được kết luận PR bị chặn theo kết quả linux/macos. Cần Linh Add checks hai tên đã có thật rồi Save changes và đọc lại.
+- local: main53872b8 đồng bộ origin; 4 file docs/memory còn modified từ cập nhật trước. Diff kalloc.c mới chỉ thêm một chú thích trước acquire trong kalloc, không đổi logic; không sửa/format C thay Linh hoặc biến chỉnh chú thích thành điều kiện thiết lập. VstHelper vẫn untracked.
+- next action: Hướng dẫn bổ sung checks trong ruleset hiện có, không tạo ruleset trùng; kiểm tra lại cấu hình sau người dùng lưu. Chưa tự thay Settings hoặc stage/commit/push.
+
+## L023 - 19/10/2026 - PR đã merge, main đồng bộ và CI đạt
+
+- type: observation / validation / guidance
+- user actions: Linh commit/push 11 file tài liệu thành 2df489d, squash merge PR #1, chuyển GitHub Desktop sang main rồi Pull origin. Hộp thoại Switch branch được hướng dẫn Bring my changes to main sau khi xác nhận chỉ VstHelper/ untracked.
+- verified Git: PR #1 merged=true lúc 06:55 UTC; squash commit 53872b8895e82f7baa453c077a0a5255b7310c79, title chore: add page-count diagnostics and team workflow. Local main cùng origin/main; trước cập nhật bộ nhớ chỉ VstHelper/ untracked, không còn tracked diff.
+- verified CI: Run PR39210447048 tại 2df489d success. Run main39212699734 tại 53872b8 completed/success; jobs linux và macos success. Linux qua format/build/usertests/crash, macos qua build kernel/fs.img. Không chạy build/test local, chưa có per-CPU/slab/benchmark.
+- verified settings: Chỉ squash bật; main.protected=false và rulesets=[] sau merge. Không suy ra đã bật protection chỉ vì main có CI xanh.
+- next action: Hướng dẫn Linh tự tạo branch ruleset main-workflow, target main/default branch, enforcement Active; yêu cầu PR với 0 approvals khi solo, require checks linux/macos, giải quyết conversations, linear history, chặn force push/xóa. Chưa áp dụng cấu hình; kiểm tra lại server khi Linh báo xong.
+- changes: Cập nhật CURRENT_STATE, RECOVERY_NOTES và tài liệu thiết lập theo mốc đã kiểm chứng; chưa commit các cập nhật này. Không sửa implementation hoặc tự stage/commit/push/merge/Settings.
+
 ## L022 - 19/10/2026 - CI thành công và chốt tài liệu chuẩn bị bằng Desktop
 
 - type: observation / validation / guidance
