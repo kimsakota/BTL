@@ -4,16 +4,19 @@ Cập nhật: 19/10/2026. Trạng thái trước và bằng chứng theo mốc n
 
 ## Checkpoint mới nhất
 
-- Linh đã squash merge PR #1 thành 53872b8895e82f7baa453c077a0a5255b7310c79, title chore: add page-count diagnostics and team workflow, rồi chuyển GitHub Desktop về main và Pull origin. Local/origin main cùng commit ở lần đọc mới.
+- Baseline main sau PR #1 là 53872b8895e82f7baa453c077a0a5255b7310c79. Linh đã commit/push tài liệu lên codex/docs-main-workflow và tạo PR #2; PR còn open/not merged ở lần đọc mới, headff8a36a. Trước lượt sửa mới local/origin nhánh docs cùng head, chỉ VstHelper untracked; không giữ nhận định cũ có 4 file chưa commit.
 - CI main run39212699734 completed/success: linux qua format/build/usertests/crash, macos qua build. Run PR39210447048 tại head2df489d cũng success. Chưa chạy build/test local trong các lượt kiểm tra này; chưa có per-CPU/slab/benchmark.
 - Bảo vệ main cho solo đã hoàn thành và đọc lại: ruleset main-workflow id25416827, active, target default branch, bypass rỗng; PR với 0 approvals, resolve conversations, linear history, chặn xóa/force push. Required checks linux và macos đều có integration ID15368; strict up-to-date tắt. Repo chỉ cho squash ở lần đọc gần nhất. Không yêu cầu Linh tạo lại ruleset hoặc thêm lại checks đã có.
-- Chưa thêm Minh/Khánh vào GitHub; chưa xác nhận board/issues hoặc push tag xv6-baseline. Các việc này chưa tự động là điều kiện phải làm trước khi học tiếp.
+- Theo Linh, Minh và Khánh chưa được thêm vào repo. Chưa có username/profile xác nhận; đã hỏi qua async. Connector không hỗ trợ endpoint list collaborators/invitations ở lần thử mới, nên không giả định trạng thái từ API. Chưa xác nhận board/issues hoặc push tag xv6-baseline.
 
 ## Bước nhỏ tiếp theo
 
-- Có 4 file tài liệu/bộ nhớ chưa commit: CURRENT_STATE, LOGBOOK, RECOVERY_NOTES và docs/Thiet-lap-GitHub-26118.md. Hướng dẫn Desktop tạo nhánh codex/docs-main-workflow từ main, commit riêng 4 file với message docs: record verified main workflow, Push origin rồi Create Pull Request. Không tự stage/commit/push/merge.
-- Kernel/kalloc.c có một dòng chú thích Linh tự thêm, chưa đổi logic ở lần đọc; VstHelper/ untracked có Git riêng. Giữ cả hai ngoài commit tài liệu; không sửa/format C thay Linh và không đặt chỉnh chú thích thành điều kiện tiếp tục.
-- Sau chốt tài liệu, quay lại Lesson 3 P02: Linh tự khai báo kiểu pool/mảng; review từng thành phần rồi init, alloc/free/count ở M1 vẫn dùng pool 0. M2 mới chọn CPU và giới hạn CPUS=1; chưa stealing nên không khẳng định hỗ trợ nhiều CPU.
+- **Ưu tiên đã sửa theo yêu cầu Linh:** đang hướng dẫn GitHub cho cả nhóm, không chuyển sang bài C. Cần mời/accept Minh và Khánh, clone, chia sẻ lesson, nhận issue/board, thử PR/review rồi mới tiếp tục công việc kỹ thuật theo nhóm.
+- Steering mới: Linh muốn up VstHelper và hỏi branch/main. Đã chuẩn bị references/VstHelper để chia sẻ snapshot 43 file nguồn/tài liệu (~1,2 MB), thêm README/SNAPSHOT.json với provenance/dirty status/hash. Repo VstHelper gốc có origin ShiftSort@7236e72 và thay đổi chưa commit, đã giữ nguyên .git/HEAD/status và ignore /VstHelper/ tại BTL. Không xóa/move repo gốc. Chưa stage/commit/push. Chốt docs trong PR #2 trước, rồi main cập nhật → nhánh codex/reference-vsthelper → chỉ .gitignore và snapshot → PR vào main. Đây là chuẩn bị snapshot cho yêu cầu chia sẻ, không mặc định thư viện đã publish.
+- Sổ tay docs/So-tay-GitHub-nhom.md và docs/lessons/README.md mới nằm ở local; chưa publish. Đã sửa 94 link nội bộ trong 6 Markdown thành tương đối; cập nhật README, CONTRIBUTING, templates, kế hoạch/quy trình và bộ nhớ. Các file mới/sửa chưa tự commit/push. PR #2 hiện có là PR workflow, chưa merge; không tự tạo nhánh/commit để tránh hỏi người dùng.
+- Bước ngay: có username chính xác thì Linh mời qua Settings → Collaborators → Add people, hai bạn accept và clone bằng Desktop. Mỗi người thử một PR ghi chú onboarding; khi có reviewer sẵn sàng mới tăng approvals lên 1. Project có quyền riêng: thêm hai bạn với Write trên board. K01–K04 và phân công trong sổ tay là đề xuất cần nhận, không là thành quả đã làm.
+- VstHelper gốc có Git riêng đã được ignore; không stage clone gốc. Chỉ references/VstHelper là bản chuẩn bị chia sẻ. User đã commit một chú thích kalloc.c vào PR #2 và sửa trailing whitespace thành ff8a36a; không sửa/format C thay Linh hoặc đặt chỉnh chú thích thành điều kiện cộng tác.
+- Khi Linh muốn quay lại học sau, P02 là pool/mảng rồi init/alloc/free/count M1 dùng pool 0; M2 local-only CPUS=1, sau đó mới stealing. Hiện không giao bài này.
 - Dùng GitHub Desktop cho hướng dẫn Git, tên nút cụ thể; chỉ dùng terminal khi người dùng yêu cầu hoặc thao tác không có trong Desktop. Với việc code, Linh tự thiết kế/viết, assistant giải thích và đọc diff; không cung cấp implementation đầy đủ.
 
 ## Bối cảnh học và nhóm

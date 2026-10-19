@@ -1,12 +1,14 @@
 # Kiểm tra và thiết lập GitHub cho dự án 26118
 
-Kiểm tra ngày 19/10/2026 trên [kimsakota/BTL](https://github.com/kimsakota/BTL), dùng plugin GitHub và đối chiếu Git local. Linh xác nhận hiện chưa thêm cộng tác viên. Cấu hình solo đã áp dụng và kiểm tra lại được ghi ở phần cập nhật bên dưới; các mục cho nhóm và công việc tiếp theo vẫn là đề xuất.
+Kiểm tra ngày 19/10/2026 trên [kimsakota/BTL](https://github.com/kimsakota/BTL), dùng plugin GitHub và đối chiếu Git local. Cập nhật sau đó: ảnh Linh cung cấp đã hiển thị hai tài khoản với nhãn Collaborator. Cấu hình solo đã áp dụng và kiểm tra lại được ghi ở phần cập nhật bên dưới; clone/push/review của từng bạn và quyền board chưa được xác nhận.
+
+**Bảo vệ main không thay thế việc đưa cả nhóm vào làm.** Hai tài khoản đã có trong danh sách Collaborator theo ảnh mới; tiếp tục clone, đăng lesson để đọc chung, nhận task và review. Minh/Khánh bắt đầu tại [hướng dẫn thành viên](Huong-dan-thanh-vien.md); Linh xem thêm [sổ tay GitHub nhóm](So-tay-GitHub-nhom.md). Connector không hỗ trợ hai endpoint list collaborators/invitations ở lần thử trước; trạng thái thành viên cập nhật dựa trên ảnh, không phải kết quả API.
 
 ## 1 Kết quả kiểm tra thực tế
 
 Bảng dưới là snapshot lần audit đầu. **Cập nhật ngày 19/10:** Linh đã commit tài liệu thành `2df489d`, squash merge [PR #1](https://github.com/kimsakota/BTL/pull/1) thành `53872b8` và đồng bộ GitHub Desktop về `main`. [CI trên main](https://github.com/kimsakota/BTL/actions/runs/39212699734) completed/success: `linux` qua format/build/usertests/crash, `macos` qua build. Repo chỉ cho squash merge. Linh đã cài clang-format 21.1.8; thông tin lỗi format và PR đang mở trong bảng bên dưới chỉ mô tả lịch sử audit để tra cứu.
 
-**Bảo vệ main đã xác nhận:** `main-workflow` id `25416827` đã **active**, target default branch, bypass rỗng; PR với 0 approvals, resolve conversations, linear history và chặn xóa/force push. Required checks đã có **`linux`** và **`macos`**, cả hai integration ID `15368`; strict up-to-date tắt. Danh sách checks từng trống ở bước tạo ban đầu, nhưng Linh đã thêm và agent đọc lại được. Các thiết lập solo này đã hoàn thành; chưa thêm cộng tác viên hoặc xác nhận board/issues.
+**Bảo vệ main đã xác nhận:** `main-workflow` id `25416827` đã **active**, target default branch, bypass rỗng; PR với 0 approvals, resolve conversations, linear history và chặn xóa/force push. Required checks đã có **`linux`** và **`macos`**, cả hai integration ID `15368`; strict up-to-date tắt. Danh sách checks từng trống ở bước tạo ban đầu, nhưng Linh đã thêm và agent đọc lại được. Đây là lần đọc setting trước ảnh Collaborator; chưa đọc lại approvals hoặc xác nhận board/issues sau khi thêm hai bạn.
 
 | Hạng mục | Kết quả quan sát | Ý nghĩa |
 |---|---|---|
@@ -137,7 +139,7 @@ Issue cần các trường ID, owner, đầu ra, phụ thuộc, tuần, acceptan
 
 Tag `xv6-baseline` cần được Linh tự push khi muốn chia sẻ mốc nền; kiểm tra tag trỏ đúng commit trước. Lượt audit không push tag. `VstHelper/` có Git riêng: nếu chỉ là mã tham khảo, đề xuất để ở ngoài checkout BTL; nếu thật sự muốn version dependency thì quyết định riêng về submodule. Không stage toàn bộ `VstHelper/` theo thói quen `git add .`.
 
-README đã được chuẩn bị lại link tương đối để vào được từ GitHub/clone khác. Các bài học vẫn còn link đường dẫn máy cũ; một lần quét trước khi chỉnh README ghi nhận 108 lần khớp root BTL trong 7 Markdown. Nên có task đổi nốt các link trong bài học, giữ nguồn ngoài repo được ghi rõ là tham khảo local thay vì link giả dùng chung.
+README và mục lục đã có link tương đối. Lượt hoàn thiện cộng tác đã đổi **94 link nội bộ trong 6 file** (Lesson 0–3, lộ trình học và kiến trúc) từ root ổ D: sang link tương đối; các line suffix của link source đổi thành #L để mở trên GitHub. Con số 108 lần khớp root ở lần quét cũ gồm cả chuỗi đường dẫn minh họa, không chỉ link. Đường dẫn lệnh chạy cần thay theo clone của từng người; nguồn ngoài repo vẫn ghi là nguồn local. Các sửa đổi mới này còn ở máy, chưa được tự commit/push.
 
 ## 7 Thứ tự thực hiện đề xuất
 

@@ -21,7 +21,7 @@ Hiện kernel/kalloc.c là allocator trang gốc: mỗi lần kalloc lấy một
 
 Khi học đến phần triển khai, người dùng sẽ tự sửa allocator trang để có danh sách theo CPU, tự viết allocator object nhỏ và tích hợp vào các thành phần kernel cần dùng. Các file mới như kernel/kmalloc.c đang là thiết kế dự kiến, chưa tồn tại như chức năng đã hoàn thành.
 
-“Tự viết toàn bộ C của đề tài” là tự viết các thay đổi và chức năng cần cho đề tài; mã nền xv6 được giữ làm hệ điều hành để phát triển trên đó. Thông tin nhập source nằm trong [Nguồn xv6](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Nguon-xv6.md>).
+“Tự viết toàn bộ C của đề tài” là tự viết các thay đổi và chức năng cần cho đề tài; mã nền xv6 được giữ làm hệ điều hành để phát triển trên đó. Thông tin nhập source nằm trong [Nguồn xv6](<../Nguon-xv6.md>).
 
 ## 1. Hàm là một đơn vị công việc
 
@@ -41,7 +41,7 @@ Không nhận tham số không có nghĩa là hàm không dùng dữ liệu nào
 
 ## 2. Khai báo: cho compiler biết cách gọi
 
-Mở [defs.h, dòng 60](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/defs.h:60>). Đây là một khai báo đã có trong source tham chiếu:
+Mở [defs.h, dòng 60](<../../kernel/defs.h#L60>). Đây là một khai báo đã có trong source tham chiếu:
 
 ```c
 void* kalloc(void);
@@ -62,7 +62,7 @@ Khai báo giúp compiler kiểm tra cách dùng hàm. Nó không chứa thao tá
 
 ## 3. Định nghĩa: chứa phần thực hiện
 
-Mở [kalloc.c, dòng 69](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/kalloc.c:69>). Định nghĩa có phần thân trong dấu ngoặc nhọn.
+Mở [kalloc.c, dòng 69](<../../kernel/kalloc.c#L69>). Định nghĩa có phần thân trong dấu ngoặc nhọn.
 
 Trong lượt đầu chỉ nhận diện tên, kiểu trả về, danh sách tham số và ranh giới phần thân. Chưa cần hiểu mọi dòng xử lý bên trong.
 
@@ -78,7 +78,7 @@ Include không chạy hàm, không tự ghép binary và không thay thế việ
 
 ## 5. Một lời gọi thực tế
 
-Mở [vm.c, dòng 228](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/vm.c:228>), tìm lời gọi kalloc và biến mem nhận kết quả. Đọc phần đầu vm.c để thấy file đã include defs.h.
+Mở [vm.c, dòng 228](<../../kernel/vm.c#L228>), tìm lời gọi kalloc và biến mem nhận kết quả. Đọc phần đầu vm.c để thấy file đã include defs.h.
 
 Chỉ cần nhận diện: vm.c yêu cầu công việc, kalloc.c cung cấp phần thực hiện, defs.h cho compiler biết giao diện của hàm. Chưa học toàn bộ subsystem bộ nhớ ảo trong lượt này.
 
@@ -95,7 +95,7 @@ Object file chứa mã máy và thông tin symbol/reference cần cho liên kế
 
 Khai báo có nhưng không đưa object chứa định nghĩa vào bước link có thể gây lỗi undefined reference. Chỉ có định nghĩa trong một file chưa đủ để mọi file khác biết cách gọi nó ở bước compile.
 
-Mở [Makefile, dòng 10](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/Makefile:10>) để nhận diện kalloc.o, rồi [dòng 93](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/Makefile:93>) để thấy target kernel và lệnh linker. Make điều phối các bước; compiler và linker thực hiện những công việc khác nhau.
+Mở [Makefile, dòng 10](<../../Makefile#L10>) để nhận diện kalloc.o, rồi [dòng 93](<../../Makefile#L93>) để thấy target kernel và lệnh linker. Make điều phối các bước; compiler và linker thực hiện những công việc khác nhau.
 
 ## 7. Điều cần tự giải thích ở lượt đầu
 
@@ -113,4 +113,4 @@ Sau khi kiểm tra cách đọc và viết khai báo, tiếp tục include và c
 
 ## 9. Bài học tiếp theo
 
-Khi đọc xong bài này, tiếp tục [Bài 1: Bộ nhớ, con trỏ, struct và allocator trang xv6](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/01-baseline-va-kalloc.md>). Bài 1 có kiến thức đầy đủ theo từng phần và các bài tập nhỏ để bạn tự viết; không cần chờ một lượt giải thích lại Lesson 0 nếu bạn đã đọc xong.
+Khi đọc xong bài này, tiếp tục [Bài 1: Bộ nhớ, con trỏ, struct và allocator trang xv6](<01-baseline-va-kalloc.md>). Bài 1 có kiến thức đầy đủ theo từng phần và các bài tập nhỏ để bạn tự viết; không cần chờ một lượt giải thích lại Lesson 0 nếu bạn đã đọc xong.

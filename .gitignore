@@ -23,3 +23,6 @@ __pycache__/
 /agent/history/*.jsonl.tmp
 
 .vs/
+
+# Independent local Git checkout; share the source snapshot under references/.
+/VstHelper/

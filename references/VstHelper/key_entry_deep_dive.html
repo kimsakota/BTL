@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân Tích Chuyên Sâu Cấu Trúc Bộ Nhớ KeyEntry (32 Bytes)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Light Theme Palette */
+            --bg-dark: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-hover: #ffffff;
+            --bg-inner: #f1f5f9;
+            --border-color: #cbd5e1;
+            --border-subtle: #e2e8f0;
+            --accent-primary: #2563eb;
+            --accent-secondary: #7c3aed;
+            --accent-success: #059669;
+            --accent-warning: #d97706;
+            --accent-danger: #dc2626;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --text-code: #1e293b;
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Outfit', sans-serif;
+            --font-code: 'Fira Code', monospace;
+            --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            --shadow-hover: 0 20px 30px -10px rgba(37, 99, 235, 0.15);
+        }
+
+        [data-theme="dark"] {
+            --bg-dark: #090d16;
+            --bg-card: #131b2e;
+            --bg-card-hover: #1c2844;
+            --bg-inner: #0f172a;
+            --border-color: #233354;
+            --border-subtle: #1e293b;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #8b5cf6;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-code: #cbd5e1;
+            --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 15px 35px -5px rgba(59, 130, 246, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            padding: 2rem;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .theme-toggle-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.6rem 1.2rem;
+            border-radius: 9999px;
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-card);
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-primary);
+        }
+
+        header h1 {
+            font-family: var(--font-heading);
+            font-size: 2.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e40af 0%, #6b21a8 50%, #9d174d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.02em;
+        }
+
+        [data-theme="dark"] header h1 {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(37, 99, 235, 0.08);
+            border: 1px solid rgba(37, 99, 235, 0.25);
+            color: var(--accent-primary);
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: var(--font-code);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.75rem;
+            box-shadow: var(--shadow-card);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent-primary);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-title {
+            font-family: var(--font-heading);
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-main);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            background: var(--bg-inner);
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .btn-toggle {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-main);
+        }
+
+        .btn-toggle.active {
+            background: var(--accent-primary);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+        }
+
+        /* 32-Byte Memory Grid Visualizer */
+        .memory-grid-container {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .memory-grid-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-family: var(--font-code);
+        }
+
+        .memory-bytes-grid {
+            display: grid;
+            grid-template-columns: repeat(16, 1fr);
+            gap: 0.35rem;
+        }
+
+        @media (max-width: 640px) {
+            .memory-bytes-grid {
+                grid-template-columns: repeat(8, 1fr);
+            }
+        }
+
+        .byte-box {
+            aspect-ratio: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 0.35rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-code);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .byte-box .idx {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            position: absolute;
+            top: 2px;
+            left: 4px;
+        }
+
+        .byte-box .val {
+            font-weight: 700;
+            color: var(--text-main);
+            margin-top: 6px;
+        }
+
+        /* Byte Highlights (Light Mode Palette) */
+        .byte-box.field-key { background: #dbeafe; border-color: #3b82f6; }
+        .byte-box.field-seckey { background: #ede9fe; border-color: #8b5cf6; }
+        .byte-box.field-offset { background: #d1fae5; border-color: #10b981; }
+        .byte-box.field-len { background: #fef3c7; border-color: #f59e0b; }
+        .byte-box.field-state { background: #fee2e2; border-color: #ef4444; }
+        .byte-box.field-type { background: #fce7f3; border-color: #ec4899; }
+        .byte-box.field-comparer { background: #ccfbf1; border-color: #14b8a6; }
+
+        [data-theme="dark"] .byte-box.field-key { background: rgba(59, 130, 246, 0.25); border-color: #3b82f6; }
+        [data-theme="dark"] .byte-box.field-seckey { background: rgba(139, 92, 246, 0.25); border-color: #8b5cf6; }
+        [data-theme="dark"] .byte-box.field-offset { background: rgba(16, 185, 129, 0.25); border-color: #10b981; }
+        [data-theme="dark"] .byte-box.field-len { background: rgba(245, 158, 11, 0.25); border-color: #f59e0b; }
+        [data-theme="dark"] .byte-box.field-state { background: rgba(239, 68, 68, 0.25); border-color: #ef4444; }
+        [data-theme="dark"] .byte-box.field-type { background: rgba(236, 72, 153, 0.25); border-color: #ec4899; }
+        [data-theme="dark"] .byte-box.field-comparer { background: rgba(20, 184, 166, 0.3); border-color: #14b8a6; }
+
+        .byte-box:hover {
+            transform: scale(1.15);
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Field Legend & Cards */
+        .field-legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .legend-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left-width: 4px;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .legend-item:hover {
+            transform: translateY(-2px);
+            background: var(--bg-inner);
+            box-shadow: var(--shadow-card);
+        }
+
+        .legend-item.color-key { border-left-color: #2563eb; }
+        .legend-item.color-seckey { border-left-color: #7c3aed; }
+        .legend-item.color-offset { border-left-color: #059669; }
+        .legend-item.color-len { border-left-color: #d97706; }
+        .legend-item.color-state { border-left-color: #dc2626; }
+        .legend-item.color-type { border-left-color: #db2777; }
+        .legend-item.color-comparer { border-left-color: #0d9488; }
+
+        .legend-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.4rem;
+        }
+
+        .legend-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            font-family: var(--font-code);
+            color: var(--text-main);
+        }
+
+        .legend-offset {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: var(--bg-inner);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-family: var(--font-code);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .legend-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* CPU Cache Line Visualizer */
+        .cache-line-visualizer {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .cache-line-box {
+            border: 2px dashed #0284c7;
+            background: rgba(2, 132, 199, 0.05);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .cache-line-title {
+            color: #0284c7;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .cache-entries-flex {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .cache-entry-chunk {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 0.4rem;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .cache-entry-chunk.highlight {
+            border-color: #059669;
+            background: rgba(5, 150, 105, 0.08);
+        }
+
+        .cache-entry-title {
+            font-family: var(--font-code);
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #059669;
+            margin-bottom: 0.3rem;
+        }
+
+        /* Simulator Box */
+        .sim-input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .sim-input {
+            flex: 1;
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-family: var(--font-code);
+            font-size: 0.95rem;
+        }
+
+        .sim-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .code-block {
+            background: var(--bg-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            color: var(--text-code);
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .code-block .keyword { color: #d946ef; font-weight: 600; }
+        .code-block .type { color: #0284c7; font-weight: 600; }
+        .code-block .attr { color: #d97706; font-weight: 600; }
+        .code-block .number { color: #7c3aed; }
+        .code-block .comment { color: #64748b; font-style: italic; }
+
+        .alert-box {
+            background: rgba(217, 119, 6, 0.08);
+            border: 1px solid rgba(217, 119, 6, 0.25);
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .alert-box.info {
+            background: rgba(37, 99, 235, 0.08);
+            border-color: rgba(37, 99, 235, 0.25);
+        }
+
+        .alert-icon {
+            font-size: 1.5rem;
+        }
+
+        .alert-content h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #d97706;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-box.info .alert-content h4 {
+            color: #2563eb;
+        }
+
+        .alert-content p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <button class="theme-toggle-btn" onclick="toggleTheme()">
+            <span id="theme-icon">☀️</span> <span id="theme-text">Giao diện Sáng</span>
+        </button>
+        <h1>Phân Tích Chuyên Sâu Struct KeyEntry (32 Bytes)</h1>
+        <p>Khám phá kiến trúc bộ nhớ đỉnh cao trong Engine CSDL Nhúng VstHelper: Căn lề Cache Line 64-bit & Kỹ thuật Chồng lấp Bộ nhớ (C/C++ Union Overlay)</p>
+        <div class="badge-container">
+            <span class="badge">Struct Size: 32 Bytes</span>
+            <span class="badge">CPU L1 Cache Line: 64 Bytes</span>
+            <span class="badge">2 Entries / Cache Line</span>
+            <span class="badge">Zero-GC Overhead</span>
+        </div>
+    </header>
+
+    <!-- SECTION 1: INTERACTIVE MEMORY VISUALIZER & UNION MODES -->
+    <div class="card" style="margin-bottom: 2.5rem;">
+        <div class="card-title">
+            <span>💻 Mô Phỏng Bộ Nhớ Tương Tác 32 Bytes (Memory Layout Visualizer)</span>
+        </div>
+
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
+            Struct <code style="color: var(--accent-primary); font-family: var(--font-code);">KeyEntry</code> sử dụng thuộc tính <code style="color: var(--accent-warning); font-family: var(--font-code);">[StructLayout(LayoutKind.Explicit, Size = 32)]</code> để điều khiển chính xác vị trí Byte của từng biến. Chuyển đổi giữa 2 Chế độ bên dưới để xem sự biến hình của bộ nhớ:
+        </p>
+
+        <div class="controls">
+            <button class="btn-toggle active" id="btn-mode-index" onclick="switchMode('index')">
+                🔥 Chế Độ 1: Index Mode (Đã Tính Toán / Chèn Về Đĩa)
+            </button>
+            <button class="btn-toggle" id="btn-mode-buffer" onclick="switchMode('buffer')">
+                ⚡ Chế Độ 2: Buffer Union Mode (Đang Chờ Mã Hóa / Băm Key)
+            </button>
+        </div>
+
+        <div class="memory-grid-container">
+            <div class="memory-grid-header">
+                <span>VÙNG NHỚ 32 BYTES LIÊN TỤC TRÊN RAM (OFFSET 0 ĐẾN 31)</span>
+                <span id="active-mode-label" style="color: var(--accent-primary); font-weight: 700;">CHẾ ĐỘ: INDEX MODE</span>
+            </div>
+            
+            <div class="memory-bytes-grid" id="bytes-grid">
+                <!-- 32 Byte boxes generated dynamically by JS -->
+            </div>
+        </div>
+
+        <!-- Dynamic Field Legend -->
+        <div class="field-legend" id="field-legend">
+            <!-- Dynamic Legend Items -->
+        </div>
+
+        <div class="alert-box info">
+            <div class="alert-icon">💡</div>
+            <div class="alert-content">
+                <h4>Kỹ Thuật Union Overlay (Chồng Lấp Bộ Nhớ 16 Bytes):</h4>
+                <p>
+                    Từ <strong>Offset 16 đến Offset 31</strong> (16 Bytes cuối), biến <code>Comparer</code> (kiểu <code>Buffer</code>) được xếp đè lên đúng vị trí của các biến <code>Offset</code>, <code>RecordLength</code>, <code>State</code>, <code>Type</code>, <code>KeyState</code>, <code>Calculated</code>. Khi ở giai đoạn đọc/ghi ban đầu, 16 Bytes này dùng làm Buffer chứa chuỗi. Khi đã băm Key xong (Index Mode), 16 Bytes này "biến hình" thành vị trí file đĩa!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 2: CPU L1 CACHE LINE & CODE ANATOMY -->
+    <div class="grid-2">
+        <!-- Card 1: CPU L1 Cache Line Fitting -->
+        <div class="card">
+            <div class="card-title">
+                <span>⚡ Tối Ưu Hóa CPU L1 Cache Line (64 Bytes)</span>
+            </div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+                Tại sao lại là đúng 32 Bytes? Bộ vi xử lý (CPU) nạp dữ liệu từ RAM vào bộ nhớ đệm L1 Cache theo từng đường <strong>Cache Line rộng 64 Bytes</strong>.
+            </p>
+
+            <div class="cache-line-visualizer">
+                <div class="cache-line-box">
+                    <div class="cache-line-title">
+                        <span>CPU L1 CACHE LINE (ĐỘ DÀI: 64 BYTES)</span>
+                        <span style="font-family: var(--font-code); color: var(--accent-success);">100% NẠP VỪA KHÍT 2 ENTRIES!</span>
+                    </div>
+                    <div class="cache-entries-flex">
+                        <div class="cache-entry-chunk highlight">
+                            <div class="cache-entry-title">KeyEntry #1</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-code);">32 Bytes (0 -> 31)</div>
+                        </div>
+                        <div class="cache-entry-chunk highlight">
+                            <div class="cache-entry-title">KeyEntry #2</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-code);">32 Bytes (32 -> 63)</div>
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+                    👉 <strong>Kết quả:</strong> Mỗi lần CPU phát lệnh đọc 1 KeyEntry từ RAM, phần cứng CPU tự động kéo luôn <strong>KeyEntry thứ 2 kế bên</strong> vào L1 Cache. Khi thuật toán Binary Search / QuickSort duyệt phần tử tiếp theo, nó đã <strong>có sẵn trong CPU L1 Cache (0.2ns)</strong> $\rightarrow$ Triệt tiêu 40-50% Cache Misses!
+                </p>
+            </div>
+        </div>
+
+        <!-- Card 2: Code Declaration & Field Table -->
+        <div class="card">
+            <div class="card-title">
+                <span>📝 Mã Nguồn Khai Báo Struct Trong C#</span>
+            </div>
+            
+            <div class="code-block"><span class="attr">[StructLayout(LayoutKind.Explicit, Size = 32)]</span>
+<span class="keyword">public unsafe struct</span> <span class="type">KeyEntry</span>
+{
+    <span class="comment">// 16 Bytes đầu: Key băm 128-bit</span>
+    <span class="attr">[FieldOffset(0)]</span>  <span class="keyword">public long</span> Key;          <span class="comment">// Hash 64-bit #1</span>
+    <span class="attr">[FieldOffset(8)]</span>  <span class="keyword">public long</span> SecondaryKey; <span class="comment">// Hash 64-bit #2</span>
+
+    <span class="comment">// 16 Bytes sau (Chế độ Index Mode)</span>
+    <span class="attr">[FieldOffset(16)]</span> <span class="keyword">public long</span> Offset;       <span class="comment">// Trỏ tới file .dat</span>
+    <span class="attr">[FieldOffset(24)]</span> <span class="keyword">public int</span> RecordLength;  <span class="comment">// Độ dài record</span>
+    <span class="attr">[FieldOffset(28)]</span> <span class="keyword">public</span> RecordState State;
+    <span class="attr">[FieldOffset(29)]</span> <span class="keyword">public</span> PrimaryMode Type;
+
+    <span class="comment">// Union Overlap: Đè lên 16 Bytes sau (Buffer Mode)</span>
+    <span class="attr">[FieldOffset(16)]</span> <span class="keyword">public</span> Buffer Comparer;   <span class="comment">// 16B KeyPool Buffer</span>
+    <span class="attr">[FieldOffset(30)]</span> <span class="keyword">public</span> KeyEntryState KeyState;
+    <span class="attr">[FieldOffset(31)]</span> <span class="keyword">public bool</span> Calculated;
+}</div>
+        </div>
+    </div>
+
+    <!-- SECTION 3: LIVE SIMULATOR FOR KEY ENCODING -->
+    <div class="card" style="margin-bottom: 2.5rem;">
+        <div class="card-title">
+            <span>🧪 Mô Phỏng Mã Hóa Dữ Liệu Thực Tế (Live Key Encoding Simulator)</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem;">
+            Thử nhập một Key bất kỳ (Chuỗi chữ hoặc Số nguyên) để xem cách hàm <code>EnsureToCompare()</code> băm dữ liệu vào 32 Bytes RAM:
+        </p>
+
+        <div class="sim-input-group">
+            <input type="text" id="sim-key-input" class="sim-input" value="kim_sakota_user_9999" placeholder="Nhập Key test tại đây...">
+            <select id="sim-type-select" class="sim-input" style="flex: 0.5;">
+                <option value="String">PrimaryMode.String</option>
+                <option value="Fixed">PrimaryMode.Fixed (Số Long)</option>
+                <option value="ObjectId">PrimaryMode.ObjectId</option>
+            </select>
+            <button class="btn-toggle active" style="flex: 0.3;" onclick="runSimulation()">Mã Hóa RAM</button>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 0;">
+            <div style="background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 1.25rem;">
+                <h4 style="color: var(--accent-primary); font-family: var(--font-code); font-size: 0.9rem; margin-bottom: 0.75rem;">
+                    KẾT QUẢ BĂM KEY (KEY & SECONDARY KEY - 16 BYTES ĐẦU)
+                </h4>
+                <div style="font-family: var(--font-code); font-size: 0.85rem; color: var(--text-main); line-height: 1.8;">
+                    <div>Key (Hex): <span id="res-key-hex" style="color: var(--accent-success); font-weight: 700;">0x0000000000000000</span></div>
+                    <div>SecondaryKey (Hex): <span id="res-seckey-hex" style="color: var(--accent-secondary); font-weight: 700;">0x0000000000000000</span></div>
+                    <div>Thuật toán mã hóa: <span id="res-algo-name" style="color: var(--accent-warning);">XXHash64 Dual Hash</span></div>
+                </div>
+            </div>
+
+            <div style="background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 1.25rem;">
+                <h4 style="color: var(--accent-success); font-family: var(--font-code); font-size: 0.9rem; margin-bottom: 0.75rem;">
+                    THÔNG TIN CHỈ MỤC ĐĨA (INDEX & FILE POINTER - 16 BYTES SAU)
+                </h4>
+                <div style="font-family: var(--font-code); font-size: 0.85rem; color: var(--text-main); line-height: 1.8;">
+                    <div>File Offset (.dat): <span id="res-offset-val" style="color: var(--accent-primary);">0x0000000000450000 (4,521,984 Bytes)</span></div>
+                    <div>Record Length: <span id="res-len-val" style="color: var(--accent-warning);">128 Bytes</span></div>
+                    <div>Trạng thái RecordState: <span style="color: var(--accent-danger);">Active (0x01)</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Theme Switcher Logic
+    function toggleTheme() {
+        const html = document.documentElement;
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        html.setAttribute('data-theme', newTheme);
+        
+        document.getElementById('theme-icon').innerText = newTheme === 'light' ? '☀️' : '🌙';
+        document.getElementById('theme-text').innerText = newTheme === 'light' ? 'Giao diện Sáng' : 'Giao diện Tối';
+    }
+
+    // Mode Data Definition
+    const indexModeFields = [
+        { name: 'Key', start: 0, end: 7, class: 'field-key', colorClass: 'color-key', type: 'long (8B)', desc: 'Hash 64-bit đầu tiên của Key (dùng so sánh nhanh).' },
+        { name: 'SecondaryKey', start: 8, end: 15, class: 'field-seckey', colorClass: 'color-seckey', type: 'long (8B)', desc: 'Hash 64-bit thứ 2 của Key (kết hợp tạo Key 128-bit).' },
+        { name: 'Offset', start: 16, end: 23, class: 'field-offset', colorClass: 'color-offset', type: 'long (8B)', desc: 'Con trỏ vị trí Byte của bản ghi nằm trong file đĩa .dat.' },
+        { name: 'RecordLength', start: 24, end: 27, class: 'field-len', colorClass: 'color-len', type: 'int (4B)', desc: 'Độ dài tính bằng Byte của bản ghi dữ liệu trong file .dat.' },
+        { name: 'State', start: 28, end: 28, class: 'field-state', colorClass: 'color-state', type: 'RecordState (1B)', desc: 'Trạng thái bản ghi (Active, Deleted, Updated).' },
+        { name: 'Type', start: 29, end: 29, class: 'field-type', colorClass: 'color-type', type: 'PrimaryMode (1B)', desc: 'Kiểu mã hóa Key (String, Fixed, ObjectId).' },
+        { name: 'KeyState', start: 30, end: 30, class: 'field-state', colorClass: 'color-state', type: 'KeyEntryState (1B)', desc: 'Quản lý bộ nhớ Key (Rented, Fixed, Heap).' },
+        { name: 'Calculated', start: 31, end: 31, class: 'field-len', colorClass: 'color-len', type: 'bool (1B)', desc: 'Đánh dấu Key đã được băm sang 128-bit hay chưa.' }
+    ];
+
+    const bufferModeFields = [
+        { name: 'Key', start: 0, end: 7, class: 'field-key', colorClass: 'color-key', type: 'long (8B)', desc: 'Chưa tính toán (bằng 0).' },
+        { name: 'SecondaryKey', start: 8, end: 15, class: 'field-seckey', colorClass: 'color-seckey', type: 'long (8B)', desc: 'Chưa tính toán (bằng 0).' },
+        { name: 'Comparer (Buffer Union)', start: 16, end: 31, class: 'field-comparer', colorClass: 'color-comparer', type: 'Buffer (16B)', desc: 'Chứa con trỏ Handle (8B) + Length (4B) + Iterator (4B) của chuỗi chưa băm.' }
+    ];
+
+    let currentMode = 'index';
+
+    function renderMemoryGrid() {
+        const gridEl = document.getElementById('bytes-grid');
+        const legendEl = document.getElementById('field-legend');
+        gridEl.innerHTML = '';
+        legendEl.innerHTML = '';
+
+        const fields = currentMode === 'index' ? indexModeFields : bufferModeFields;
+
+        // Render 32 byte boxes
+        for (let i = 0; i < 32; i++) {
+            const box = document.createElement('div');
+            box.className = 'byte-box';
+            box.id = `byte-${i}`;
+            
+            // Find field for this byte
+            const field = fields.find(f => i >= f.start && i <= f.end);
+            if (field) {
+                box.classList.add(field.class);
+            }
+
+            box.innerHTML = `
+                <span class="idx">${i}</span>
+                <span class="val">${i < 16 ? '00' : (currentMode === 'index' ? 'FF' : 'AB')}</span>
+            `;
+            gridEl.appendChild(box);
+        }
+
+        // Render Legend Cards
+        fields.forEach(field => {
+            const card = document.createElement('div');
+            card.className = `legend-item ${field.colorClass}`;
+            card.onmouseenter = () => highlightBytes(field.start, field.end, true);
+            card.onmouseleave = () => highlightBytes(field.start, field.end, false);
+            
+            card.innerHTML = `
+                <div class="legend-head">
+                    <span class="legend-name">${field.name}</span>
+                    <span class="legend-offset">Offset ${field.start}${field.start !== field.end ? ' -> ' + field.end : ''} (${field.type})</span>
+                </div>
+                <div class="legend-desc">${field.desc}</div>
+            `;
+            legendEl.appendChild(card);
+        });
+    }
+
+    function highlightBytes(start, end, enable) {
+        for (let i = start; i <= end; i++) {
+            const el = document.getElementById(`byte-${i}`);
+            if (el) {
+                if (enable) {
+                    el.style.transform = 'scale(1.2)';
+                    el.style.boxShadow = '0 0 15px var(--accent-primary)';
+                    el.style.zIndex = '20';
+                } else {
+                    el.style.transform = 'none';
+                    el.style.boxShadow = 'none';
+                    el.style.zIndex = '1';
+                }
+            }
+        }
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        document.getElementById('btn-mode-index').classList.toggle('active', mode === 'index');
+        document.getElementById('btn-mode-buffer').classList.toggle('active', mode === 'buffer');
+        document.getElementById('active-mode-label').innerText = mode === 'index' ? 'CHẾ ĐỘ: INDEX MODE (ĐÃ BĂM KEY / FILE POINTER)' : 'CHẾ ĐỘ: BUFFER UNION MODE (CHUỖI THÔ CHỜ BĂM)';
+        renderMemoryGrid();
+    }
+
+    // XXHash64 Hash Simulation
+    function simpleHash64(str) {
+        let hash = 5381n;
+        for (let i = 0; i < str.length; i++) {
+            hash = (hash * 33n) ^ BigInt(str.charCodeAt(i));
+        }
+        return hash & 0xFFFFFFFFFFFFFFFFn;
+    }
+
+    function runSimulation() {
+        const input = document.getElementById('sim-key-input').value;
+        const type = document.getElementById('sim-type-select').value;
+
+        let key1 = 0n;
+        let key2 = 0n;
+        let algo = '';
+
+        if (type === 'String') {
+            key1 = simpleHash64(input);
+            key2 = simpleHash64(input + '_sec');
+            algo = 'XXHash64 Dual Hash (Nén chuỗi ' + input.length + 'B -> 16B)';
+        } else if (type === 'Fixed') {
+            key1 = BigInt(parseInt(input) || 12345678);
+            key2 = 0n;
+            algo = 'Direct Fixed 64-bit Long Value';
+        } else {
+            key1 = 0x123456789ABCDEF0n;
+            key2 = 0x0000000011223344n;
+            algo = 'ObjectId Hex Hash (12 Bytes -> 16B)';
+        }
+
+        document.getElementById('res-key-hex').innerText = '0x' + key1.toString(16).toUpperCase().padStart(16, '0');
+        document.getElementById('res-seckey-hex').innerText = '0x' + key2.toString(16).toUpperCase().padStart(16, '0');
+        document.getElementById('res-algo-name').innerText = algo;
+    }
+
+    // Initial Render
+    renderMemoryGrid();
+    runSimulation();
+</script>
+
+</body>
+</html>

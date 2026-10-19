@@ -1,0 +1,261 @@
+{
+  "source_remote": "https://github.com/kimsakota/ShiftSort.git",
+  "source_head": "7236e72f83c2b780bf37fa42c9cf601d3d6db35c",
+  "source_working_tree_dirty": true,
+  "source_status_porcelain_v1_z_records": [
+    " M Enums.cs",
+    " M Helper/HexHelper.cs",
+    " M Keys/KeyEntry.cs",
+    " M Keys/KeyIndexer.cs",
+    " M Lists/RawList.cs",
+    " M Math.cs",
+    " M Memory/Buffer.cs",
+    " M Memory/DataPage.cs",
+    " M Memory/DataSlot.cs",
+    " M Memory/Memory.cs",
+    " M Memory/StringReader.cs",
+    " M Memory/StringWriter.cs",
+    " M ObjectId.cs",
+    " M VstHelper.sln",
+    " M docs/research-paper-guide.md",
+    "?? LATEX/",
+    "?? Memory/readme.md",
+    "?? Roadmap_CSDL_VstHelper.md",
+    "?? TODO_CHECKLIST.md",
+    "?? docs/Giao_trinh_VST_NoGC_tu_A_den_Z.docx",
+    "?? docs/memory-pool-research.md",
+    "?? docs/research.md",
+    "?? docs/s.md",
+    "?? key_entry_deep_dive.html"
+  ],
+  "snapshot_kind": "selected working-tree files; includes uncommitted changes and non-ignored new files",
+  "excluded": [
+    "Git metadata",
+    "IDE/cache/build output",
+    "per-user settings",
+    "generated TeX auxiliary files"
+  ],
+  "skipped_candidates": [
+    "LATEX/paper.aux",
+    "LATEX/paper.bbl",
+    "LATEX/paper.blg",
+    "LATEX/paper.out"
+  ],
+  "files": [
+    {
+      "path": ".gitattributes",
+      "bytes": 2581,
+      "sha256": "462475ee5301e77d2a54a64757d95c3f21fc3a79e92e6ec94bdfcc8b36e48964"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 6585,
+      "sha256": "cecdcf578be42a04a093cf13b289090a5108e0ba6413a08fd5beec9ee482cc47"
+    },
+    {
+      "path": "Enums.cs",
+      "bytes": 3414,
+      "sha256": "51cd0884c80a8302ea16b3ced55af13d72ccd942461869931a60d17c7fe19aca"
+    },
+    {
+      "path": "Helper/HexHelper.cs",
+      "bytes": 3901,
+      "sha256": "abfbf0c57007528061e9da69d280eecf40b885c92dd1d53c3328db935b0a3252"
+    },
+    {
+      "path": "Helper/JsonHelper.cs",
+      "bytes": 1672,
+      "sha256": "d4f33be3ae82b7adc9a8a3070d9124ddbdc544a2827bdb9c064d4a4db3929a71"
+    },
+    {
+      "path": "Helper/StringHelper.cs",
+      "bytes": 9619,
+      "sha256": "d0f13fa57bd46c0520e7ffc002b0cbdf221e7e3f1d2c9a2f6fdc8180fc08ab14"
+    },
+    {
+      "path": "IO/File.cs",
+      "bytes": 10306,
+      "sha256": "8df0df97722938d19b048eef6cf26253a168056fd802e7efbdf95b6c3e41d7f0"
+    },
+    {
+      "path": "IO/MappedFile.cs",
+      "bytes": 4550,
+      "sha256": "8aa74d495821d11272d84de8445391308454c8c9b8e5274e26b1077188b7cb49"
+    },
+    {
+      "path": "Keys/KeyEntry.cs",
+      "bytes": 6404,
+      "sha256": "7f6a2fc2bd60dff2840011965fc1efdaf851c8827bb252412655d6fd005e6b79"
+    },
+    {
+      "path": "Keys/KeyIndexer.cs",
+      "bytes": 8169,
+      "sha256": "9aff9a68f61c190e912f1aadf8f5f374bd6361689e24ec55e318ecfd114c2fdf"
+    },
+    {
+      "path": "Keys/KeyPath.cs",
+      "bytes": 2165,
+      "sha256": "2188fb0783405198e4f4b3ba5a5413d7a9585a5b8dd870c31fc35dc981e6b3da"
+    },
+    {
+      "path": "LATEX/KHUNG_NOI_DUNG_BAI_BAO.md",
+      "bytes": 41457,
+      "sha256": "7e0843b64e23de1221310d8a480a8afe1b0aae073a2fde09b137c4fc1ade966f"
+    },
+    {
+      "path": "LATEX/figs/allocation-comparison.pdf",
+      "bytes": 25976,
+      "sha256": "cc4ee0e23c455e8735d8ca8afed1ca0253d9a0d0c85998c923a5e26b70528d32"
+    },
+    {
+      "path": "LATEX/figs/latency-comparison.pdf",
+      "bytes": 23215,
+      "sha256": "7c6af40ae1b5fff8405d7caa953977e35669bc9769497fd2f7ec5dc372b2adaf"
+    },
+    {
+      "path": "LATEX/figs/scalability-speedup.pdf",
+      "bytes": 19821,
+      "sha256": "8b42277c6e79475f81c4e50537271b7f0d75364f94d365a71aba77487c9c6a5b"
+    },
+    {
+      "path": "LATEX/figs/sort-time-comparison.pdf",
+      "bytes": 21925,
+      "sha256": "3b6064dc93035d14685206929e4f294a9dc4b5fbd8d5cb8359f07b3711459e4d"
+    },
+    {
+      "path": "LATEX/figs/threshold-analysis.pdf",
+      "bytes": 18776,
+      "sha256": "fc2b7c7a1ca30064b7f43cac80bd49480eff324139cb524ececaf293e5d38f43"
+    },
+    {
+      "path": "LATEX/paper.pdf",
+      "bytes": 334886,
+      "sha256": "5cd6b5f954519f150084a143314ceafad6dfebad16cc12276b6fce60cba9c261"
+    },
+    {
+      "path": "LATEX/paper.tex",
+      "bytes": 43409,
+      "sha256": "49de8b41723b4b08af7509c8f2d4303b5f2431a0976719bc80d63dbded1d1aea"
+    },
+    {
+      "path": "LATEX/references.bib",
+      "bytes": 3326,
+      "sha256": "ee2b1e3a0fe61776b9ca0c255b758bf3e1d8ed9b5d27ece5666f2fdd577ef32f"
+    },
+    {
+      "path": "Lists/RawList.cs",
+      "bytes": 9797,
+      "sha256": "18ac1c5d77e6db63ad66aa324409e68c07ef36f1cdea3255abaacd96043a8a7d"
+    },
+    {
+      "path": "Math.cs",
+      "bytes": 14527,
+      "sha256": "92d7792844b3e399a0bb6c8e09716c284685c17ba458f6a68d0ecc3669e86a6b"
+    },
+    {
+      "path": "Memory/Buffer.cs",
+      "bytes": 5152,
+      "sha256": "6749bdc377f6610bdb811d0df3d879e732c0f7d0b10904f46de86f75f8c53f50"
+    },
+    {
+      "path": "Memory/DataPage.cs",
+      "bytes": 3037,
+      "sha256": "7b75b8526735436784262bc71a0b0b356ab7635e874ccb8a8ceeb1a96bae6307"
+    },
+    {
+      "path": "Memory/DataSlot.cs",
+      "bytes": 3824,
+      "sha256": "65f40b2d37d152b5c5cc2e46891fd46d61b85088f207bf06bdbff54e7cfacff2"
+    },
+    {
+      "path": "Memory/Memory.cs",
+      "bytes": 22425,
+      "sha256": "2d1f2b54329be608ddd0aacabb39ce633c3c33b17faccb46cf0a0eeef0dab1b0"
+    },
+    {
+      "path": "Memory/StringReader.cs",
+      "bytes": 4657,
+      "sha256": "da5e96f31a23e29a3b12c1321128a1e06f61fd95bff558e6c92e6b95811c752b"
+    },
+    {
+      "path": "Memory/StringWriter.cs",
+      "bytes": 5409,
+      "sha256": "d9c32c68e7ba0a8f3668d17ab25dd3d6e1b0db978b66c6cb53d7a9f2fed4441f"
+    },
+    {
+      "path": "Memory/readme.md",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "ObjectId.cs",
+      "bytes": 4631,
+      "sha256": "e6c8536d8cfbd2df81d47aaf592365b8d744ab040c9b90db5c7c56b500908246"
+    },
+    {
+      "path": "Roadmap_CSDL_VstHelper.md",
+      "bytes": 7104,
+      "sha256": "51990c7e185865240853ad4ac381ae1e9416db71222a240629200c2cf38953e2"
+    },
+    {
+      "path": "TODO_CHECKLIST.md",
+      "bytes": 24254,
+      "sha256": "3c0b6f4a322a2768578ddd0ff471615a7646953c8b56fda55622d2ee62d89e3e"
+    },
+    {
+      "path": "Thread/LockManager.cs",
+      "bytes": 4096,
+      "sha256": "f46c58adef82b76539a4c7824d74c18440c8f6d080de91e2b2804462c6184688"
+    },
+    {
+      "path": "Thread/SystemClock.cs",
+      "bytes": 2894,
+      "sha256": "6567550ab64c03a3ee2fb742df1a545eda9693bb1d0e06c4747b67460995bad9"
+    },
+    {
+      "path": "VstHelper.csproj",
+      "bytes": 197,
+      "sha256": "35481ae02893d9ddc18cc32368728748b8e9333dba7d8e5f72d15354d7269653"
+    },
+    {
+      "path": "VstHelper.sln",
+      "bytes": 2108,
+      "sha256": "1f7a790b2b8c6d3daa90351c3ae939ecfc816aa5a5badcd9a84082ca39be8965"
+    },
+    {
+      "path": "docs/Giao_trinh_VST_NoGC_tu_A_den_Z.docx",
+      "bytes": 355801,
+      "sha256": "b2d2620d4fb916561d6e929f802123c2107dc92256c8a63df87726201ab959c3"
+    },
+    {
+      "path": "docs/agents.md",
+      "bytes": 20365,
+      "sha256": "a054671e8fc7a5657c2e07f42b88debb8f7a10343d011d085e9daf39fdad1f28"
+    },
+    {
+      "path": "docs/memory-pool-research.md",
+      "bytes": 13163,
+      "sha256": "d59112bccafd1055844dddd2668d15f9fc74734adcda3b1949f3628e14254d64"
+    },
+    {
+      "path": "docs/research-paper-guide.md",
+      "bytes": 71767,
+      "sha256": "08b8ce0a0802886a9d73b4ad3148e06edc11820e7494c01d792e7abad869a760"
+    },
+    {
+      "path": "docs/research.md",
+      "bytes": 10337,
+      "sha256": "e243af142c4ae8a767a1435dbeb511a365c97c610022755011352c055b6c0600"
+    },
+    {
+      "path": "docs/s.md",
+      "bytes": 2081,
+      "sha256": "41a4051e6c9c80e9cf5c3089d822f0f2ea33f1f3cec32b3e116fcc0dc9c430b9"
+    },
+    {
+      "path": "key_entry_deep_dive.html",
+      "bytes": 33423,
+      "sha256": "b2f44e96a71e1e217b98a141270a53ec54e83caee0760c05d56dd3fafbe04ba4"
+    }
+  ]
+}

@@ -196,7 +196,7 @@ Máy hiện có VS Code, Git và lệnh WSL nhưng chưa có distro Linux. Chưa
    sudo apt-get install git build-essential gdb-multiarch qemu-system-misc gcc-riscv64-linux-gnu binutils-riscv64-linux-gnu bc perl
    ```
 
-3. Source đã được nhập vào root BTL từ bản Exercise được kiểm tra tại [Nguon-xv6.md](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Nguon-xv6.md>), cùng LICENSE và metadata phiên bản. Dùng bản BTL để học và code. Nếu về sau có starter chính thức khác, so sánh và hợp nhất file trùng thay vì ghi đè mù quáng.
+3. Source đã được nhập vào root BTL từ bản Exercise được kiểm tra tại [Nguon-xv6.md](<Nguon-xv6.md>), cùng LICENSE và metadata phiên bản. Dùng bản BTL để học và code. Nếu về sau có starter chính thức khác, so sánh và hợp nhất file trùng thay vì ghi đè mù quáng.
 
 4. Mở workspace trong VS Code. Sau khi WSL và extension đã sẵn sàng, chọn `WSL: Reopen Folder in WSL` hoặc mở thư mục từ terminal WSL bằng `code .`.
 

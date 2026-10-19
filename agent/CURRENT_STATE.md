@@ -4,7 +4,7 @@ Cập nhật: 19/10/2026.
 
 ## Project status
 
-- Giai đoạn: PR #1 đã squash merge; baseline main53872b8 có Lesson 0–3, quy trình, templates và hàm đếm trang; CI qua format/build/usertests/crash. Bảo vệ main cho giai đoạn solo đã cấu hình và đọc lại đúng, gồm required checks linux/macos. Chưa triển khai per-CPU/slab.
+- Giai đoạn: Bảo vệ main cho solo đã cấu hình, nhưng cộng tác nhóm chưa hoàn tất. Linh yêu cầu tiếp tục mời/onboard Minh và Khánh, chia sẻ lesson và giao việc/review; chưa chuyển sang học C. Main53872b8 có baseline/CI đạt; chưa per-CPU/slab. PR #2 còn mở ở lần đọc mới.
 - Mục tiêu: đề tài 19, Slab allocator and per-CPU free lists trên xv6; nối kiến thức từ BaoKhoaHoc/VstHelper.
 - Người dùng trong chat này: Nguyễn Kim Linh; muốn làm nhiều và hiểu toàn bộ dự án.
 - Nhóm dự án 26118: Nguyễn Kim Linh 20233495, Lê Trần Hiếu Minh 20233528, Nguyễn An Khánh 20224019. Đã có nhân lực; chưa xác nhận deadline, quỹ giờ và phân công với hai bạn.
@@ -25,7 +25,7 @@ Cập nhật: 19/10/2026.
 | CST-010 | Mã dự án 26118, số đề tài 19; nhóm gồm Linh 20233495, Minh 20233528, Khánh 20224019; người dùng là Linh | Cao | Ảnh và yêu cầu trực tiếp 19/10; LOGBOOK L015 | Người dùng đính chính | 19/10/2026 |
 | CST-011 | Run main39212699734 tại head53872b8 đã completed/success: linux format/build/usertests/crash success; macos build/job success. Run PR39210447048 tại head2df489d cũng success. Chưa có per-CPU/slab hoặc benchmark; không có kalloctest.c/kcsan.c MIT lab trong BTL | Cao tại lúc kiểm tra | GitHub run và jobs; L023 | Source/run mới | 19/10/2026 |
 | CST-012 | Tuần 19–25/10/2026 mới khởi động nhóm; phần Linh đang học là học trước/chuẩn bị cá nhân, không tự tính là kết quả nhóm W01 | Cao | Người dùng trả lời trực tiếp ngày 19/10; LOGBOOK L015 | Người dùng đính chính hoặc có kết quả W01 thật | 19/10/2026 |
-| CST-013 | PR #1 đã squash merge thành 53872b8895e82f7baa453c077a0a5255b7310c79; local đang main, cùng origin/main ở lần đọc. Có 4 file tài liệu/bộ nhớ modified chưa commit, một dòng chú thích Linh thêm trong kalloc.c và VstHelper/ untracked | Cao tại lúc kiểm tra | Git local; L025 | Nhánh/PR/working tree thay đổi | 19/10/2026 |
+| CST-013 | PR #1 đã merge thành main53872b8. PR #2 docs-main-workflow còn open/not merged, headff8a36a. Trước lượt hoàn thiện nhóm, local cùng origin nhánh này, tracked tree sạch, chỉ VstHelper/ untracked. Lượt này có thêm/sửa tài liệu, templates và bộ nhớ chưa commit; không sửa C | Cao tại lúc kiểm tra | Git và plugin GitHub; L026 | Nhánh/PR/working tree thay đổi | 19/10/2026 |
 | CST-014 | Ruleset main-workflow id25416827 active, target default branch main, bypass rỗng; chặn xóa/force push, linear history, PR với 0 approvals và resolve conversations. Required checks đã có linux và macos, integration_id15368 cho cả hai; strict=false. Repo chỉ cho squash ở lần đọc trước; chưa thêm cộng tác viên | Cao về trường đã đọc | Plugin GitHub ruleset detail; L025 | Cấu hình/thành viên đổi | 19/10/2026 |
 
 ## Active operating decisions
@@ -41,15 +41,16 @@ Cập nhật: 19/10/2026.
 | OP-007 | Cuối phần code nêu diff/kiểm tra thật, gợi ý commit và nhắc người dùng tự commit/push; không tự stage/commit/push. Chú thích chỉ gợi ý khi cần, không bắt buộc và không trì hoãn mốc đã đạt để chỉnh trình bày comment | Linh giữ quy tắc tự commit/push, làm rõ không cần coi trọng chú thích | LOGBOOK L013, L019; AGENTS.md | Người dùng đổi quy tắc hoặc yêu cầu rõ thao tác Git | 19/10/2026 |
 | OP-008 | Linh muốn tham gia sâu và hiểu toàn bộ, đồng thời chia việc độc lập cho đủ ba người. Owner theo module + review/giải thích chéo là phương án đề xuất, chưa được nhóm chốt | Yêu cầu tổ chức nhóm và báo cáo tuần | LOGBOOK.md L015; docs/Quy-trinh-nhom-26118.md | Nhóm xác nhận hoặc đổi vai trò | 19/10/2026 |
 | OP-009 | Hướng dẫn Git bằng GitHub Desktop, chỉ rõ tên/vị trí nút; không mặc định giao lệnh Git terminal. Agent vẫn có thể đọc Git local để kiểm tra | Người dùng yêu cầu dùng GitHub Desktop và gửi ảnh UI | LOGBOOK L020; AGENTS.md | Người dùng đổi công cụ | 19/10/2026 |
+| OP-010 | Ưu tiên hoàn thiện quy trình ba người: mời/accept, clone, chia sẻ lesson, nhận task/board và review. Không tự chuyển sang bài C khi Linh còn hỏi cách tổ chức GitHub | Linh đính chính assistant chuyển sang Lesson 3 quá sớm và yêu cầu quy trình thực hành chung | Yêu cầu trực tiếp; LOGBOOK L026; AGENTS.md | Nhóm vận hành được hoặc Linh yêu cầu chuyển bài | 19/10/2026 |
 
 ## Current context
 
 | Area | Current value | Source | Revisit when | Last checked |
 |---|---|---|---|---|
-| Current priority | Cấu hình bảo vệ main cho solo đã xác nhận đủ. Chốt riêng 4 file docs/memory trên nhánh codex/docs-main-workflow bằng GitHub Desktop; không gộp kalloc.c/VstHelper vào commit tài liệu. Sau PR tài liệu, quay lại Lesson 3 P02 theo chặng nhỏ. Không tự stage/commit/push/Settings | LOGBOOK L025; Git và GitHub | Sau chốt tài liệu hoặc người dùng đổi bước | 19/10/2026 |
+| Current priority | Tiếp tục workflow nhóm; Linh vừa muốn chia sẻ VstHelper. Đã chuẩn bị snapshot references/VstHelper (43 file nguồn + README/SNAPSHOT), ignore clone gốc để giữ Git riêng. Hướng dẫn nhánh mới codex/reference-vsthelper từ main cập nhật sau chốt docs PR #2, chỉ commit .gitignore và snapshot. 19 Markdown workflow đang local; chưa tự commit/push. Vẫn chờ username Minh/Khánh để mời/accept, clone, task/board/review; không quay lại C | LOGBOOK L026–L027; yêu cầu Linh và kiểm tra Git/file | Sau chốt docs/snapshot hoặc nhận tài khoản nhóm | 19/10/2026 |
 | Build và runtime | Local chỉ xác nhận style, chưa chạy local build/test. CI main39212699734 tại 53872b8 completed/success: linux format/build/usertests/crash và macos build đạt. Đây là baseline có hàm đếm trang, chưa phải perCPU/slab hoặc benchmark | Plugin GitHub run/jobs; L023 | Source/run mới hoặc thực hành local | 19/10/2026 |
 | Learning progress | Đã xác nhận đọc xong Lesson 0; Lesson 1–3 đã soạn. Hàm đếm đã vào main và CI baseline đạt; chưa suy ra Linh đã hoàn thành các bài thực hành khác | LOGBOOK L011–L014, L023; source và CI | Sau bài học tiếp theo | 19/10/2026 |
-| Next implementation step | Sau chuẩn bị GitHub, Linh tự khai báo pool/mảng, ghép M1 giữ pool 0 và count; kiểm tra rồi tự viết M2 local path. Không sửa C hoặc commit/push thay | docs/lessons/03-per-cpu-free-lists.md mục 11; L023 | Bước tự viết được kiểm tra | 19/10/2026 |
+| Next implementation step | Chưa phải việc đang giao: sau khi Linh muốn trở lại học, P02 là pool/mảng rồi M1 giữ pool 0/count; M2 local path sau. Hiện chỉ làm workflow GitHub ba người, không sửa C thay hoặc yêu cầu làm bài C | docs/lessons/03-per-cpu-free-lists.md; yêu cầu Linh L026 | Người dùng quay lại học C | 19/10/2026 |
 
 ## Current constraints
 

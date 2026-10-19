@@ -2,6 +2,8 @@
 
 Ngày nghiên cứu: 19/10/2026, múi giờ Asia/Saigon. Đây là **phương án đề xuất để ba thành viên thống nhất**, chưa phải phân công mà Minh và Khánh đã nhận.
 
+**Bắt đầu thao tác tại [sổ tay GitHub của nhóm](So-tay-GitHub-nhom.md)**: mời Minh/Khánh, clone, chia sẻ lesson, nhận issue và thử review. File này tập trung vào ranh giới kỹ thuật và cách ghép phần của ba người. Ưu tiên hiện tại là hoàn tất cộng tác nhóm theo yêu cầu Linh, chưa chuyển sang giao bài C riêng cho Linh.
+
 Mục tiêu là để mỗi người có phần kỹ thuật có thể tự phát triển và kiểm tra, sau đó ghép qua API đã thống nhất. Linh tham gia sâu vào tầng trang, phần tích hợp khó và review các tầng còn lại để hiểu toàn bộ dự án. Phạm vi mã giữ theo [kiến trúc hiện có](Kien-truc-du-an.md); các thành viên tự viết C, tài liệu này không cung cấp implementation.
 
 ## 1 Nhóm và yêu cầu đã xác nhận
@@ -27,9 +29,9 @@ Lesson 0–3, ghi chú và phần code Linh thử trước được xếp là **
 Kiểm tra trực tiếp ngày 19/10/2026:
 
 - Workspace đã có xv6, tài liệu nghiên cứu, kiến trúc, Lesson 0–3 và remote `https://github.com/kimsakota/BTL.git`.
-- Tag `xv6-baseline` trỏ đến `e287830021e09be802e783970e2481bfa6942968`; HEAD local là `c829ab9932a6865936e4922cabd3280b3d121284`. HEAD và working tree không đồng nhất vì đang có thay đổi chưa commit.
+- Tag `xv6-baseline` trỏ đến `e287830021e09be802e783970e2481bfa6942968`, chưa xác nhận được chia sẻ lên origin. PR #1 đã merge vào main tại `53872b8`; khi bắt đầu task phải kiểm tra revision và working tree thực tế, không dùng SHA ghi trong tài liệu thay cho kiểm tra Git.
 - `kernel/kalloc.c` vẫn có một `kmem.lock` và một free list. Đã có `kfreepage_count`, khai báo tại `defs.h` và caller sau `kinit` trong `main.c`.
-- Chưa có implementation per-CPU hoặc slab trong phần source khảo sát. Kiểm tra GitHub tiếp ngày 19/10: job macOS của PR #1 build kernel/fs.img thành công; Linux fail ở format nên build/test phía sau bị skipped. Chưa xác nhận runtime/benchmark; xem [kiểm tra GitHub](Thiet-lap-GitHub-26118.md).
+- Chưa có implementation per-CPU hoặc slab. CI main run39212699734 đã qua Linux format/build/usertests/crash và macOS build. Chưa có benchmark hoặc log local của cả ba người; xem [kiểm tra GitHub](Thiet-lap-GitHub-26118.md).
 - Không có `user/kalloctest.c` và `kernel/kcsan.c` của MIT lock-lab trong bản BTL. Không ghi các công cụ đó là test đã sẵn có.
 - Có `.github/workflows/test.yml`; đã đọc job/log thật và xác định lỗi format. Tách format khỏi build/test là hướng đề xuất, chưa sửa workflow. Hiện Linh chưa thêm cộng tác viên vào GitHub.
 

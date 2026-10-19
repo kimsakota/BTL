@@ -25,7 +25,7 @@ Ownership, lifetime, khóa hoặc trạng thái CPU/ngắt liên quan:
 ## Tiêu chí nghiệm thu
 
 - [ ] Đầu ra cụ thể khớp mục tiêu
-- [ ] Tự kiểm tra; review chéo khi có reviewer khác; chú thích giải thích quyết định nếu có code
+- [ ] Tự kiểm tra; review chéo khi có reviewer khác; nội dung đúng phạm vi task
 - [ ] Kiểm tra phù hợp có bằng chứng, ghi rõ phần chưa chạy
 - [ ] Đưa kết quả/trở ngại vào báo cáo với cùng ID
 

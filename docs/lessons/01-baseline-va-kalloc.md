@@ -2,7 +2,7 @@
 
 Ngày biên soạn và đối chiếu source: 14/10/2026.
 
-Bài này tiếp nối [Bài 0: Hàm, header và liên kết](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/00-ham-header-va-lien-ket.md>). Bạn đã đọc Bài 0; ở đây chuyển sang cách dữ liệu được biểu diễn và liên kết trong bộ nhớ.
+Bài này tiếp nối [Bài 0: Hàm, header và liên kết](<00-ham-header-va-lien-ket.md>). Bạn đã đọc Bài 0; ở đây chuyển sang cách dữ liệu được biểu diễn và liên kết trong bộ nhớ.
 
 Phương thức học: bạn tự thiết kế, tự viết và tự sửa toàn bộ C của bài tập/đề tài. Tài liệu cung cấp kiến thức, ví dụ nhỏ và các đoạn **mã xv6 đang có để đọc tham chiếu**. Phần bài tập chỉ có yêu cầu và gợi ý; không có implementation hoàn chỉnh để chép.
 
@@ -104,7 +104,7 @@ Một biến đếm và một biến duyệt danh sách có nhiệm vụ khác n
 
 ### 2.2. Đọc types.h
 
-Mở [types.h](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/types.h>). Các khai báo gốc gồm:
+Mở [types.h](<../../kernel/types.h>). Các khai báo gốc gồm:
 
 ```c
 typedef unsigned int uint;
@@ -133,7 +133,7 @@ Với target RV64 và quy ước LP64 thông thường mà bài này xét:
 
 Đặc biệt, đừng dùng kết quả `sizeof(unsigned long)` từ compiler Windows để suy ra trực tiếp kích thước `uint64` của kernel RISC-V. Máy chạy compiler và máy đích mà compiler tạo code cho có thể khác nhau.
 
-Baseline đặt `-march=rv64gc` và `-std=gnu99` trong [Makefile](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/Makefile:68>). Bài tham chiếu các quy tắc C cơ bản trong dự thảo C11 N1570 để kiểm tra thuật ngữ; việc đó không đổi chế độ ngôn ngữ của dự án. GNU99 là C99 với các mở rộng GNU. [GCC về các chế độ C](https://gcc.gnu.org/onlinedocs/gcc/Standards.html).
+Baseline đặt `-march=rv64gc` và `-std=gnu99` trong [Makefile](<../../Makefile#L68>). Bài tham chiếu các quy tắc C cơ bản trong dự thảo C11 N1570 để kiểm tra thuật ngữ; việc đó không đổi chế độ ngôn ngữ của dự án. GNU99 là C99 với các mở rộng GNU. [GCC về các chế độ C](https://gcc.gnu.org/onlinedocs/gcc/Standards.html).
 
 **Bài nhỏ:** mở types.h, tự tìm định nghĩa `uint8`, `uint16`, `uint32`. Ghi kiểu gốc của mỗi tên và vì sao tên đó phù hợp với target đang xét.
 
@@ -355,7 +355,7 @@ Dấu ngoặc trong `(*p).da_cap` giữ đúng thứ tự: lấy đối tượng
 
 ### 5.3. Đọc struct run tự tham chiếu
 
-Mã gốc tại [kalloc.c, dòng 17](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/kalloc.c:17>):
+Mã gốc tại [kalloc.c, dòng 17](<../../kernel/kalloc.c#L17>):
 
 ```c
 struct run {
@@ -373,7 +373,7 @@ Với layout một trường pointer trên target của bài, struct run chiếm
 
 ### 5.4. Struct không có tên kiểu riêng của kmem
 
-Mã ở [kalloc.c, dòng 21](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/kalloc.c:21>) có dạng:
+Mã ở [kalloc.c, dòng 21](<../../kernel/kalloc.c#L21>) có dạng:
 
 ```c
 struct {
@@ -522,18 +522,18 @@ Cấp một slot rồi gọi page kfree vào địa chỉ giữa trang là sai A
 
 | File trong BTL | Phần cần đọc | Trách nhiệm/phụ thuộc |
 |---|---|---|
-| [types.h](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/types.h>) | Các typedef | Tên kiểu được dùng trong kernel |
-| [riscv.h](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/riscv.h:389>) | PGSIZE, PGROUNDUP, PGROUNDDOWN | Kích thước và căn chỉnh trang |
-| [memlayout.h](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/memlayout.h:43>) | KERNBASE, PHYSTOP | Giới hạn RAM theo cấu hình xv6 này |
-| [kernel.ld](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/kernel.ld:44>) | Symbol end | Linker xác định cuối image kernel |
-| [kalloc.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/kalloc.c>) | run, kmem và bốn hàm allocator | Sở hữu free list và thực hiện cấp/trả trang |
-| [spinlock.h](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.h>) | Kiểu struct spinlock | Cấu trúc khóa được nhúng trong kmem |
-| [spinlock.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.c>) | initlock, acquire, release | Khởi tạo và thực hiện đồng bộ |
-| [defs.h](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/defs.h:59>) | Nhóm khai báo kalloc.c | Công bố các hàm cho file khác gọi |
-| [main.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/main.c:19>) | kinit trước kvminit | Khởi tạo allocator trước các phần cần lấy trang |
-| [vm.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/vm.c:228>) | Một lời gọi kalloc trong uvmalloc | Ví dụ caller nhận trang và xử lý kết quả |
-| [Makefile](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/Makefile:10>) | kalloc.o trong OBJS | Link phần thực hiện vào kernel |
-| [printk.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/printk.c:64>) | Định dạng số khi quan sát | Tiện ích in của kernel, không phải printf libc |
+| [types.h](<../../kernel/types.h>) | Các typedef | Tên kiểu được dùng trong kernel |
+| [riscv.h](<../../kernel/riscv.h#L389>) | PGSIZE, PGROUNDUP, PGROUNDDOWN | Kích thước và căn chỉnh trang |
+| [memlayout.h](<../../kernel/memlayout.h#L43>) | KERNBASE, PHYSTOP | Giới hạn RAM theo cấu hình xv6 này |
+| [kernel.ld](<../../kernel/kernel.ld#L44>) | Symbol end | Linker xác định cuối image kernel |
+| [kalloc.c](<../../kernel/kalloc.c>) | run, kmem và bốn hàm allocator | Sở hữu free list và thực hiện cấp/trả trang |
+| [spinlock.h](<../../kernel/spinlock.h>) | Kiểu struct spinlock | Cấu trúc khóa được nhúng trong kmem |
+| [spinlock.c](<../../kernel/spinlock.c>) | initlock, acquire, release | Khởi tạo và thực hiện đồng bộ |
+| [defs.h](<../../kernel/defs.h#L59>) | Nhóm khai báo kalloc.c | Công bố các hàm cho file khác gọi |
+| [main.c](<../../kernel/main.c#L19>) | kinit trước kvminit | Khởi tạo allocator trước các phần cần lấy trang |
+| [vm.c](<../../kernel/vm.c#L228>) | Một lời gọi kalloc trong uvmalloc | Ví dụ caller nhận trang và xử lý kết quả |
+| [Makefile](<../../Makefile#L10>) | kalloc.o trong OBJS | Link phần thực hiện vào kernel |
+| [printk.c](<../../kernel/printk.c#L64>) | Định dạng số khi quan sát | Tiện ích in của kernel, không phải printf libc |
 
 Các số dòng đã đối chiếu ngày 14/10/2026. Khi bạn thêm code, dòng có thể dịch chuyển; hãy tìm theo tên hàm/symbol.
 
@@ -616,7 +616,7 @@ Mũi tên thể hiện lời gọi hoặc phần dữ liệu được dùng, kh�
 | kinit | Không nhận tham số | Khởi tạo khóa và đưa các trang khả dụng vào free list |
 | freerange | Địa chỉ đầu và cuối phạm vi | Gọi page free để đưa từng trang trọn vẹn vào pool |
 
-Mở [kinit](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/kalloc.c:27>). Hai công việc trong mã gốc:
+Mở [kinit](<../../kernel/kalloc.c#L27>). Hai công việc trong mã gốc:
 
 ```c
 initlock(&kmem.lock, "kmem");
@@ -632,7 +632,7 @@ Nếu truyền một bản sao đối tượng cần sửa, thay đổi trên b�
 
 ### 9.2. Vì sao phải làm tròn lên?
 
-Mở [freerange](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/kalloc.c:34>), nhận diện:
+Mở [freerange](<../../kernel/kalloc.c#L34>), nhận diện:
 
 ```c
 p = (char *)PGROUNDUP((uint64)pa_start);
@@ -707,7 +707,7 @@ Tên kfree ở bài này là page free gốc của xv6. Nó không nhận “m�
 
 ### 10.2. Kiểm tra đầu vào của kfree
 
-Đọc điều kiện tại [kalloc.c, dòng 51](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/kalloc.c:51>):
+Đọc điều kiện tại [kalloc.c, dòng 51](<../../kernel/kalloc.c#L51>):
 
 ```c
 if (((uint64)pa % PGSIZE) != 0 || (char *)pa < end || (uint64)pa >= PHYSTOP)
@@ -769,7 +769,7 @@ Thứ tự hai phép gán có ý nghĩa. Nếu đổi head sang A trước rồi
 
 ### 10.5. Pop: lấy trang đầu
 
-Đoạn thao tác gốc trong [kalloc](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/kalloc.c:69>):
+Đoạn thao tác gốc trong [kalloc](<../../kernel/kalloc.c#L69>):
 
 ```c
 acquire(&kmem.lock);
@@ -800,7 +800,7 @@ Kalloc không bảo đảm zero-initialize. Caller cần dữ liệu sạch ph�
 
 ### 10.6. Đọc một caller mà không học toàn bộ vm.c
 
-Mở [uvmalloc, vm.c dòng 228](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/vm.c:228>):
+Mở [uvmalloc, vm.c dòng 228](<../../kernel/vm.c#L228>):
 
 ```c
 mem = kalloc();
@@ -881,7 +881,7 @@ Không suy ra rằng mọi dòng trong hàm phải giữ khóa, cũng không suy
 
 ### 11.5. Ngắt và CPU: chỉ đọc đúng cơ chế hiện có
 
-Ở [spinlock.c](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/kernel/spinlock.c:22>), acquire gọi push_off trước khi lấy khóa, dùng atomic exchange để lấy khóa; release thả khóa rồi gọi pop_off.
+Ở [spinlock.c](<../../kernel/spinlock.c#L22>), acquire gọi push_off trước khi lấy khóa, dùng atomic exchange để lấy khóa; release thả khóa rồi gọi pop_off.
 
 push_off/pop_off theo dõi mức lồng và trạng thái ngắt ban đầu. Thả khóa không đồng nghĩa luôn bật ngắt. Bài 2 sẽ giải thích race, memory ordering, CPU ID và lý do phải giữ đúng trạng thái này.
 
@@ -920,7 +920,7 @@ Kernel là môi trường freestanding: không mặc định có runtime/libc c�
 
 ### 12.2. Trạng thái được kiểm chứng
 
-- Source nền đã được nhập vào BTL; nguồn và commit ghi tại [Nguồn xv6](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Nguon-xv6.md>) và [metadata](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/xv6-baseline.json>).
+- Source nền đã được nhập vào BTL; nguồn và commit ghi tại [Nguồn xv6](<../Nguon-xv6.md>) và [metadata](<../xv6-baseline.json>).
 - Diff source ngày 14/10/2026 có chú thích/khoảng trắng ở defs.h và kalloc.c; chưa đổi logic allocator.
 - Kiểm tra môi trường gần nhất ngày 13/10/2026 chưa có distro WSL. Chưa kiểm tra lại cài đặt trong lượt soạn bài này.
 - Chưa có bằng chứng build/boot/usertests thành công tại BTL và chưa có hàm đếm mới.
@@ -1137,7 +1137,7 @@ Một số đếm đúng lúc boot và quick tests pass là bằng chứng cho p
 
 ### 13.9. Gợi ý chú thích và nhắc commit khi chốt phần code
 
-Khi bạn hoàn thành một phần có thay đổi source, assistant sẽ đọc phần đó, gợi ý chú thích và nhắc commit/push theo [quy trình chốt phần code](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Lo-trinh-hoc.md>).
+Khi bạn hoàn thành một phần có thay đổi source, assistant sẽ đọc phần đó, gợi ý chú thích và nhắc commit/push theo [quy trình chốt phần code](<../Lo-trinh-hoc.md>).
 
 Với hàm đếm, các ý cần được bạn tự chú thích khi phù hợp:
 
@@ -1192,7 +1192,7 @@ Không cần trả lời tất cả trong một lượt. Chọn nhóm tương �
 
 ### 14.3. Bước học sau
 
-Tiếp tục [Bài 2: Race condition, spinlock, CPU ID và trạng thái ngắt](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/lessons/02-race-spinlock-va-cpu.md>). Bài 2 đi sâu critical section, atomic/order và push_off/pop_off. Sau khi hiểu những cơ chế đó mới triển khai free list theo CPU và stealing.
+Tiếp tục [Bài 2: Race condition, spinlock, CPU ID và trạng thái ngắt](<02-race-spinlock-va-cpu.md>). Bài 2 đi sâu critical section, atomic/order và push_off/pop_off. Sau khi hiểu những cơ chế đó mới triển khai free list theo CPU và stealing.
 
 Trong Bài 1, giữ allocator gốc để hiểu rõ điểm xuất phát. Slab và per-CPU lists còn là phần bạn sẽ thiết kế/viết trong các bài tiếp theo.
 
@@ -1202,7 +1202,7 @@ Phần giải thích, sơ đồ số nhỏ và bài tập là tài liệu đư�
 
 | Nguồn chính | Dùng để đối chiếu |
 |---|---|
-| [Source và phiên bản xv6 của BTL](<D:/2. FullStack/2026.1/Hệ điều hành/BTL/docs/Nguon-xv6.md>) | Baseline, layout, API và nơi nhập mã |
+| [Source và phiên bản xv6 của BTL](<../Nguon-xv6.md>) | Baseline, layout, API và nơi nhập mã |
 | [MIT xv6 book, chương 3](https://mit-pdos.github.io/xv6-riscv-book/mem.html) | Direct mapping, page allocator và free list |
 | [WG14 N1570, dự thảo C11](https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf) | §6.3.2.3 con trỏ; §6.5.3.2 &/*; §6.5.3.4 sizeof; §6.5.6 phép cộng con trỏ; §6.7.2.1 struct |
 | [RISC-V psABI, mục 4.1](https://riscv-non-isa.github.io/riscv-elf-psabi-doc/#_cc_type_sizes_and_alignments) | Kích thước/căn chỉnh kiểu theo LP64 |
