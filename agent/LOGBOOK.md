@@ -1,6 +1,116 @@
 # Nhật ký dự án
 
-Cập nhật: 15/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
+Cập nhật: 19/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
+
+## L022 - 19/10/2026 - CI thành công và chốt tài liệu chuẩn bị bằng Desktop
+
+- type: observation / validation / guidance
+- user request: Linh báo đã xong và hỏi bước tiếp theo.
+- CI verified: Plugin đọc run39209117349 completed/conclusion success, updated_at 2026-10-19T06:22:42Z (13:22:42 Asia/Saigon), head58be186120ab6315f7c5f5c830e9e1bd33896af1. Linux117918333408: format/build/usertests/crash đều completed/success. macOS117918333592 success với build kernel/fs.img. Đây là kết quả CI từ xa của checkpoint/PR merge ref, không phải build/test local hoặc benchmark.
+- Git verified: Local/origin vẫn58be186, PR #1 open/not merged, 2 commits/20 files. 9 tracked Markdown/config docs modified + 2 new Markdown + VstHelper untracked = 12 mục Changes. Source/Makefile/workflow không có diff; git diff --check đạt.
+- next small step: Desktop bỏ tick VstHelper, giữ 11 file docs/quy trình, Summary docs: organize team workflow and GitHub guidance, Commit 11 files rồi Push origin. Mốc commit riêng docs để tiếp tục chuẩn bị repo; không yêu cầu chỉnh chú thích hay sửa C.
+- scope note: Giai đoạn solo/chuẩn bị có thể chốt checkpoint ban đầu một lần bằng squash sau review/CI, rồi các task mới mở PR nhỏ. Tách checkpoint thành các PR nhỏ vẫn là phương án nếu cần review độc lập, không là điều kiện phải rewrite lịch sử.
+- changes: Cập nhật README/tài liệu audit và bộ nhớ theo kết quả cuối thực tế; không sửa C/h/S/Makefile/workflow hoặc thao tác Git ghi/merge.
+- validation: Kiểm tra tài liệu/link và xác nhận 11 file trước hướng dẫn Desktop; không chạy lại test đã đạt khi chưa có source thay đổi.
+
+## L021 - 19/10/2026 - Xác nhận push thành công và CI đã qua format/build
+
+- type: observation / guidance / validation
+- user context: Linh gửi ảnh Desktop đã chuyển sang Fetch origin nhưng Changes vẫn 12, nói không có gì xảy ra. Cần giải thích kết quả push và phần local chưa commit bằng ngôn ngữ đơn giản.
+- verified push: Git local origin/head cùng 58be186120ab6315f7c5f5c830e9e1bd33896af1, rev-list 0/0. Plugin GitHub PR #1 head cùng SHA, 2 commits/20 changed files, còn open/not merged; merge ref mới 7e9ea6227d841aa32e1f7d30c0771ee43485c138. Không phải thao tác push lỗi.
+- CI: Tạo run PR39209117349 và push39209113495, đều in_progress ở lần đọc. Jobs của run PR: linux117918333408 checkout/deps/format/build success, usertests in_progress, crash pending; macos117918333592 success, build kernel/fs.img success. Chưa có kết quả cuối run/usertests/crash; chưa kết luận runtime hay benchmark pass.
+- guidance: Push gửi commit đã tạo; các file chưa commit trong Changes vẫn ở máy. Hướng dẫn xem run/PR Checks trên GitHub để thấy tiến độ, tiếp tục dùng Desktop cho commit/push. Không commit nhóm 12 file chỉ để làm sạch danh sách, VstHelper vẫn ngoài scope.
+- actions: Chỉ đọc Git/GitHub jobs và cập nhật bộ nhớ; không thao tác Git ghi, không rerun/merge/comment hoặc tác động source.
+- next action: Đọc lại run39209117349 khi cần kết quả mới; chỉ chốt mốc/merge sau khi có kết quả thực và scope được review.
+
+## L020 - 19/10/2026 - Hướng dẫn GitHub Desktop và xác nhận commit format
+
+- type: user-preference / observation / guidance
+- request: Linh yêu cầu hướng dẫn bằng GitHub Desktop, gửi ảnh repo BTL với Push origin 1, Changes 12 và commit style(kernel): fix formatting vừa tạo.
+- verified: Git local HEAD58be186 trên codex/linh-review-existing-changes, origin7a61ccf, rev-list left/right 0/1. Commit chứa đúng bio.c/kalloc.c/main.c/spinlock.c/string.c, 13 insertions/10 deletions. Index rỗng; source không còn diff chưa commit, tài liệu và VstHelper vẫn chưa commit.
+- preference: Ưu tiên hướng dẫn GitHub Desktop, tên/vị trí nút cụ thể, một thao tác rõ mỗi bước. Chỉ dùng lệnh terminal cho người dùng khi cần và nêu lý do; không giới hạn công cụ đọc Git của agent.
+- guidance: Chỉ cần bấm Push origin trên thanh trên, chờ trở lại Fetch origin. Nút Commit 12 files tạo commit khác từ Changes, không phải nút push. Các thay đổi chưa commit không được đưa lên chỉ bằng push commit format.
+- changes: Cập nhật AGENTS, OP-009 và checkpoint; không stage/commit/push hoặc điều khiển UI thay người dùng.
+- next action: Sau Linh push, đọc CI run mới; chưa xác nhận remote đã nhận 58be186 hoặc tests pass.
+
+## L019 - 19/10/2026 - Bỏ yêu cầu chỉnh chú thích và tiếp tục chốt Git
+
+- type: user-preference / guidance
+- user request: Linh nói không cần coi trọng chú thích code và hỏi bước tiếp. Sau giải thích trước đó quá nhiều bước, ưu tiên chỉ dẫn Git ngắn, mục đích rõ.
+- decision: Chú thích không là yêu cầu bắt buộc hay điều kiện chặn mốc đã đạt; chỉ gợi ý khi có giá trị kỹ thuật thật hoặc người dùng yêu cầu. Giữ nguyên quyền tự viết C và tự stage/commit/push của người dùng.
+- verified: Nhánh review vẫn HEAD7a61ccf, source diff đúng 5 file format như L018, index rỗng, chưa commit/push phần format. Docs và VstHelper còn ngoài scope. Không có lý do yêu cầu sửa lại comment trước chốt format.
+- changes: Cập nhật AGENTS, OP-007, current priority và recovery/lộ trình; không sửa source hoặc thực hiện Git ghi.
+- next step: Hướng dẫn một block lệnh cd/add đúng 5 file/commit style/push nhánh review, giải thích ngắn add/commit/push. Sau người dùng push mới đọc CI để xác nhận build/test.
+
+## L018 - 19/10/2026 - Review phần format trước commit riêng
+
+- type: code-review / validation
+- request: Linh báo đã format theo hướng dẫn.
+- observation: Working diff có đúng 5 file source kernel/bio.c, kalloc.c, main.c, spinlock.c, string.c: 13 insertions/10 deletions, chỉ bỏ khoảng trắng/dòng trống và đổi canh/ngắt dòng. Không thấy đổi logic trong diff đã đọc. Chú thích acquire/release dài vẫn ở cuối dòng làm lời gọi bị tách nhiều dòng, hợp lệ nhưng khó đọc.
+- validation: git diff --check đạt; clang-format 21.1.8 --dry-run --Werror toàn kernel/*.[ch], user/*.[ch], mkfs/*.c đạt exit 0. Không sửa source hoặc chạy formatter ghi thay người dùng; chưa build/boot/test/benchmark, chưa có run CI mới được kiểm tra.
+- git state: Nhánh codex/linh-review-existing-changes vẫn tại 7a61ccf, index rỗng, source format chưa commit. Tài liệu audit chưa commit và VstHelper/ untracked có Git riêng; cần giữ ngoài commit format.
+- guidance: Gợi ý chú thích ngắn trên dòng riêng giải thích khóa bảo vệ việc công bố trang vào freelist; release trở lại một dòng. Sau tự sửa/chạy lại format/check, Linh tự stage đúng 5 file, commit style(kernel): align learning changes with clang-format và push nhánh hiện tại. Assistant không stage/commit/push.
+- next action: Sau người dùng chốt/push, đọc CI mới; kết quả local style đạt không thay thế runtime hoặc CI pass.
+
+## L017 - 19/10/2026 - Tiếp tục cấu hình và kiểm tra formatter local
+
+- type: observation / guidance
+- request: Linh yêu cầu tiếp tục sau hướng dẫn Settings General.
+- observations: GitHub xác nhận squash bật, merge commit/rebase tắt. Không đọc lại auto-delete/default message/rulesets. Ba run mới nhất vẫn như audit, chưa có run mới. Source kalloc.c còn nguyên format cũ; working tree có tài liệu audit chưa commit và VstHelper/ untracked.
+- environment: wsl --list --verbose xác nhận Ubuntu WSL2; /etc/os-release là Ubuntu 26.04.1 LTS. command -v thấy make, riscv64-linux-gnu-gcc, qemu-system-riscv64; clang-format not found. Log CI cũ ghi gói clang-format 21.1.6; không suy ra phiên bản toolchain local đã kiểm tra đủ.
+- next step: Linh cài formatter trong Ubuntu, đặt chú thích dài lên dòng riêng nếu cần và tự chạy make fmt; xem diff đúng phần C để assistant review. Sau khi phần format được kiểm tra mới chốt commit riêng, người dùng tự commit/push. Chưa có kết quả format/build/test mới.
+- changes: Cập nhật trạng thái môi trường và setting đã xác minh; không sửa C/h/S/Makefile/workflow, không cài phần mềm hoặc thao tác Git ghi.
+- install follow-up: Linh gửi lỗi apt install clang-format: Unable to locate package. Kiểm tra read-only thấy ubuntu.sources đã gồm main/universe/restricted/multiverse, nhưng index resolute/universe binary-amd64 Packages 0 byte và apt-cache search/policy không có clang-format. Chưa xác định nguyên nhân tải index lỗi; cần output sudo apt update. sudo -n true báo cần xác thực tương tác; không có apt update/install nào do agent thực hiện. Đối chiếu hướng dẫn APT Ubuntu chính thức, không vội thêm kho hay đổi tên gói.
+- cache diagnosis: Sau apt update do Linh chạy chỉ Hit, file index universe vẫn 0 byte; cấu hình IndexTargets/amd64 có Packages, nguồn universe đã bật. Metadata InRelease ghi size Packages 76.792.699 byte, curl HEAD HTTPS Packages.xz trả 200/15.960.824 byte. Xác định bản cache local rỗng, chưa biết sự kiện tạo ra cache lỗi. Hướng dẫn loại bỏ đúng một file index rỗng để APT tải lại, không xóa gói đã cài hoặc sửa sources; chưa thực hiện xóa/cập nhật/cài thay người dùng, chưa có kết quả sửa thành công.
+- install verified: Linh báo đã cài xong; đọc trực tiếp clang-format --version qua WSL xác nhận Ubuntu clang-format 21.1.8 (6ubuntu1). Chưa có diff kernel/user/mkfs mới; chưa format/build/test. Cập nhật bước tiếp sang Linh tự xử lý chú thích dài rồi make fmt và review diff trước commit riêng. Không suy ra phiên bản local trùng chính xác CI cũ 21.1.6.
+
+## L016 - 19/10/2026 - Audit GitHub và chuẩn bị quy trình solo rồi nhóm
+
+- type: observation / research / documentation
+- user request: Dùng plugin GitHub kiểm tra repo hiện tại, việc cần setting cho quy trình ngăn nắp và lịch sử commit; Linh nói chưa thêm thành viên.
+- method: Plugin GitHub get_repo/fetch/search PR/issues/branches/commits/rulesets/jobs/job log; Git local log/stat/diff/config định danh và ls-remote tags. Đọc GitHub Docs về rulesets, squash, workflow triggers và commit email. Không đọc nội dung repo lồng VstHelper.
+- state: Main c829ab9 có 4 commit, trong đó 8ea6f01/c829ab9 tên dấu chấm; code chú thích/whitespace trộn với docs. Nhánh codex/linh-review-existing-changes@7a61ccf đã push, hơn main 1; PR #1 mở, 17 file, không draft/chưa merge. Đầu audit tracked working tree sạch, VstHelper/ untracked có .git riêng.
+- settings: Public/default main; main.protected=false, rulesets=[]; cả merge/squash/rebase bật, auto-delete head branch tắt. Admin endpoint protection bị integration 403, không suy diễn lỗi đó; kết luận bảo vệ dựa branches/rulesets. Issues query rỗng. Projects feature bật nhưng chưa xác nhận board v2. Templates có trong head PR, chưa main.
+- history/identity: Đồ thị chưa rối; khó đọc do tên/scope. Global config hiện tên Nguyễn Kim Linh/noreply GitHub đúng, checkpoint mới gắn profile, 4 commit cũ author API null. .gitattributes đã chuẩn LF. Tag baseline local@e287830; API ref 404 và git ls-remote --tags origin rỗng, chưa chia sẻ tag.
+- CI evidence: Danh sách 5 run đều conclusion failure; xem run PR 39202934361 và run main 38749137150. Run PR job linux 117899570299 fail make fmt + diff; log diff đúng 5 file bio/kalloc/main/spinlock/string. Linux build/usertests/crash skipped. Job macos 117899570533 build kernel/kernel fs.img success, kiểm tra synthetic PR merge ref 5fef268… từ head7a61ccf/basec829ab9, chưa phải merge thực. Thay kết luận cũ chưa có bằng chứng build, nhưng chưa xác nhận runtime/benchmark.
+- proposal: Giữ 4 commit main, dùng nhánh task/PR/squash rõ từ đây; bảo toàn checkpoint rồi tách code/docs khi bàn giao. Solo PR với 0 approval bắt buộc, có thành viên thì 1 review; sửa format và tách job CI trước require checks. Settings chưa apply; chưa rewrite lịch sử.
+- outputs: docs/Thiet-lap-GitHub-26118.md, CONTRIBUTING.md; link README tương đối và trạng thái CI thật; templates thích hợp solo/team; bổ sung quy trình/bộ nhớ. Attach PR #1 vào chat để tham chiếu, không gửi comment/review hay request reviewer.
+- validation: 9 Markdown và 29 liên kết local hợp lệ, code fences/UTF-8/whitespace đạt; README không còn link root máy cũ. git diff --check đạt; git diff --exit-code trên kernel/user/mkfs/Makefile/workflow đạt, giữ nguyên implementation và CI. Không chạy formatter/build/test local hoặc pipeline mới. Lỗi CI được dẫn từ log thật, không tuyên bố đã sửa/pass.
+- actions not performed: Không thay C/h/S/Makefile/workflow, Git config/history/refs/Settings; không stage/commit/push/merge/mời người/tạo issue/board.
+- next action: Linh xem checklist, tự sửa format C theo bài học rồi kiểm tra/chốt; áp dụng Settings và tách PR chỉ khi được yêu cầu rõ. Cuối tuần điền kết quả thật vào W01, không dùng trạng thái audit cũ để kết luận CI hiện tại.
+- should promote to current state?: yes, facts và kết quả audit; cấu hình/cleanup giữ nhãn đề xuất.
+
+## L015 - 19/10/2026 - Nghiên cứu quy trình nhóm 26118 và báo cáo tuần
+
+- type: user-context / research / documentation
+- summary: Người dùng xác nhận tên Linh, muốn tham gia nhiều/hiểu toàn bộ và chia phần riêng cho ba thành viên như cách làm việc thực tế; cung cấp ảnh đề tài, thông báo, template PDF và sample PDF.
+- facts: Mã 26118, đề tài 19; Nguyễn Kim Linh 20233495, Lê Trần Hiếu Minh 20233528, Nguyễn An Khánh 20224019. Báo cáo ít nhất mỗi tuần, cùng thread môn học, mọi người có đóng góp, nối TODO trước và cho phép sai khác 25%; template có năm phần, summary 200–300 từ.
+- user clarification: Trong lúc nghiên cứu, Linh xác nhận tuần này mới bắt đầu dự án nhóm, phần đang học là học trước. W1 theo lịch là 19–25/10/2026; không gộp Lesson/code/tài liệu chuẩn bị cá nhân thành kết quả nhóm W01. Đã tách task khởi động K01–K04 khỏi TODO W2 N01–N04 có điều kiện đầu vào.
+- method: Đọc chat được chỉ định qua read_thread; đọc memory/kiến trúc/source/Git/CI; trích và render hai PDF; xem ảnh; kiểm tra tài liệu chính MIT lock lab, Bonwick/USENIX, GitHub Flow/Projects/CODEOWNERS và QEMU MTTCG.
+- observation: Source vẫn list/lock chung với kfreepage_count/prototype/caller; chưa perCPU/slab. Không có user/kalloctest.c hoặc kernel/kcsan.c. CI file có nhưng không kiểm chứng pipeline. Baseline tag e287830, HEAD c829ab9, working tree có thay đổi từ trước; remote kimsakota/BTL.
+- proposal: Một repo/ba clone, nhánh ngắn theo task, API nhỏ, PR/review chéo. Linh page/buffer/tích hợp, Minh slab/file, Khánh test/inode; Linh học toàn luồng bằng review/teach-back/reproduce. Slab phát triển trên page gốc để song song; ba client chính file/inode/buf, pipe thử trước. Chưa được nhóm chốt phân công.
+- outputs: docs/Quy-trinh-nhom-26118.md; docs/Ke-hoach-va-backlog-26118.md; docs/bao-cao/README.md; bản nháp W01 Markdown/PDF; mẫu task/PR local .github; liên kết README và bộ nhớ.
+- report status: PDF ba trang, summary 251 từ theo whitespace; kiểm tra lại bản render sau khi cập nhật bối cảnh khởi động. Ngày from/to thực tế, đóng góp thực Minh/Khánh, xác nhận phần của Linh và URL design/board còn thiếu; nhãn DRAFT rõ ràng, không nộp thay nhóm. Không lấy tiến độ/test/công cụ nhóm mẫu làm dữ kiện nhóm này.
+- validation: Kiểm tra 10 Markdown, 21 liên kết local, code fences và đối chiếu ID K01–K04/N01–N04; summary 251 từ, PDF đủ mục/MSSV, ba trang, text bounds hợp lệ; xem cả ba PNG bản cuối. git diff --check tài liệu đạt. Diff kernel/user/mkfs/Makefile giống đầu lượt và SHA256 kalloc.c/defs.h/main.c/Makefile giữ nguyên. Không chạy build/boot/test/benchmark.
+- limitations: Đã biết tuần khởi động nhưng chưa biết giờ nộp chính thức/hạn cuối kỳ; đề xuất tổng hợp nội bộ 24/10 chỉ là lịch nhóm. W01 còn là khung chờ đầu ra cuối tuần. Công thức sai khác 25% chưa do giảng viên xác nhận; không tự gán phần trăm tiến độ. Mẫu/plan không chứng minh ba thành viên đã đóng góp.
+- actions not performed: Không sửa implementation C/h/S/Makefile, không stage/commit/push, không tạo board/issue/PR hoặc gửi tin/báo cáo ra ngoài.
+- next action: Nhận kỳ/hạn và contributions thật, chỉnh bản nháp theo đúng thời gian; hoặc tiếp tục tự code Lesson 3 khi Linh quay lại học.
+- should promote to current state?: yes, chỉ thông tin nhóm/yêu cầu/đầu ra, phân công giữ nhãn đề xuất.
+
+## L014 - 17/10/2026 - Tạo Lesson 3 về free list theo CPU
+
+- type: documentation / observation
+- summary: Người dùng yêu cầu file Markdown Lesson 3; giữ cách dạy đầy đủ, tự viết C, gợi ý chú thích và nhắc commit/push từng phần.
+- source update: Kalloc.c đã có kfreepage_count với lock bao vòng duyệt, defs.h có prototype, main.c gọi/in ngay sau kinit. Đây là bằng chứng source, chưa xác nhận runtime; thay kết luận cũ chưa có hàm đếm.
+- result: Tạo docs/lessons/03-per-cpu-free-lists.md với pool/mảng struct, lifetime tên khóa, init trước freerange, ownership/invariant, guard/local free-alloc, count nhiều pool và bản đồ reference. Có bài A–I và mốc M0/M1/M2 để người dùng tự code/check/commit.
+- design for lesson: M1 đổi state thành mảng nhưng giữ pool 0 chung. M2 local-only chưa stealing, chỉ đặt tiêu chí CPUS=1; local-empty không là global OOM. Lesson 4 thêm remote allocation trước kiểm chứng nhiều CPU.
+- count semantics: Giữ một khóa mỗi lần quét pool. Boot yên cho tổng giải thích theo end/PHYSTOP; runtime không coi tổng nhiều thời điểm là snapshot đồng thời. Chưa thêm counter chung hoặc giữ đồng thời nhiều khóa.
+- sources: Source BTL/Makefile và kiến trúc, MIT lock lab/xv6 book, WG14 N1570. Thiết kế M1/M2 là hướng dẫn cho BTL, không phải implementation đã nhập.
+- changes: Lesson 3, liên kết từ Lesson 2/README/lộ trình và bộ nhớ; không sửa C/header/assembly/Makefile, không stage/commit/push.
+- validation: Kiểm tra 7 tài liệu, 68 liên kết local/số dòng, code fences, thứ tự mục 0–15 và 3 điểm source của hàm đếm/khai báo/caller; git diff --check tài liệu đạt. Diff kernel/user/mkfs/Makefile sau soạn bài giống snapshot đầu lượt, giữ nguyên phần C người dùng đã viết.
+- limitations: Chưa kiểm tra lại cài môi trường; chưa build/boot/test. Chưa có source per-CPU/slab. Việc tạo tài liệu không tự hoàn thành các mốc code.
+- next action: Người dùng kiểm tra/chốt hàm đếm nếu chưa làm, rồi tự viết pool/mảng và lần lượt M1/M2; assistant kiểm tra, gợi ý chú thích/message và nhắc tự commit/push.
+- should promote to current state?: yes
 
 ## L013 - 15/10/2026 - Gợi ý chú thích và nhắc commit sau từng phần code
 

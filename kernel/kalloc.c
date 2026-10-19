@@ -20,14 +20,14 @@ struct run {
 
 struct {
   struct spinlock lock; // Khóa bảo vệ freelist khi nhiều CPU truy cập cùng lúc
-  struct run *freelist; 
+  struct run *freelist;
 } kmem;
 
 void
 kinit()
 {
-  initlock(&kmem.lock, "kmem"); // Khởi tạo khóa 
-  freerange(end, (void *)PHYSTOP); // Khởi tạo các page free  
+  initlock(&kmem.lock, "kmem");    // Khởi tạo khóa
+  freerange(end, (void *)PHYSTOP); // Khởi tạo các page free
 }
 
 void
@@ -56,10 +56,14 @@ kfree(void *pa)
 
   r = (struct run *)pa;
 
-  acquire(&kmem.lock); // Yêu cầu quyền truy cập vào kmem.lock để đảm bảo rằng không có CPU nào khác đang truy cập vào freelist cùng lúc  
+  acquire(
+    &kmem
+       .lock); // Yêu cầu quyền truy cập vào kmem.lock để đảm bảo rằng không có CPU nào khác đang truy cập vào freelist cùng lúc
   r->next = kmem.freelist;
   kmem.freelist = r;
-  release(&kmem.lock); // Giải phóng quyền truy cập vào kmem.lock để cho phép các CPU khác truy cập vào freelist
+  release(
+    &kmem
+       .lock); // Giải phóng quyền truy cập vào kmem.lock để cho phép các CPU khác truy cập vào freelist
 }
 
 // Allocate one 4096-byte page of physical memory.
@@ -79,4 +83,21 @@ kalloc(void)
   if (r)
     memset((char *)r, 5, PGSIZE); // fill with junk
   return (void *)r;
+}
+
+uint64
+kfreepage_count(void)
+{
+  struct run *r;
+  uint64 count = 0;
+
+  acquire(&kmem.lock);
+  r = kmem.freelist;
+
+  while (r) {
+    count++;
+    r = r->next;
+  }
+  release(&kmem.lock);
+  return count;
 }
