@@ -1,10 +1,10 @@
 # Trạng thái hiện tại
 
-Cập nhật: 19/10/2026.
+Cập nhật: 23/10/2026.
 
 ## Project status
 
-- Giai đoạn: Bảo vệ main cho solo đã cấu hình, nhưng cộng tác nhóm chưa hoàn tất. Linh yêu cầu tiếp tục mời/onboard Minh và Khánh, chia sẻ lesson và giao việc/review; chưa chuyển sang học C. Main53872b8 có baseline/CI đạt; chưa per-CPU/slab. PR #2 còn mở ở lần đọc mới.
+- Giai đoạn: Đang hoàn thiện hồ sơ báo cáo W01 về cấu trúc dự án và dùng GitHub. Minh/Khánh đã được thêm vào repo theo Linh xác nhận. PR #2/#4/#8/#9 đã merge; main và origin/main ở 5c5fb99. Lượt sửa lỗi hiện tại nằm trên codex/fix-w01-evidence: gỡ xung đột stash, giữ hai ảnh minh-chung và xóa hai ảnh linh-chung đúng yêu cầu. Chưa có slab/per-CPU hoặc benchmark mới.
 - Mục tiêu: đề tài 19, Slab allocator and per-CPU free lists trên xv6; nối kiến thức từ BaoKhoaHoc/VstHelper.
 - Người dùng trong chat này: Nguyễn Kim Linh; muốn làm nhiều và hiểu toàn bộ dự án.
 - Nhóm dự án 26118: Nguyễn Kim Linh 20233495, Lê Trần Hiếu Minh 20233528, Nguyễn An Khánh 20224019. Đã có nhân lực; chưa xác nhận deadline, quỹ giờ và phân công với hai bạn.
@@ -25,8 +25,8 @@ Cập nhật: 19/10/2026.
 | CST-010 | Mã dự án 26118, số đề tài 19; nhóm gồm Linh 20233495, Minh 20233528, Khánh 20224019; người dùng là Linh | Cao | Ảnh và yêu cầu trực tiếp 19/10; LOGBOOK L015 | Người dùng đính chính | 19/10/2026 |
 | CST-011 | Run main39212699734 tại head53872b8 đã completed/success: linux format/build/usertests/crash success; macos build/job success. Run PR39210447048 tại head2df489d cũng success. Chưa có per-CPU/slab hoặc benchmark; không có kalloctest.c/kcsan.c MIT lab trong BTL | Cao tại lúc kiểm tra | GitHub run và jobs; L023 | Source/run mới | 19/10/2026 |
 | CST-012 | Tuần 19–25/10/2026 mới khởi động nhóm; phần Linh đang học là học trước/chuẩn bị cá nhân, không tự tính là kết quả nhóm W01 | Cao | Người dùng trả lời trực tiếp ngày 19/10; LOGBOOK L015 | Người dùng đính chính hoặc có kết quả W01 thật | 19/10/2026 |
-| CST-013 | PR #1 đã merge thành main53872b8. PR #2 docs-main-workflow còn open/not merged, headff8a36a. Trước lượt hoàn thiện nhóm, local cùng origin nhánh này, tracked tree sạch, chỉ VstHelper/ untracked. Lượt này có thêm/sửa tài liệu, templates và bộ nhớ chưa commit; không sửa C | Cao tại lúc kiểm tra | Git và plugin GitHub; L026 | Nhánh/PR/working tree thay đổi | 19/10/2026 |
-| CST-014 | Ruleset main-workflow id25416827 active, target default branch main, bypass rỗng; chặn xóa/force push, linear history, PR với 0 approvals và resolve conversations. Required checks đã có linux và macos, integration_id15368 cho cả hai; strict=false. Repo chỉ cho squash ở lần đọc trước; chưa thêm cộng tác viên | Cao về trường đã đọc | Plugin GitHub ruleset detail; L025 | Cấu hình/thành viên đổi | 19/10/2026 |
+| CST-013 | Main local/origin/main ở 5c5fb99 (PR #9), hai ghi chú Minh đã khôi phục và ba xung đột đã gỡ. Đã commit và push codex/fix-w01-evidence theo yêu cầu rõ của Linh, thiết lập upstream và đối chiếu remote SHA. Nhánh sửa giữ đúng 2 ảnh minh-chung; GitHub main chưa nhận phần sửa qua PR/merge | Cao tại lúc kiểm tra | Git local/remote refs; LOGBOOK L031 | Commit/push/merge hoặc đổi working tree | 23/10/2026 |
+| CST-014 | Cấu hình lần đọc 19/10: main-workflow active, PR 0 approvals, resolve conversations, linear history, chặn xóa/force push; checks linux/macos integration_id15368, strict=false; chỉ squash. Linh đã xác nhận thêm Minh/Khánh, Minh có ghi chú và PR onboarding trên main. Chưa tái kiểm tra Settings hoặc xác nhận đầy đủ Khánh/board | Cao về cấu hình tại ngày đọc và bằng chứng nhóm; không suy ra cấu hình hiện tại đã đổi | L025, L031; user xác nhận và source ghi chú Minh | Cấu hình/thành viên đổi | 23/10/2026 |
 
 ## Active operating decisions
 
@@ -47,7 +47,7 @@ Cập nhật: 19/10/2026.
 
 | Area | Current value | Source | Revisit when | Last checked |
 |---|---|---|---|---|
-| Current priority | Tiếp tục workflow nhóm; Linh vừa muốn chia sẻ VstHelper. Đã chuẩn bị snapshot references/VstHelper (43 file nguồn + README/SNAPSHOT), ignore clone gốc để giữ Git riêng. Hướng dẫn nhánh mới codex/reference-vsthelper từ main cập nhật sau chốt docs PR #2, chỉ commit .gitignore và snapshot. 19 Markdown workflow đang local; chưa tự commit/push. Vẫn chờ username Minh/Khánh để mời/accept, clone, task/board/review; không quay lại C | LOGBOOK L026–L027; yêu cầu Linh và kiểm tra Git/file | Sau chốt docs/snapshot hoặc nhận tài khoản nhóm | 19/10/2026 |
+| Current priority | Phần sửa W01 đã commit và publish trên codex/fix-w01-evidence: README ngắn 3 phần, giữ hai ảnh minh-chung và xóa hai linh-chung. Còn PR/merge vào main và tổng hợp đủ đóng góp nhóm để nộp báo cáo tuần. Linh cho phép tự commit/push riêng lần sửa này, không thành quyền auto-commit các bài học sau | Yêu cầu Linh 23/10; source và Git; L031 | PR/merge sửa lỗi và đủ đóng góp nhóm | 23/10/2026 |
 | Build và runtime | Local chỉ xác nhận style, chưa chạy local build/test. CI main39212699734 tại 53872b8 completed/success: linux format/build/usertests/crash và macos build đạt. Đây là baseline có hàm đếm trang, chưa phải perCPU/slab hoặc benchmark | Plugin GitHub run/jobs; L023 | Source/run mới hoặc thực hành local | 19/10/2026 |
 | Learning progress | Đã xác nhận đọc xong Lesson 0; Lesson 1–3 đã soạn. Hàm đếm đã vào main và CI baseline đạt; chưa suy ra Linh đã hoàn thành các bài thực hành khác | LOGBOOK L011–L014, L023; source và CI | Sau bài học tiếp theo | 19/10/2026 |
 | Next implementation step | Chưa phải việc đang giao: sau khi Linh muốn trở lại học, P02 là pool/mảng rồi M1 giữ pool 0/count; M2 local path sau. Hiện chỉ làm workflow GitHub ba người, không sửa C thay hoặc yêu cầu làm bài C | docs/lessons/03-per-cpu-free-lists.md; yêu cầu Linh L026 | Người dùng quay lại học C | 19/10/2026 |
@@ -62,7 +62,7 @@ Cập nhật: 19/10/2026.
 ## Open questions
 
 - Overview/rubric, giờ nộp chính thức, hạn cuối kỳ và ngày from/to thực tế của W01; tuần khởi động đã xác nhận 19–25/10/2026.
-- Đóng góp thật Minh/Khánh trong kỳ, quỹ giờ và GitHub usernames; URL design/board và ngày/permalink nộp chưa có.
+- Đóng góp và minh chứng W01 của cả ba, quỹ giờ, URL design/board và permalink nộp chưa đủ. Minh dùng tài khoản Minhlth và có ghi chú onboarding tự báo cáo môi trường/test; chưa đối chiếu raw log Minh trong lượt này. Không mời lại thành viên đã có hoặc nhận đã hoàn thành bài kỹ thuật từ việc đọc tài liệu.
 - Cách giảng viên định lượng sai khác 25% và cumulative progress; quy ước nội bộ trong tài liệu chỉ là đề xuất.
 - Cách môn học tính ít nhất 3 cấu trúc kernel chuyển động và quy định tên API cuối.
 - Hiệu quả của batch stealing/adaptive policy chỉ có thể kết luận sau thực nghiệm.
