@@ -8,6 +8,7 @@
 - [Sổ tay GitHub: mời thành viên, clone, đăng lesson, giao việc và review](docs/So-tay-GitHub-nhom.md).
 - [Mục lục Lesson 0–3 để cả nhóm đọc](docs/lessons/README.md).
 - [Backlog và đầu ra W1 cho từng người](docs/Ke-hoach-va-backlog-26118.md).
+- [Nộp đóng góp và minh chứng W01 theo từng thành viên](docs/bao-cao/W01/README.md).
 
 Repo public nên mọi người có thể đọc tài liệu đã có trên main ngay. Ảnh Linh cung cấp ngày 19/10 đã hiển thị hai tài khoản với nhãn Collaborator. Bước tiếp theo là mỗi bạn clone, nhận việc và thử push nhánh/PR/review; quyền board và việc tăng approvals cần kiểm tra riêng.
 
