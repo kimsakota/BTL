@@ -4,15 +4,15 @@ Cập nhật: 23/10/2026. Nguồn chuẩn hiện tại: CURRENT_STATE.md và LOG
 
 ## Trạng thái sau sửa lỗi local
 
-- Linh đã yêu cầu assistant tự xử lý và commit, xóa hai ảnh linh-chung. Quyền này chỉ cho lần sửa hiện tại; chưa yêu cầu push/merge hoặc auto-commit bài học sau.
+- Linh đã yêu cầu assistant tự xử lý, commit và push lần sửa này, xóa hai ảnh linh-chung. Quyền này chỉ cho lần sửa hiện tại; chưa yêu cầu merge hoặc auto-commit bài học sau.
 - Main và origin/main đã được đồng bộ ở 5c5fb99, có PR #9. Commit local b00fe36 từng xóa nhầm hai ghi chú Minh đã lưu trong backup; hai ghi chú W1_Minh.md và minh.md được giữ đúng như origin/main.
 - Phần sửa nằm trên một nhánh codex/fix-w01-evidence từ main mới. Ba xung đột Markdown do áp stash đã được gỡ; README của Linh dùng bản ngắn 3 phần, dẫn đúng 01-minh-chung.png và 02-minh-chung.png. Hai ảnh 01-linh-chung.png/02-linh-chung.png được xóa theo yêu cầu; không sửa ảnh giữ lại hoặc implementation.
 - Đã lưu working files, raw index, 9 stage blobs và full history bundle trong C:/Users/KimSakota/.codex/backups/BTL-conflicts-20261023-aa7t56qa/. Stash gây xung đột65a2e92 đã được sao lưu và bỏ để tránh áp lại; stash5221c62 chứa hướng dẫn thành viên từ trước vẫn giữ nguyên.
-- Phần sửa được chốt bằng commit local theo yêu cầu. Chưa push hoặc đưa vào GitHub main; web chỉ hết hai ảnh trùng sau khi nhánh sửa được publish và PR merge. Không force-push main.
+- Đã push thành công codex/fix-w01-evidence và thiết lập upstream origin/codex/fix-w01-evidence. Commit sửa nội dung là 8b49680; sau đó Linh có fix và revert fix, không thay đổi kết quả cuối của bản sửa. Remote đã được đối chiếu đúng HEAD. Main trên GitHub vẫn ở 5c5fb99; chỉ nhánh sửa đã hết hai ảnh trùng, cần PR/merge để main nhận phần sửa. Chưa xác nhận CI mới; không force-push.
 
 ## Bước tiếp theo
 
-- Linh xem diff/commit trên codex/fix-w01-evidence. Nếu muốn cập nhật GitHub, Publish branch rồi mở PR vào main; chỉ thực hiện push thay khi có yêu cầu rõ. Không dùng lại PR #8/#9 vì đã merge.
+- Nhánh sửa đã publish, không yêu cầu Linh commit/publish lại khi không có thay đổi mới. Có thể mở PR tại https://github.com/kimsakota/BTL/compare/main...codex/fix-w01-evidence?expand=1 để đưa phần sửa vào main; chưa tạo PR thay người dùng trong lượt push này. Không dùng lại PR #8/#9 vì đã merge.
 - Sau merge, về main và Fetch/Pull trước việc mới. Kết thúc công việc bằng commit/push hoặc giữ thay đổi trên đúng nhánh; không mang các sửa README/bộ nhớ chưa commit sang main cũ bằng stash.
 - Tiếp tục lấy đóng góp/ảnh/log thật của cả ba và tổng hợp báo cáo W01. Theo Linh, tuần đầu chủ yếu tạo cấu trúc dự án và dùng GitHub. Chưa có bản báo cáo cuối được nộp; GitHub lưu minh chứng không thay reply đính kèm báo cáo trong thread môn học.
 
