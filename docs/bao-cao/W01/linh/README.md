@@ -17,7 +17,7 @@ Trong tuần đầu, tôi tập trung chuẩn bị cấu trúc dự án và th�
 Phần học trước của tôi được ghi riêng trong [ghi chú onboarding](../../../onboarding/linh.md). Hồ sơ W01 này tập trung vào việc khởi tạo dự án và dùng GitHub.
 
 ## 2. Ảnh minh chứng
-
+ 
 ### Ảnh 1 - Cập nhật repo và xem lịch sử
 
 Ảnh chụp ngày 23/10/2026 cho thấy GitHub Desktop đang mở repo BTL, ở main và xem History tại commit `94f56a2`. Tôi đã tải được thay đổi chung và xem diff ghi chú onboarding của Minh. Nội dung test trong diff là ghi chú của Minh; ảnh minh chứng thao tác GitHub của tôi.
