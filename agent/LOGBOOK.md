@@ -2,13 +2,24 @@
 
 Cập nhật: 23/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
 
+## L031 - 23/10/2026 - Gỡ xung đột local và giữ đúng hai ảnh minh chứng
+
+- authorization: Linh yêu cầu assistant tự xử lý và commit, xóa hai file linh-chung. Đây là quyền stage/commit cho lần sửa này; chưa có yêu cầu push/merge thay người dùng.
+- diagnosis: Local main b00fe36 lệch với origin/main; b00fe36 xóa docs/onboarding/W1_Minh.md và minh.md, không phải ảnh. Stash 65a2e92 được áp khi quay về main gây UU ở LOGBOOK, RECOVERY_NOTES và README W01/linh. Origin/main5c5fb99 (PR #9) có bốn tên ảnh nhưng mỗi cặp linh/minh có blob giống hệt nhau.
+- backup: Đã sao lưu working copies, 9 stage blobs, raw index, refs/reflog và full Git bundle --all --reflog, kiểm tra đọc lại/CRC và hash, tại C:/Users/KimSakota/.codex/backups/BTL-conflicts-20261023-aa7t56qa/. Gói repository-before-repair.bundle giữ được commit b00fe36 và các stash cũ trước khi sửa.
+- repair: Sau xác nhận không có file ngoài dự kiến và implementation trees không khác, đồng bộ main local về origin/main5c5fb99; giữ hai ghi chú Minh. Tạo một nhánh codex/fix-w01-evidence từ main mới, lấy lại nội dung mới nhất của 3 Markdown từ stage 3 đã backup, giữ README ngắn 3 phần và dẫn 01-minh-chung.png/02-minh-chung.png. Chỉ xóa 01-linh-chung.png và 02-linh-chung.png. Không sửa ảnh giữ lại hoặc source C/h/S.
+- stash handling: Nội dung và các thay đổi xóa trong stash65a2e92 đã được đối chiếu với yêu cầu: giữ sửa 3 Markdown, thực hiện xóa 2 ảnh linh-chung, bỏ ý định xóa nhầm ghi chú Minh. Stash này đã lưu bundle và được bỏ khỏi danh sách để tránh áp lại xung đột. Stash5221c62 chứa hướng dẫn thành viên từ trước vẫn giữ nguyên.
+- memory: Cập nhật checkpoint/CURRENT_STATE đúng main5c5fb99, PR #8/#9 đã merge, canonical ảnh là minh-chung theo lựa chọn cuối của Linh. Không tạo thêm thay đổi bộ nhớ chỉ để ghi từng lần bấm nút.
+- scope and validation: Chỉ thay Markdown/bộ nhớ và xóa hai ảnh trùng. Đối chiếu index không còn unmerged, kiểm tra link/ảnh của README và diff whitespace; implementation, workflow và nội dung hai ảnh giữ lại phải khớp base. Không chạy build/boot/test vì phần sửa này không thay implementation.
+
 ## L030 - 23/10/2026 - README đóng góp và hai ảnh W01 của Linh
 
 - request: Linh đã thêm hai ảnh vào thư mục cá nhân, muốn được hướng dẫn viết README và làm bước tiếp theo.
 - verified: Nhánh hiện tại codex/linh-onboarding ở ad79434, cùng origin; PR #8 Create onboarding còn mở lúc đọc web. Commit này đã có docs/onboarding/linh.md (5 dòng) và 01-minh-chung.png; 02-minh-chung.png còn untracked trước lượt sửa. Không hướng dẫn tạo lại nhánh nop_bao_cao hoặc mở PR khác.
 - images reviewed: Ảnh 1 là GitHub Desktop tại main94f56a2/PR #6, xem History và diff ghi chú Minh; chỉ chứng minh thao tác đồng bộ/xem thay đổi, không phải test do Linh chạy. Ảnh 2 là Files changed của PR #8, có ghi chú onboarding Linh và ảnh 1 tại thời điểm chụp. Hai ảnh chụp 23/10; không dùng trạng thái trong ảnh thay cho trạng thái GitHub mới hơn.
 - changes: Điền bản README local W01/linh với thông tin người đóng góp, bảng công việc có link PR #2/#4/#8, phần học trước dẫn ghi chú gốc, caption và link tương đối tới cả hai ảnh. Có phần chốt W01 và TODO kỳ sau ở trạng thái đề xuất. Không gán build/boot/forktest/benchmark của Minh cho Linh hoặc nhận đã triển khai slab/per-CPU.
-- next: Linh đọc lại nội dung, tự commit README/ảnh 2 và các ghi nhớ cùng mốc nếu chọn, Push origin trên codex/linh-onboarding. PR #8 tự cập nhật; nhờ thành viên review, đợi kết quả CI thực tế rồi merge và pull main. Chưa tự stage/commit/push/merge, không sửa implementation hoặc ảnh.
+- follow-up: Linh muốn được hướng dẫn lại từ đầu. README được rút gọn thành 3 phần: việc đã làm, hai ảnh có caption và việc tiếp theo. Link ảnh dùng 01-linh-chung.png/02-linh-chung.png, kiểm tra cả hai tồn tại. Các cặp tên minh-chung và linh-chung có cùng nội dung ở lần đọc đầu; người dùng đang tự dọn tên cũ trong lúc làm, assistant không xóa/stage ảnh.
+- next: Lần kiểm tra mới, codex/linh-onboarding ở 322810e đã cùng origin, còn README mới chưa commit. origin/main đã có a4ed7be Create onboarding (#8): PR #8 đã merge, không tiếp tục nói push sẽ cập nhật PR #8 đang mở. Nếu đưa phần bổ sung lên main cần PR mới từ nhánh công việc, sau khi Linh tự commit/push. Local main có commit b00fe36 Xóa 2 file minh, ahead1/behind1 so với origin/main; chưa xử lý lệch lịch sử và không tự reset/force-push. Giữ nguyên index/user changes, chỉ sửa README và checkpoint.
 - current context: main tracking ở 94f56a2, đã có PR #4 (fd42c53), PR #5 và PR #6; ghi chú Minh W1_Minh.md có nội dung và username Minhlth. Kết quả môi trường/test trong ghi chú Minh là tự báo cáo, chưa đối chiếu raw log/ảnh của Minh trong lượt này. Nhận định cũ Minh chỉ có file rỗng đã được thay thế.
 
 ## L029 - 23/10/2026 - Tổ chức hồ sơ báo cáo và minh chứng theo tuần
