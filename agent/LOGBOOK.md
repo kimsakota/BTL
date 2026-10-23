@@ -1,6 +1,15 @@
 # Nhật ký dự án
 
-Cập nhật: 19/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
+Cập nhật: 23/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
+
+## L029 - 23/10/2026 - Tổ chức hồ sơ báo cáo và minh chứng theo tuần
+
+- request: Linh muốn lưu ảnh/tài liệu báo cáo trong repo, chia thư mục theo tuần. Linh xác nhận W01 mới tạo cấu trúc dự án và dùng GitHub; Minh/Khánh đã được thêm vào repo, không mời lại.
+- changes: Đã tạo local docs/bao-cao/W01/README.md và linh/minh/khanh/chung/README.md. Mỗi người điền đóng góp, lưu ảnh/log và dẫn PR trong thư mục mình; phần chung lưu bằng chứng nhóm và thông tin nộp. Báo cáo tổng hợp .md/.pdf sau này đặt tại W01. W02 trở đi tạo cùng cấu trúc khi bắt đầu kỳ mới.
+- integration: Bổ sung hướng dẫn đặt tên ảnh, link tương đối, cách gửi PR bằng Desktop và quy trình nộp trong docs/bao-cao/README.md; nối từ README root và sổ tay. Giữ nháp cũ ở vị trí hiện tại để không gãy link. Không tạo ảnh/log/kết quả giả hoặc bản nộp cuối, không sửa source C/h/S.
+- validation: 8 Markdown liên quan và 44 target tương đối hiện có đã kiểm tra, các fence cân bằng; link thành viên-guide bị thiếu từ trước nằm ngoài thay đổi và không được tính là link mới đã sửa. 5 Markdown W01 mới kiểm tra không có trailing whitespace; git diff --check đạt. Không cần build/test cho thay đổi tài liệu này.
+- workflow: Chưa stage/commit/push, không tạo branch/worktree. Linh tự tạo nhánh codex/docs-weekly-evidence qua Desktop, chọn phần tài liệu thuộc việc này, commit/push và mở PR vào main. Sau merge, Minh/Khánh pull main rồi mỗi người gửi PR minh chứng riêng theo tuần. Lưu trên repo không thay việc đính kèm báo cáo vào thread môn học.
+- context correction: PR #2 đã merge và snapshot VstHelper đã có trên main; kiểm tra trước trong chat thấy main/origin/main c9b0128 với commit summary (#3) thêm file onboarding Minh còn rỗng. Những nhận định PR #2 còn mở/chưa có thành viên trong checkpoint 19/10 là lịch sử, không áp dụng lại.
 
 ## L027 - 19/10/2026 - Chuẩn bị VstHelper để chia sẻ trong BTL
 
