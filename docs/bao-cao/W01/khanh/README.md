@@ -18,16 +18,11 @@ Ghi chú onboarding chi tiết: [`docs/onboarding/W1_Khanh.md`](../../../onboard
 | ONB-KHANH | Mở Pull Request về `main`, chọn reviewer | 23/10/2026 | [PR #15](https://github.com/kimsakota/BTL/pull/15) |
 | ONB-KHANH | Điền README W01 và thêm ảnh minh chứng, commit và push bằng GitHub Desktop | 23/10/2026 | [PR #15](https://github.com/kimsakota/BTL/pull/15) |
 
-## Tài liệu đã đọc
+Tài liệu đã đọc:
 
 - Huong-dan-thanh-vien.md (bản Linh gửi)
 - `docs/Quy-trinh-nhom-26118.md`
 - `docs/lessons/00-ham-header-va-lien-ket.md`, `docs/lessons/01-baseline-va-kalloc.md`
-
-## Khó khăn
-
-- Mạng yếu nên tải GitHub Desktop mất nhiều thời gian; phần tạo nhánh và ghi chú onboarding phải làm trên GitHub web trước.
-- Chưa cài đủ toolchain RISC-V (`riscv64-linux-gnu-gcc`, `gdb-multiarch`).
 
 ## Ảnh và log minh chứng
 
@@ -39,4 +34,13 @@ Ghi chú onboarding chi tiết: [`docs/onboarding/W1_Khanh.md`](../../../onboard
 
   ![PR #15: tác giả ankhanh2594 và nội dung thay đổi](2026-10-23-pr-files-changed.png)
 
-Minh chứng chung xem [thư mục chung](../chung/README.md).
+Chưa có log build/test vì chưa chạy `make qemu`. Minh chứng chung xem [thư mục chung](../chung/README.md).
+
+## Trở ngại và TODO kỳ sau
+
+- Trở ngại:
+  - Mạng yếu nên tải GitHub Desktop mất nhiều thời gian; phần tạo nhánh và ghi chú onboarding phải làm trên GitHub web trước.
+  - Chưa cài đủ toolchain RISC-V (`riscv64-linux-gnu-gcc`, `gdb-multiarch`), chưa chạy `make qemu` trên repo BTL.
+- Task kỳ sau, đầu ra và mốc dự kiến: đề xuất cài đủ môi trường build xv6 và nhận `K03` (test matrix page/object, expected result, mẫu log); cần Linh xác nhận trước khi cam kết.
+
+[Về mục lục W01](../README.md).
