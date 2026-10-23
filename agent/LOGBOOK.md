@@ -2,6 +2,15 @@
 
 Cập nhật: 23/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
 
+## L030 - 23/10/2026 - README đóng góp và hai ảnh W01 của Linh
+
+- request: Linh đã thêm hai ảnh vào thư mục cá nhân, muốn được hướng dẫn viết README và làm bước tiếp theo.
+- verified: Nhánh hiện tại codex/linh-onboarding ở ad79434, cùng origin; PR #8 Create onboarding còn mở lúc đọc web. Commit này đã có docs/onboarding/linh.md (5 dòng) và 01-minh-chung.png; 02-minh-chung.png còn untracked trước lượt sửa. Không hướng dẫn tạo lại nhánh nop_bao_cao hoặc mở PR khác.
+- images reviewed: Ảnh 1 là GitHub Desktop tại main94f56a2/PR #6, xem History và diff ghi chú Minh; chỉ chứng minh thao tác đồng bộ/xem thay đổi, không phải test do Linh chạy. Ảnh 2 là Files changed của PR #8, có ghi chú onboarding Linh và ảnh 1 tại thời điểm chụp. Hai ảnh chụp 23/10; không dùng trạng thái trong ảnh thay cho trạng thái GitHub mới hơn.
+- changes: Điền bản README local W01/linh với thông tin người đóng góp, bảng công việc có link PR #2/#4/#8, phần học trước dẫn ghi chú gốc, caption và link tương đối tới cả hai ảnh. Có phần chốt W01 và TODO kỳ sau ở trạng thái đề xuất. Không gán build/boot/forktest/benchmark của Minh cho Linh hoặc nhận đã triển khai slab/per-CPU.
+- next: Linh đọc lại nội dung, tự commit README/ảnh 2 và các ghi nhớ cùng mốc nếu chọn, Push origin trên codex/linh-onboarding. PR #8 tự cập nhật; nhờ thành viên review, đợi kết quả CI thực tế rồi merge và pull main. Chưa tự stage/commit/push/merge, không sửa implementation hoặc ảnh.
+- current context: main tracking ở 94f56a2, đã có PR #4 (fd42c53), PR #5 và PR #6; ghi chú Minh W1_Minh.md có nội dung và username Minhlth. Kết quả môi trường/test trong ghi chú Minh là tự báo cáo, chưa đối chiếu raw log/ảnh của Minh trong lượt này. Nhận định cũ Minh chỉ có file rỗng đã được thay thế.
+
 ## L029 - 23/10/2026 - Tổ chức hồ sơ báo cáo và minh chứng theo tuần
 
 - request: Linh muốn lưu ảnh/tài liệu báo cáo trong repo, chia thư mục theo tuần. Linh xác nhận W01 mới tạo cấu trúc dự án và dùng GitHub; Minh/Khánh đã được thêm vào repo, không mời lại.
