@@ -136,6 +136,8 @@ Minh không cần chờ per-CPU xong mới thiết kế/slab: dùng hợp đồn
 
 Đầu tuần nhận việc nhỏ; khi làm cập nhật issue/board; trước hạn nội bộ mỗi người tự cung cấp task, đã làm gì, link đầu ra và kiểm tra/trở ngại. Linh tổng hợp báo cáo W01, cả ba xác nhận phần mình rồi người được nhóm giao nộp vào thread môn học. Học trước cá nhân không tự thành đóng góp của cả nhóm. Không đợi code xong mới báo cáo tuần. Lịch tám tuần trong backlog chỉ là khung tham khảo, chưa có deadline cuối kỳ xác nhận.
 
+Ảnh, log và ghi chú đóng góp lưu trong [thư mục báo cáo theo tuần](bao-cao/README.md): W01 có phần riêng cho [Linh, Minh, Khánh và minh chứng chung](bao-cao/W01/README.md). Mỗi người sửa phần mình, gửi PR vào main; Linh tổng hợp thành báo cáo của tuần. Đây là nơi lưu bằng chứng, vẫn cần đính kèm báo cáo vào thread môn học.
+
 ## 9. Checklist kết thúc thiết lập nhóm
 
 - [x] Hai tài khoản đã có trong danh sách Collaborator theo ảnh Linh cung cấp ngày 19/10.
