@@ -1,8 +1,8 @@
 # Quy trình làm việc nhóm dự án 26118
 
-Ngày nghiên cứu: 19/10/2026, múi giờ Asia/Saigon. Đây là **phương án đề xuất để ba thành viên thống nhất**, chưa phải phân công mà Minh và Khánh đã nhận.
+Cập nhật: 24/10/2026, múi giờ Asia/Saigon. Đây là **phương án đề xuất để ba thành viên thống nhất**. Linh muốn trực tiếp code và hiểu toàn bộ; mỗi người vẫn có phần C độc lập. Lịch W01–W08, việc W02 và tiêu chí nằm tại [kế hoạch tám tuần](Ke-hoach-va-backlog-26118.md).
 
-**Bắt đầu thao tác tại [sổ tay GitHub của nhóm](So-tay-GitHub-nhom.md)**: mời Minh/Khánh, clone, chia sẻ lesson, nhận issue và thử review. File này tập trung vào ranh giới kỹ thuật và cách ghép phần của ba người. Ưu tiên hiện tại là hoàn tất cộng tác nhóm theo yêu cầu Linh, chưa chuyển sang giao bài C riêng cho Linh.
+**Thao tác Git tại [sổ tay GitHub của nhóm](So-tay-GitHub-nhom.md)**. Linh đã xác nhận cả ba hoàn tất phần khởi động Git; tiếp theo là chốt gói việc, API, code và review. File này quy định ranh giới kỹ thuật và cách ghép phần của ba người; không yêu cầu mời lại các thành viên đã vào repo.
 
 Mục tiêu là để mỗi người có phần kỹ thuật có thể tự phát triển và kiểm tra, sau đó ghép qua API đã thống nhất. Linh tham gia sâu vào tầng trang, phần tích hợp khó và review các tầng còn lại để hiểu toàn bộ dự án. Phạm vi mã giữ theo [kiến trúc hiện có](Kien-truc-du-an.md); các thành viên tự viết C, tài liệu này không cung cấp implementation.
 
@@ -20,7 +20,7 @@ Mục tiêu là để mỗi người có phần kỹ thuật có thể tự phá
 
 Thông báo Linh chép yêu cầu một thread của nhóm trong kênh môn học, ít nhất một báo cáo mỗi tuần, reply kèm file. Khoảng cách hai báo cáo quá 14 ngày bị tính mất một báo cáo; đây **không phải** sự cho phép nộp hai tuần một lần. Mọi thành viên phải có công việc và đóng góp trong từng báo cáo. Công việc/kết quả phải nối với TODO trước đó, cho phép sai khác 25%.
 
-Linh xác nhận **tuần này mới bắt đầu dự án nhóm**, còn phần đang học là học trước. Tuần khởi động theo lịch hiện tại là 19–25/10/2026. Đề xuất chốt báo cáo nội bộ vào thứ Bảy 24/10 để có thời gian rà soát trước cuối tuần; đây là lịch nhóm đề xuất, chưa phải giờ nộp chính thức đã được giảng viên xác nhận. Chưa biết hạn cuối kỳ, số tuần còn lại và mức sẵn sàng của Minh/Khánh.
+Linh xác nhận **tuần này mới bắt đầu dự án nhóm**, còn phần đang học là học trước. Tuần khởi động theo lịch hiện tại là 19–25/10/2026. Đề xuất chốt báo cáo nội bộ vào thứ Bảy 24/10 để có thời gian rà soát trước cuối tuần; đây là lịch nhóm đề xuất, chưa phải giờ nộp chính thức đã được giảng viên xác nhận. Ngày 24/10, Linh yêu cầu mục tiêu tám tuần tổng cộng, W01 19–25/10 đến W08 07–13/12. Hạn cuối kỳ chính thức chưa xác nhận; Linh đã xác nhận 10–12 giờ/người/tuần gồm học, code, review và báo cáo. Khánh cần hoàn tất toolchain đầu W02.
 
 Lesson 0–3, ghi chú và phần code Linh thử trước được xếp là **chuẩn bị cá nhân trước dự án**. Có thể dùng làm tài liệu nền khi nhóm bắt đầu, nhưng không báo toàn bộ là kết quả nhóm mới làm trong tuần 1. Mỗi báo cáo chỉ nhận công việc trong kỳ và đúng tác giả.
 
@@ -33,7 +33,7 @@ Kiểm tra trực tiếp ngày 19/10/2026:
 - `kernel/kalloc.c` vẫn có một `kmem.lock` và một free list. Đã có `kfreepage_count`, khai báo tại `defs.h` và caller sau `kinit` trong `main.c`.
 - Chưa có implementation per-CPU hoặc slab. CI main run39212699734 đã qua Linux format/build/usertests/crash và macOS build. Chưa có benchmark hoặc log local của cả ba người; xem [kiểm tra GitHub](Thiet-lap-GitHub-26118.md).
 - Không có `user/kalloctest.c` và `kernel/kcsan.c` của MIT lock-lab trong bản BTL. Không ghi các công cụ đó là test đã sẵn có.
-- Có `.github/workflows/test.yml`; đã đọc job/log thật và xác định lỗi format. Tách format khỏi build/test là hướng đề xuất, chưa sửa workflow. Hiện Linh chưa thêm cộng tác viên vào GitHub.
+- Có `.github/workflows/test.yml`; đã đọc job/log thật và xác định lỗi format. Tách format khỏi build/test là hướng đề xuất, chưa sửa workflow. Linh đã xác nhận thêm Minh/Khánh; hồ sơ Git của cả ba đã được đối chiếu ngày 24/10, không suy ra log runtime đầy đủ.
 
 Các sản phẩm được chuẩn bị với trợ giúp của assistant cần được từng tác giả đọc, kiểm tra và giải thích. File tồn tại không tự chứng minh mọi thành viên đã tham gia hoặc nội dung đã được nhóm chốt.
 
@@ -64,7 +64,7 @@ Mỗi task có **một người chịu trách nhiệm kết quả** và một ng
 | `main.c`, `defs.h`, Makefile, syscall plumbing | Linh điều phối | PR nhỏ riêng cho phần dùng chung, review với người cần API |
 | Tài liệu thiết kế và báo cáo | Tác giả phần liên quan | Linh tổng hợp; cả ba xác nhận phần của mình |
 
-Không cần lập CODEOWNERS bằng username chưa biết. Có thể thêm sau khi biết tài khoản của Minh/Khánh và quyền repository; trước đó phân công reviewer bằng tay. GitHub hỗ trợ tự yêu cầu review theo CODEOWNERS; việc bắt buộc approval còn phụ thuộc cấu hình và quyền của repository. [GitHub code owners](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners).
+Có thể chọn reviewer bằng tay với tài khoản đã biết: kimsakota, Minhlth, ankhanh2594. CODEOWNERS là lựa chọn thêm sau khi xác nhận quyền và nhu cầu; việc này không chặn code/review W02. GitHub hỗ trợ tự yêu cầu review theo CODEOWNERS; việc bắt buộc approval còn phụ thuộc cấu hình và quyền của repository. [GitHub code owners](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners).
 
 ## 4 Cách phát triển song song qua hợp đồng
 
@@ -241,18 +241,19 @@ Linh tổng hợp không có nghĩa phải tự viết lại báo cáo cho hai b
 
 ### Giúp Linh hiểu toàn bộ mà vẫn giao việc rõ
 
-- Mỗi tuần mỗi tác giả giải thích 10–15 phút một phần mình sở hữu: luồng gọi, dữ liệu, khóa và một failure path.
+- Mỗi tuần có buổi tổng 45–60 phút; mỗi tác giả giải thích 10–15 phút phần mình sở hữu: luồng gọi, dữ liệu, khóa và một failure path. Linh giải thích lại và cùng chạy test; tính thời gian này vào quỹ giờ.
 - Linh review thiết kế slab và harness, tự lần theo một object từ client → slab → trang → free, rồi giải thích lại cho tác giả kiểm tra.
 - Linh tự chạy lại ít nhất một test của Minh và một test của Khánh khi môi trường sẵn sàng; ghi đó là reproduce/review, không nhận tác quyền code của bạn.
-- Ở mốc tích hợp, cả ba giải thích được một race/lifetime bug có thể xảy ra và cách kiểm tra. Khi Linh viết PR, Minh/Khánh làm reviewer để tránh phụ thuộc một người.
+- Ở W03–W05, Linh trực tiếp ghép init/API, làm buffer và cùng Khánh review inode; tác giả từng module vẫn tự viết/đứng tên phần mình. Khi Linh viết PR, Minh/Khánh review. Phản hồi PR mục tiêu trong một ngày làm việc, các PR nhỏ có thể review chéo để không dồn hết vào Linh.
+- Trước mỗi bước slab, đối chiếu `Memory.cs` của VstHelper với lựa chọn xv6: bin/class, slot, metadata, trạng thái slot và cấp/trả. Per-CPU/stealing là phần cần thiết kế cho xv6, chưa có trong allocator VstHelper đã đọc.
 
 ## 9 Công cụ vừa đủ và các việc phải xác nhận
 
-Đề xuất GitHub Issues + Projects cho task, Markdown trong repository cho thiết kế, và thread môn học cho nộp báo cáo. GitHub Projects có thể theo dõi issues/PR trong nhiều dạng view; nhóm chỉ cần một board đơn giản Backlog → Ready → Doing → Review → Done, thêm Blocked khi vướng phụ thuộc. [GitHub Projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects).
+Đã triển khai [Project BTL 26118](https://github.com/users/kimsakota/projects/1) ngày 24/10 với cây W02 #16 và sub-issue #17–#20; dùng bốn trạng thái Todo → Doing → Review → Done. Khi vướng phụ thuộc, ghi blocker trên Issue. Minh/Khánh có quyền WRITER; tất cả việc ban đầu ở Todo. Thiết kế vẫn ở Markdown và báo cáo vẫn nộp trong thread môn học. Xem [liên kết và cách vận hành](Thiet-lap-GitHub-26118.md).
 
-Mẫu dùng “e.g. Figma” và “e.g. JIRA”, nên tên công cụ là ví dụ; vẫn phải giữ hai trường Design thinking page và Task management page. Nếu giảng viên có yêu cầu riêng về công cụ thì theo yêu cầu đó. Chưa có URL board hoặc design page đang được nhóm dùng thì để chờ bổ sung, không chế ra URL.
+Mẫu dùng “e.g. Figma” và “e.g. JIRA”, nên tên công cụ là ví dụ; vẫn phải giữ hai trường Design thinking page và Task management page. Nếu giảng viên có yêu cầu riêng về công cụ thì theo yêu cầu đó. Trường Task management page có thể dùng URL Project đã tạo; Design thinking page dùng tài liệu thiết kế nhóm thực sự đang review. Nếu môn có yêu cầu công cụ riêng thì theo yêu cầu đó.
 
-Việc cần chốt: giờ/hạn nộp chính thức và hạn cuối kỳ; công việc thực tế của mỗi người trong tuần khởi động; tài khoản GitHub và quỹ thời gian; API cuối phải đúng tên nào; ba cấu trúc được tính thế nào; Overview/common deliverables; cách giảng viên tính sai khác 25% và cumulative progress. Danh sách này không chặn nhóm đọc source, thống nhất API và chuẩn bị baseline.
+Việc cần chốt: giờ/hạn nộp chính thức và hạn cuối kỳ; công việc thực tế của mỗi người trong tuần khởi động; nhận việc của từng thành viên theo quỹ 10–12 giờ/người/tuần đã xác nhận; API cuối phải đúng tên nào; ba cấu trúc được tính thế nào; Overview/common deliverables; cách giảng viên tính sai khác 25% và cumulative progress. Danh sách này không chặn nhóm đọc source, thống nhất API và chuẩn bị baseline.
 
 ## 10 Tài liệu thực hành đi kèm
 

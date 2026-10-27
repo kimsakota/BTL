@@ -1,13 +1,20 @@
 # Trạng thái hiện tại
 
-Cập nhật: 23/10/2026.
+Cập nhật: 24/10/2026.
+
+## Quyết định vận hành W02 — 27/10/2026
+
+- Linh chốt không tạo file/hồ sơ `docs/bao-cao/W02` riêng trong repo.
+- Issue N01–N04 và các PR là nơi làm việc chính: mỗi buổi cập nhật comment có revision, lệnh, kết quả, link PR/log và blocker; review ghi ngay trên PR/Issue.
+- Linh tổng hợp W02 bằng permalink comment/PR/log để chốt W03. Chỉ tạo file nộp ngoài GitHub nếu môn học bắt buộc, không dùng file đó làm sổ tiến độ.
+- Comment nhận việc đầu tiên của Linh đã có trên Issue #17; chưa có comment W02 nào trên Issue #20.
 
 ## Project status
 
-- Giai đoạn: Đang hoàn thiện hồ sơ báo cáo W01 về cấu trúc dự án và dùng GitHub. Minh/Khánh đã được thêm vào repo theo Linh xác nhận. PR #2/#4/#8/#9 đã merge; main và origin/main ở 5c5fb99. Lượt sửa lỗi hiện tại nằm trên codex/fix-w01-evidence: gỡ xung đột stash, giữ hai ảnh minh-chung và xóa hai ảnh linh-chung đúng yêu cầu. Chưa có slab/per-CPU hoặc benchmark mới.
+- Giai đoạn: Đã triển khai GitHub Issues/Projects theo yêu cầu Linh ngày 24/10: Project public số1, cây W02 #16 với sub-issue #17–#20, milestone W02, board Todo/Doing/Review/Done. Linh/Minh/Khánh đã được gán đúng việc; Minh/Khánh có WRITER. Tất cả Todo, chưa nhận là đã thực hiện code. Local đang ở nhánh update@c782bb5 với báo cáo/tài liệu chưa commit; không tự đổi nhánh hoặc push. Kế hoạch W02 và 8 tuần vẫn theo docs/Ke-hoach-va-backlog-26118.md.
 - Mục tiêu: đề tài 19, Slab allocator and per-CPU free lists trên xv6; nối kiến thức từ BaoKhoaHoc/VstHelper.
 - Người dùng trong chat này: Nguyễn Kim Linh; muốn làm nhiều và hiểu toàn bộ dự án.
-- Nhóm dự án 26118: Nguyễn Kim Linh 20233495, Lê Trần Hiếu Minh 20233528, Nguyễn An Khánh 20224019. Đã có nhân lực; chưa xác nhận deadline, quỹ giờ và phân công với hai bạn.
+- Nhóm dự án 26118: Nguyễn Kim Linh 20233495, Lê Trần Hiếu Minh 20233528, Nguyễn An Khánh 20224019. Linh xác nhận khoảng 10–12 giờ/người/tuần ngày 24/10; chưa xác nhận deadline chính thức và việc nhận toàn bộ phân công kỹ thuật của hai bạn.
 
 ## Stable facts
 
@@ -25,8 +32,8 @@ Cập nhật: 23/10/2026.
 | CST-010 | Mã dự án 26118, số đề tài 19; nhóm gồm Linh 20233495, Minh 20233528, Khánh 20224019; người dùng là Linh | Cao | Ảnh và yêu cầu trực tiếp 19/10; LOGBOOK L015 | Người dùng đính chính | 19/10/2026 |
 | CST-011 | Run main39212699734 tại head53872b8 đã completed/success: linux format/build/usertests/crash success; macos build/job success. Run PR39210447048 tại head2df489d cũng success. Chưa có per-CPU/slab hoặc benchmark; không có kalloctest.c/kcsan.c MIT lab trong BTL | Cao tại lúc kiểm tra | GitHub run và jobs; L023 | Source/run mới | 19/10/2026 |
 | CST-012 | Tuần 19–25/10/2026 mới khởi động nhóm; phần Linh đang học là học trước/chuẩn bị cá nhân, không tự tính là kết quả nhóm W01 | Cao | Người dùng trả lời trực tiếp ngày 19/10; LOGBOOK L015 | Người dùng đính chính hoặc có kết quả W01 thật | 19/10/2026 |
-| CST-013 | Main local/origin/main ở 5c5fb99 (PR #9), hai ghi chú Minh đã khôi phục và ba xung đột đã gỡ. Đã commit và push codex/fix-w01-evidence theo yêu cầu rõ của Linh, thiết lập upstream và đối chiếu remote SHA. Nhánh sửa giữ đúng 2 ảnh minh-chung; GitHub main chưa nhận phần sửa qua PR/merge | Cao tại lúc kiểm tra | Git local/remote refs; LOGBOOK L031 | Commit/push/merge hoặc đổi working tree | 23/10/2026 |
-| CST-014 | Cấu hình lần đọc 19/10: main-workflow active, PR 0 approvals, resolve conversations, linear history, chặn xóa/force push; checks linux/macos integration_id15368, strict=false; chỉ squash. Linh đã xác nhận thêm Minh/Khánh, Minh có ghi chú và PR onboarding trên main. Chưa tái kiểm tra Settings hoặc xác nhận đầy đủ Khánh/board | Cao về cấu hình tại ngày đọc và bằng chứng nhóm; không suy ra cấu hình hiện tại đã đổi | L025, L031; user xác nhận và source ghi chú Minh | Cấu hình/thành viên đổi | 23/10/2026 |
+| CST-013 | Local update@c782bb5 có DOCX W01 và tài liệu đang sửa, chưa commit/push. origin/main439e89b sau fetch cũ. GitHub Project1 và Issues16–20 đã tạo thật, không cần commit source để chúng xuất hiện | Cao tại lúc kiểm tra | Git local; GraphQL/REST và public Project | Commit/merge hoặc đổi working tree/Project | 24/10/2026 |
+| CST-014 | Settings main lần đọc 19/10 giữ như lịch sử, chưa tái audit. Ngày 24/10 xác nhận assignees repo gồm kimsakota, Minhlth, ankhanh2594; Project1 linked BTL/public, Minh/Khánh được cấp WRITER. Không coi đã gán Issue là đã nhận/hoàn thành | Cao về API đã đọc/ghi; Settings cũ chỉ có giá trị tại ngày đọc | L025/L031; GitHub API và Project1 | Cấu hình/quyền/thành viên đổi | 24/10/2026 |
 
 ## Active operating decisions
 
@@ -47,10 +54,10 @@ Cập nhật: 23/10/2026.
 
 | Area | Current value | Source | Revisit when | Last checked |
 |---|---|---|---|---|
-| Current priority | Phần sửa W01 đã commit và publish trên codex/fix-w01-evidence: README ngắn 3 phần, giữ hai ảnh minh-chung và xóa hai linh-chung. Còn PR/merge vào main và tổng hợp đủ đóng góp nhóm để nộp báo cáo tuần. Linh cho phép tự commit/push riêng lần sửa này, không thành quyền auto-commit các bài học sau | Yêu cầu Linh 23/10; source và Git; L031 | PR/merge sửa lỗi và đủ đóng góp nhóm | 23/10/2026 |
+| Current priority | Issues + Projects đã triển khai: https://github.com/users/kimsakota/projects/1; tree view1, board view3, cha W02 #16, N01 Linh #17, N02 Minh #18, N03 Khánh #19, N04 cả ba #20. Tất cả Todo, có ngày bắt đầu 26/10, hạn 30/10 cho code và 31/10 cho tổng hợp; milestone1 tới 01/11. Tiếp theo từng người xác nhận nhận việc và cập nhật theo tiến độ; Linh bắt đầu E01/P01/P02, không chờ học hết lesson | Yêu cầu Linh triển khai; API remote đã verify; quỹ 10–12 giờ/người/tuần | Nhận task, thay đổi scope hoặc kết quả code | 24/10/2026 |
 | Build và runtime | Local chỉ xác nhận style, chưa chạy local build/test. CI main39212699734 tại 53872b8 completed/success: linux format/build/usertests/crash và macos build đạt. Đây là baseline có hàm đếm trang, chưa phải perCPU/slab hoặc benchmark | Plugin GitHub run/jobs; L023 | Source/run mới hoặc thực hành local | 19/10/2026 |
 | Learning progress | Đã xác nhận đọc xong Lesson 0; Lesson 1–3 đã soạn. Hàm đếm đã vào main và CI baseline đạt; chưa suy ra Linh đã hoàn thành các bài thực hành khác | LOGBOOK L011–L014, L023; source và CI | Sau bài học tiếp theo | 19/10/2026 |
-| Next implementation step | Chưa phải việc đang giao: sau khi Linh muốn trở lại học, P02 là pool/mảng rồi M1 giữ pool 0/count; M2 local path sau. Hiện chỉ làm workflow GitHub ba người, không sửa C thay hoặc yêu cầu làm bài C | docs/lessons/03-per-cpu-free-lists.md; yêu cầu Linh L026 | Người dùng quay lại học C | 19/10/2026 |
+| Next implementation step | Linh có thể bắt đầu P02 sau baseline và review API ngắn: struct/mảng pool, init mọi khóa, ban đầu dùng pool0 và cập nhật count. P03 local-only là bước trung gian CPUS=1; P04/P05 hoàn thiện nhiều CPU ở W03. Không chờ học hết lesson và không tự viết C thay Linh | Lesson 3; kế hoạch W02; yêu cầu Linh 24/10 | Kết quả P02 hoặc nhóm đổi phạm vi | 24/10/2026 |
 
 ## Current constraints
 
@@ -62,7 +69,7 @@ Cập nhật: 23/10/2026.
 ## Open questions
 
 - Overview/rubric, giờ nộp chính thức, hạn cuối kỳ và ngày from/to thực tế của W01; tuần khởi động đã xác nhận 19–25/10/2026.
-- Đóng góp và minh chứng W01 của cả ba, quỹ giờ, URL design/board và permalink nộp chưa đủ. Minh dùng tài khoản Minhlth và có ghi chú onboarding tự báo cáo môi trường/test; chưa đối chiếu raw log Minh trong lượt này. Không mời lại thành viên đã có hoặc nhận đã hoàn thành bài kỹ thuật từ việc đọc tài liệu.
+- Linh xác nhận cả ba đã xong onboarding; Minh có thiết kế S01 và tự báo cáo môi trường, Khánh vẫn ghi thiếu toolchain. Project/Issue URL đã có; còn cần các thành viên xác nhận nhận task, thu log cùng revision và permalink nộp báo cáo.
 - Cách giảng viên định lượng sai khác 25% và cumulative progress; quy ước nội bộ trong tài liệu chỉ là đề xuất.
 - Cách môn học tính ít nhất 3 cấu trúc kernel chuyển động và quy định tên API cuối.
 - Hiệu quả của batch stealing/adaptive policy chỉ có thể kết luận sau thực nghiệm.
