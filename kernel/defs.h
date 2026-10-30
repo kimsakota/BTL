@@ -62,6 +62,9 @@ void            kfree(void *);
 void            kinit(void);
 uint64          kfreepage_count(void); // Returns the number of free pages in the physical memory.
 
+// kalloctest.c
+void            kalloctest(int);
+
 // log.c
 void            initlog(int, struct superblock*);
 void            log_write(struct buf*);

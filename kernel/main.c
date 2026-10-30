@@ -18,6 +18,9 @@ main()
     printk("\n");
     kinit(); // physical page allocator
     printk("free pages after kinit: %lu\n", kfreepage_count());
+#ifdef KALLOCTEST
+    kalloctest(KALLOCTEST_INJECT); // T02: harness tang trang
+#endif
     kvminit();          // create kernel page table
     kvminithart();      // turn on paging
     procinit();         // process table
