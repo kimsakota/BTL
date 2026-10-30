@@ -34,8 +34,8 @@ kt_report(char *id, char *expected, uint64 actual, uint64 want, int ok)
     kt_pass++;
   else
     kt_fail++;
-  printk("KT|case=%s|expected=%s|want=%lu|actual=%lu|result=%s\n", id,
-         expected, want, actual, ok ? "PASS" : "FAIL");
+  printk("KT|case=%s|expected=%s|want=%lu|actual=%lu|result=%s\n", id, expected,
+         want, actual, ok ? "PASS" : "FAIL");
 }
 
 // P01: moi trang cap ra khac 0, chia het cho PGSIZE, nam trong [end, PHYSTOP)
@@ -189,6 +189,6 @@ kalloctest(int inject)
   kt_conserve(before);
   kt_free_fill();
   kt_exhaust(before);
-  printk("KT|end|pass=%d|fail=%d|free_after=%lu|summary=%s\n", kt_pass,
-         kt_fail, kfreepage_count(), kt_fail == 0 ? "ALL_PASS" : "HAS_FAIL");
+  printk("KT|end|pass=%d|fail=%d|free_after=%lu|summary=%s\n", kt_pass, kt_fail,
+         kfreepage_count(), kt_fail == 0 ? "ALL_PASS" : "HAS_FAIL");
 }
