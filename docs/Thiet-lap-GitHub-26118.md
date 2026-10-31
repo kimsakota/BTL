@@ -1,5 +1,36 @@
 # Kiểm tra và thiết lập GitHub cho dự án 26118
 
+## Issues và Projects đã triển khai ngày 24/10/2026
+
+- [Project BTL 26118 — Tiến độ 8 tuần](https://github.com/users/kimsakota/projects/1), đã liên kết repo BTL và bật public để chia sẻ minh chứng.
+- [Cây công việc](https://github.com/users/kimsakota/projects/1/views/1): Issue cha W02 #16 và các sub-issue #17–#20; hierarchy đã bật.
+- [Bảng tiến độ](https://github.com/users/kimsakota/projects/1/views/3): cột **Todo → Doing → Review → Done**.
+- [Milestone W02](https://github.com/kimsakota/BTL/milestone/1): hạn nội bộ ngày 01/11/2026; thời hạn môn học được ưu tiên nếu sớm hơn.
+
+| Issue | Người phụ trách | Phạm vi | Hạn dự kiến |
+|---|---|---|---|
+| [W02 #16](https://github.com/kimsakota/BTL/issues/16) | Linh điều phối | Đầu việc cha của tuần | 01/11 |
+| [N01 #17](https://github.com/kimsakota/BTL/issues/17) | kimsakota | Baseline, P02 mảng pool, review API | 30/10 |
+| [N02 #18](https://github.com/kimsakota/BTL/issues/18) | Minhlth | Review S01, code slab một class | 30/10 |
+| [N03 #19](https://github.com/kimsakota/BTL/issues/19) | ankhanh2594 | Hoàn tất môi trường và code harness/assertion | 30/10 |
+| [N04 #20](https://github.com/kimsakota/BTL/issues/20) | Cả ba, Linh điều phối | Review, ghép và tổng hợp comment W02 | 31/10 |
+
+Linh là owner; Minh và Khánh đã được cấp quyền **WRITER** cho Project mới. Các Issue đều đang open và ở **Todo**; được gán việc chưa có nghĩa thành viên đã xác nhận nhận việc hoặc đã làm xong.
+
+### Nhận việc và cập nhật minh chứng
+
+1. Mỗi người mở Issue của mình, đọc checklist và phản hồi xác nhận phạm vi khi bắt đầu.
+2. Chuyển Todo → Doing khi làm thực tế. Sau buổi có đầu ra, cập nhật việc đã làm, link PR/commit/log, phần còn vướng ngay trên Issue.
+3. Chuyển Review khi có đầu ra để kiểm tra; reviewer và hạn dự kiến đã nằm trong bảng. PR ghi `Refs #17` khi liên quan, hoặc `Closes #17` khi đáp ứng đủ điều kiện của Issue tương ứng.
+4. Chuyển Done/đóng Issue sau review và kiểm tra thật. Việc chưa xong giữ nguyên ID sang tuần sau; không đổi nhãn thành Done chỉ vì hết tuần.
+5. Cuối tuần, mỗi người ghi đóng góp và bằng chứng trực tiếp trên Issue/PR; Linh tổng hợp bằng các permalink comment, PR và log. Không tạo file W02 riêng trong repo. Nếu môn học bắt buộc một file nộp ngoài GitHub thì chỉ tạo theo yêu cầu đó, không coi file đó là nơi theo dõi công việc.
+
+Tuần sau tạo Issue cha W03 và các việc con từ TODO đã chốt, thêm vào cùng Project, chọn Tuần W03 và hạn dự kiến. Không tạo lại Project mỗi tuần; giữ Issue/PR đã hoàn thành để tra lịch sử. Các bước này cập nhật theo công việc thực, không bổ sung hoạt động giả cho những ngày trước.
+
+## Lịch sử kiểm tra trước khi triển khai bảng
+
+Các phần dưới là snapshot từ 19/10 và các lần cập nhật cũ; trạng thái Issues/Projects mới nhất nằm ở phần trên. Không suy ra Settings/CI hiện tại từ snapshot cũ.
+
 Kiểm tra ngày 19/10/2026 trên [kimsakota/BTL](https://github.com/kimsakota/BTL), dùng plugin GitHub và đối chiếu Git local. Cập nhật sau đó: ảnh Linh cung cấp đã hiển thị hai tài khoản với nhãn Collaborator. Cấu hình solo đã áp dụng và kiểm tra lại được ghi ở phần cập nhật bên dưới; clone/push/review của từng bạn và quyền board chưa được xác nhận.
 
 **Bảo vệ main không thay thế việc đưa cả nhóm vào làm.** Hai tài khoản đã có trong danh sách Collaborator theo ảnh mới; tiếp tục clone, đăng lesson để đọc chung, nhận task và review. Minh/Khánh bắt đầu tại [hướng dẫn thành viên](Huong-dan-thanh-vien.md); Linh xem thêm [sổ tay GitHub nhóm](So-tay-GitHub-nhom.md). Connector không hỗ trợ hai endpoint list collaborators/invitations ở lần thử trước; trạng thái thành viên cập nhật dựa trên ảnh, không phải kết quả API.

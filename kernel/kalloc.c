@@ -18,15 +18,21 @@ struct run {
   struct run *next;
 };
 
-struct {
+struct page_pool {
   struct spinlock lock; // Khóa bảo vệ freelist khi nhiều CPU truy cập cùng lúc
   struct run *freelist;
-} kmem;
+};
+
+static struct page_pool
+  kmem[NCPU]; // Mảng các page_pool, mỗi CPU có một page_pool riêng
 
 void
 kinit()
 {
-  initlock(&kmem.lock, "kmem");    // Khởi tạo khóa
+  for (int i = 0; i < NCPU; i++) {
+    initlock(&kmem[i].lock, "kmem");
+    kmem[i].freelist = 0;
+  }
   freerange(end, (void *)PHYSTOP); // Khởi tạo các page free
 }
 
@@ -57,12 +63,14 @@ kfree(void *pa)
   r = (struct run *)pa;
 
   acquire(
-    &kmem
+    &kmem[0]
        .lock); // Yêu cầu quyền truy cập vào kmem.lock để đảm bảo rằng không có CPU nào khác đang truy cập vào freelist cùng lúc
-  r->next = kmem.freelist;
-  kmem.freelist = r;
+
+  r->next = kmem[0].freelist;
+  kmem[0].freelist = r;
+
   release(
-    &kmem
+    &kmem[0]
        .lock); // Giải phóng quyền truy cập vào kmem.lock để cho phép các CPU khác truy cập vào freelist
 }
 
@@ -75,14 +83,17 @@ kalloc(void)
   struct run *r;
 
   // Giữ khóa khi nối trang trả về vào freelist
-  acquire(&kmem.lock);
-  r = kmem.freelist;
+  acquire(&kmem[0].lock);
+
+  r = kmem[0].freelist;
   if (r)
-    kmem.freelist = r->next;
-  release(&kmem.lock);
+    kmem[0].freelist = r->next;
+
+  release(&kmem[0].lock);
 
   if (r)
     memset((char *)r, 5, PGSIZE); // fill with junk
+
   return (void *)r;
 }
 
@@ -92,13 +103,17 @@ kfreepage_count(void)
   struct run *r;
   uint64 count = 0;
 
-  acquire(&kmem.lock);
-  r = kmem.freelist;
+  for (int i = 0; i < NCPU; i++) {
+    acquire(&kmem[i].lock);
 
-  while (r) {
-    count++;
-    r = r->next;
+    r = kmem[i].freelist;
+    while (r) {
+      count++;
+      r = r->next;
+    }
+
+    release(&kmem[i].lock);
   }
-  release(&kmem.lock);
+
   return count;
 }
