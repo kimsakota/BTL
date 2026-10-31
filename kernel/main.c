@@ -17,6 +17,9 @@ main()
     printk("xv6 kernel is booting\n");
     printk("\n");
     kinit(); // physical page allocator
+#ifdef KALLOCTEST
+    kalloctest(KALLOCTEST_INJECT); // T02: harness tang trang
+#endif
     kmalloc_init();
     slab_test();
     printk("free pages after slab test: %lu\n", kfreepage_count());

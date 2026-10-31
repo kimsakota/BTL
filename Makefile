@@ -83,6 +83,12 @@ CFLAGS += -fno-builtin-free
 CFLAGS += -fno-builtin-memcpy -Wno-main
 CFLAGS += -fno-builtin-printf -fno-builtin-fprintf -fno-builtin-vprintf
 CFLAGS += -I.
+ifdef KALLOCTEST
+OBJS += $K/kalloctest.o
+KALLOCTEST_INJECT ?= 0
+CFLAGS += -DKALLOCTEST -DKALLOCTEST_INJECT=$(KALLOCTEST_INJECT)
+CFLAGS += -DKT_CPUS=$(or $(CPUS),3) -DKT_REV=\"$(shell git describe --always --dirty 2>/dev/null)\"
+endif
 CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
 
 # Disable PIE when possible (for Ubuntu 16.10 toolchain)
