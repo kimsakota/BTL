@@ -1,6 +1,6 @@
 # Test matrix allocator (T01) và harness trang (T02) — Khánh
 
-Issue: #19 (N03). Bản đầu 30/10/2026. Cập nhật 31/10/2026 theo review PR #21 lần 1 (chặn ca không an toàn, kiểm tra địa chỉ trong P07, sửa mô tả cờ build) và lần 2 (chống trang trùng trong P07, ghép `main` sau #22/#23, đổi tên API object).
+Issue: #19 (N03). Bản đầu 30/10/2026. Cập nhật 31/10/2026 theo review PR #21 lần 1 (chặn ca không an toàn, kiểm tra địa chỉ trong P07, sửa mô tả cờ build) lần 2 (chống trang trùng trong P07, ghép `main` sau #22/#23, đổi tên API object) và lần 3 (P07c không trả lại trang đã có trong bitmap).
 
 ## 1. Cách kích hoạt
 
@@ -17,6 +17,8 @@ make clean
 make qemu CPUS=1 KALLOCTEST=1 KALLOCTEST_INJECT=2   # tự kiểm tra: đường chặn NULL/địa chỉ sai/trùng
 make clean
 make qemu CPUS=1 KALLOCTEST=1 KALLOCTEST_INJECT=3   # tự kiểm tra: trang trùng trong P07
+make clean
+make qemu CPUS=1 KALLOCTEST=1 KALLOCTEST_INJECT=4   # tự kiểm tra: P07c nhận trang đã có trong bitmap
 ```
 
 Đổi cờ thì phải `make clean`, vì object cũ không tự biên dịch lại khi chỉ đổi cờ.
@@ -31,7 +33,7 @@ make qemu CPUS=1 KALLOCTEST=1 KALLOCTEST_INJECT=3   # tự kiểm tra: trang tr�
 - Trang được test "sở hữu" khi hợp lệ (P01) và không trùng trang khác (P03). Trang trùng chỉ giữ bản đầu tiên.
 - Nếu có trang sai hoặc trùng (`kt_unsafe`), ca ghi vào trang (P04) bị bỏ qua và tính FAIL (`note=skipped_unsafe`).
 - Khi dọn dẹp chỉ `kfree` trang đang sở hữu, không bao giờ `kfree` địa chỉ sai hoặc trả một trang hai lần.
-- P07 không ghi gì vào các trang đã cấp. Trang đã cấp được đánh dấu bằng bitmap 1 bit/trang (4 KB) nằm ngoài trang. Mỗi trang phải hợp lệ và chưa có bit; gặp trang sai hoặc trùng thì dừng vòng lặp và bỏ qua P07c. Dọn dẹp duyệt bitmap, mỗi trang trả đúng một lần.
+- P07 không ghi gì vào các trang đã cấp. Trang đã cấp được đánh dấu bằng bitmap 1 bit/trang (4 KB) nằm ngoài trang. Mỗi trang phải hợp lệ và chưa có bit; gặp trang sai hoặc trùng thì dừng vòng lặp và bỏ qua P07c. P07c chỉ `kfree` trang chưa có trong bitmap. Dọn dẹp duyệt bitmap, mỗi trang trả đúng một lần.
 
 ## 3. Ca kiểm thử tầng trang (`kalloc`/`kfree`)
 
@@ -49,7 +51,7 @@ N = 64 trang sống cùng lúc. Cột cuối là kết quả chế độ thườ
 | P07a | Cấp đến hết (OOM) | `kalloc` đến khi trả 0 | Số trang cấp được = `before` | Khác, hoặc dừng sớm vì trang sai/trùng | PASS |
 | P07b | Địa chỉ khi OOM | `kt_valid` từng trang | 0 trang sai | > 0 | PASS |
 | P07e | Không trùng khi OOM | Kiểm bit của trang trong bitmap trước khi đánh dấu | 0 trang trùng | > 0 | PASS |
-| P07c | Hết bộ nhớ | `kalloc` thêm 1 lần | Trả 0 | ≠ 0, hoặc bị bỏ qua vì P07b/P07e | PASS |
+| P07c | Hết bộ nhớ | `kalloc` thêm 1 lần; nếu nhận trang thì chỉ trả khi trang chưa có trong bitmap | Trả 0 | ≠ 0, hoặc bị bỏ qua vì P07b/P07e | PASS |
 | P07d | Bảo toàn sau OOM | Trả mỗi trang có bit đúng một lần rồi đếm | `before` | Khác | PASS |
 
 P02 và P06 kiểm tra hành vi junk 5/1 của `kalloc.c`. Nếu bản per-CPU đổi giá trị junk thì cập nhật expected, không xoá ca.
@@ -63,6 +65,7 @@ Lỗi giả lập chỉ tác động lên dữ liệu của harness, trang thậ
 | `INJECT=1` | P03: tăng bộ đếm trùng; P04: đè 1 ô trong trang 3; P05b: tạm giữ 1 trang | 3 FAIL: P03, P04, P05b |
 | `INJECT=2` | P01: trang 2 thành NULL, trang 4 trùng trang 3, trang 6 lệch 8 byte; P07: trang thứ 11 lệch 8 byte | 7 FAIL: P01, P02, P03, P04 (bỏ qua), P07a, P07b, P07c (bỏ qua). Kernel boot tới shell |
 | `INJECT=3` | P07: lần cấp thứ 11 trả lại trang vừa cấp | 3 FAIL: P07a (dừng ở 10), P07e (1), P07c (bỏ qua). P07d PASS, kernel boot tới shell |
+| `INJECT=4` | P07c: `kalloc` trả lại trang đã có trong bitmap thay vì 0 | 1 FAIL: P07c. P07d PASS (mỗi trang trả đúng một lần), kernel boot tới shell |
 
 ## 5. Ca kiểm thử tầng object (slab, T03) — chưa chạy
 
@@ -82,7 +85,7 @@ S02 đã merge vào `main` (#23). API: `kmalloc_init()`, `kmalloc(uint64 size)` 
 Mỗi dòng của harness bắt đầu bằng `KT|`, lọc bằng `grep -a '^KT|'`.
 
 ```text
-KT|begin|rev=<git describe>|cpus=<CPUS>|inject=<0/1/2/3>|n=<N>|free_before=<số trang>
+KT|begin|rev=<git describe>|cpus=<CPUS>|inject=<0/1/2/3/4>|n=<N>|free_before=<số trang>
 KT|case=<ID>|expected=<mô tả>|want=<giá trị mong đợi>|actual=<giá trị thật>|result=<PASS/FAIL>
 KT|case=<ID>|expected=safe_input|result=FAIL|note=skipped_unsafe
 KT|end|pass=<số>|fail=<số>|free_after=<số trang>|summary=<ALL_PASS/HAS_FAIL>
@@ -94,7 +97,7 @@ Manifest đi kèm mỗi lần chạy: người chạy, ngày, revision, OS, tool
 
 - PASS toàn bộ: dòng `KT|end` có `pass=12|fail=0`, và kernel boot tiếp tới `init: starting sh`.
 - FAIL: có dòng `result=FAIL`, hoặc kernel `panic`, hoặc không xuất hiện `KT|end` sau 60 giây.
-- `INJECT=1` phải ra đúng 3 FAIL; `INJECT=2` đúng 7 FAIL; `INJECT=3` đúng 3 FAIL; cả ba vẫn boot tới shell. Khác đi nghĩa là harness hỏng.
+- `INJECT=1` phải ra đúng 3 FAIL; `INJECT=2` đúng 7 FAIL; `INJECT=3` đúng 3 FAIL; `INJECT=4` đúng 1 FAIL; tất cả vẫn boot tới shell. Khác đi nghĩa là harness hỏng.
 
 ## 8. Yêu cầu ghép file dùng chung 
 
