@@ -17,7 +17,9 @@ main()
     printk("xv6 kernel is booting\n");
     printk("\n");
     kinit(); // physical page allocator
-    printk("free pages after kinit: %lu\n", kfreepage_count());
+    kmalloc_init();
+    slab_test();
+    printk("free pages after slab test: %lu\n", kfreepage_count());
     kvminit();          // create kernel page table
     kvminithart();      // turn on paging
     procinit();         // process table
