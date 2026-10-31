@@ -1,25 +1,57 @@
 # Điểm tiếp tục
 
-Cập nhật: 23/10/2026. Nguồn chuẩn hiện tại: CURRENT_STATE.md và LOGBOOK L031. Các checkpoint cũ là lịch sử, không áp lại trạng thái nhánh/PR hoặc tên ảnh đã đổi.
+Cập nhật: 31/10/2026. Nguồn chuẩn hiện tại: CURRENT_STATE.md và LOGBOOK L033.
 
-## Trạng thái sau sửa lỗi local
+## Slab W02 — điểm tiếp tục
 
-- Linh đã yêu cầu assistant tự xử lý, commit và push lần sửa này, xóa hai ảnh linh-chung. Quyền này chỉ cho lần sửa hiện tại; chưa yêu cầu merge hoặc auto-commit bài học sau.
-- Main và origin/main đã được đồng bộ ở 5c5fb99, có PR #9. Commit local b00fe36 từng xóa nhầm hai ghi chú Minh đã lưu trong backup; hai ghi chú W1_Minh.md và minh.md được giữ đúng như origin/main.
-- Phần sửa nằm trên một nhánh codex/fix-w01-evidence từ main mới. Ba xung đột Markdown do áp stash đã được gỡ; README của Linh dùng bản ngắn 3 phần, dẫn đúng 01-minh-chung.png và 02-minh-chung.png. Hai ảnh 01-linh-chung.png/02-linh-chung.png được xóa theo yêu cầu; không sửa ảnh giữ lại hoặc implementation.
-- Đã lưu working files, raw index, 9 stage blobs và full history bundle trong C:/Users/KimSakota/.codex/backups/BTL-conflicts-20261023-aa7t56qa/. Stash gây xung đột65a2e92 đã được sao lưu và bỏ để tránh áp lại; stash5221c62 chứa hướng dẫn thành viên từ trước vẫn giữ nguyên.
-- Đã push thành công codex/fix-w01-evidence và thiết lập upstream origin/codex/fix-w01-evidence. Commit sửa nội dung là 8b49680; sau đó Linh có fix và revert fix, không thay đổi kết quả cuối của bản sửa. Remote đã được đối chiếu đúng HEAD. Main trên GitHub vẫn ở 5c5fb99; chỉ nhánh sửa đã hết hai ảnh trùng, cần PR/merge để main nhận phần sửa. Chưa xác nhận CI mới; không force-push.
+- Nhánh `codex/slab-allocator_page` đã merge `origin/main` (`13c39f3`) bằng commit `3a9612c` do Minhlth tạo lúc phiên trước bị ngắt. Conflict CURRENT_STATE/RECOVERY_NOTES đã được hòa, giữ nội dung main về nhóm/P02 và nối slab status. WIP được khôi phục từ `stash@{0}` và stash vẫn được giữ làm backup; local branch có 2 commits ahead upstream. Không commit/push thay Linh.
+- `kernel/main.c` gọi `kmalloc_init()` rồi `slab_test()` sau `kinit()`. QEMU boot in `slab_test: ALL PASSED (capacity=63, obj_size=64)`; `usertests` và `crash` qua local ngày 31/10.
+- `slab_test()` kiểm tra alignment, slab thứ hai và simulated OOM/retry. `SLAB_TEST_CASE=1/2/3` chọn double-free, misaligned pointer và non-slab pointer panic tests riêng.
+- Sửa tài liệu thiết kế đã đồng bộ với layout 32B header, 64B stride, 63 slots, 8B alignment và freelist nhúng.
+- Checklist hiện tại `docs/w02_check.md` kết thúc sau mục format/whitespace; section 4 chưa có bước test phía sau. Đã kiểm tra normal slab boot test, alignment, second slab, fault-injected OOM/retry, ba panic cases, `usertests` và `crash`.
 
-## Bước tiếp theo
+## Hồ sơ W01 lịch sử
 
-- Nhánh sửa đã publish, không yêu cầu Linh commit/publish lại khi không có thay đổi mới. Có thể mở PR tại https://github.com/kimsakota/BTL/compare/main...codex/fix-w01-evidence?expand=1 để đưa phần sửa vào main; chưa tạo PR thay người dùng trong lượt push này. Không dùng lại PR #8/#9 vì đã merge.
-- Sau merge, về main và Fetch/Pull trước việc mới. Kết thúc công việc bằng commit/push hoặc giữ thay đổi trên đúng nhánh; không mang các sửa README/bộ nhớ chưa commit sang main cũ bằng stash.
-- Tiếp tục lấy đóng góp/ảnh/log thật của cả ba và tổng hợp báo cáo W01. Theo Linh, tuần đầu chủ yếu tạo cấu trúc dự án và dùng GitHub. Chưa có bản báo cáo cuối được nộp; GitHub lưu minh chứng không thay reply đính kèm báo cáo trong thread môn học.
+Các ghi chú dưới đây phản ánh lần sửa W01 ngày 23/10, không phải trạng thái nhánh hiện tại. Nguồn chuẩn về nhóm/W02 nằm ở CURRENT_STATE và các mục lịch sử bên dưới.
 
-## Ngữ cảnh nhóm và giới hạn
+## GitHub Issues và Projects đã triển khai
 
-- Đề tài 19 trên xv6, mã 26118; Linh 20233495, Minh 20233528, Khánh 20224019. Minh/Khánh đã được thêm vào repo theo xác nhận của Linh; không mời lại. Ưu tiên workflow nhóm khi người dùng đang hỏi GitHub.
-- Tài liệu nhóm và snapshot references/VstHelper đã có trên main. Không upload lại snapshot hoặc xóa Git/dirty work của clone VstHelper gốc.
-- Minh dùng tài khoản Minhlth, có ghi chú onboarding/môi trường/test trên main. Đây là tự báo cáo của Minh; ảnh Linh xem diff đó không chứng minh test do Linh chạy. Khánh/board/đóng góp hoàn chỉnh còn cần bằng chứng.
-- CI baseline53872b8 run39212699734 từng xác nhận linux format/build/usertests/crash và macos build đạt. Không có build/test mới trong sửa tài liệu này, chưa có slab/per-CPU hoặc benchmark. Không đổi workflow chỉ vì hai sự kiện push/pull_request cùng chạy CI.
-- Template báo cáo giữ thông tin chung và 5 mục: summary 200–300 từ/cumulative progress, activities, đóng góp đủ ba người, code review (algorithm/source/testing), TODO (issues/next tasks/milestone). Mẫu không ấn định số ảnh.
+- Linh yêu cầu triển khai ngay, đã tạo thật ngày 24/10: https://github.com/users/kimsakota/projects/1 (public, linked kimsakota/BTL). View1 Cây công việc đã bật hierarchy; view3 Bảng tiến độ nhóm cột theo Status gồm Todo/Doing/Review/Done. View2 thử ban đầu đã bỏ, chỉ còn hai view sử dụng.
+- Milestone W02 số1; parent Issue16; sub-issue17 N01 gán kimsakota, 18 N02 gán Minhlth, 19 N03 gán ankhanh2594, 20 N04 gán cả ba. Checklist, reviewer, ngày bắt đầu 26/10 và hạn nội bộ đã ghi. Cả năm Issue open/Todo, không tick công việc kỹ thuật đã đạt.
+- Minh và Khánh được cấp WRITER trên Project mới qua mutation thành công. Quan hệ cha–con, option/status/date, repo link và hierarchy public page đã kiểm tra. Không gửi tin riêng sang Teams/chat khác.
+- GitHub connector đã kết nối, get_profile xác nhận kimsakota và create/update Issue dùng được. Token Git GCM thiếu project; Linh hoàn tất OAuth GitHub CLI (API đã xác nhận) để cấu hình Projects. CLI portable tại C:/Users/KimSakota/.codex/tmp/BTL-issues-projects-20261024/github-cli/bin/gh.exe, nguồn cli/cli và SHA256 đã verify. Không ghi token/device code vào repo.
+- CUA và Computer Use runtime lỗi khởi tạo, không có UI action; đã làm qua API/CLI. Không nói chờ cấp quyền nữa: đăng nhập Projects đã thành công và bảng đã hoàn tất.
+- Local lúc kết thúc đang nhánh update@c782bb5 do người dùng chuyển, giữ nguyên tất cả thay đổi tài liệu/DOCX; cập nhật docs/Thiet-lap-GitHub-26118.md, backlog/quy trình và checkpoint. Không tự commit/push hoặc sửa C/h/S. Tiếp theo mở Issue17 cho Linh, thành viên xác nhận nhận việc và cập nhật Doing khi làm thật.
+
+## Việc tiếp theo đã được yêu cầu
+
+- Linh yêu cầu phân việc W02 cho cả ba và kế hoạch hoàn thành trong 8 tuần, đồng thời muốn tự code và hiểu hết. Đã cập nhật docs/Ke-hoach-va-backlog-26118.md và docs/Quy-trinh-nhom-26118.md: W01 19–25/10 đến W08 07–13/12, Linh đã trả lời async xác nhận khoảng 10–12 giờ/người/tuần. Kế hoạch đã đổi giả định thành quỹ giờ xác nhận, gồm 6–7 giờ code/test, 2 giờ học, 1–2 giờ review/ghép và 1 giờ báo cáo. Phân công kỹ thuật vẫn chờ các thành viên nhận task.
+- Phân công đề xuất: Linh trang/stealing/buffer/tích hợp, Minh slab/file, Khánh harness/inode/đo. W02 gói N01 Linh E01/P01/P02 + G02; N02 Minh review S01 rồi S02 một class; N03 Khánh hoàn tất môi trường và code test; N04 review/báo cáo. Issue16–20 và Project1 đã triển khai theo yêu cầu mới; chưa tạo nhánh code/PR, chưa coi gán việc là thành viên đã xác nhận nhận việc.
+- Mục tiêu W03 lõi trang/object hoạt động; W05 đủ ba client; W06 khóa chức năng; W07 dữ liệu; W08 dự phòng/bàn giao. Buddy/adaptive/magazine để phần tùy chọn. Linh hiểu toàn bộ qua đọc PR, giải thích lại, chạy test và ghép thật, không nhận thay tác quyền hai bạn.
+- VstHelper áp dụng nguyên lý bin/class, metadata/owner, slot và tái sử dụng ở tầng slab; chưa là code C hiện thực. Kế hoạch có bảng đối chiếu và thay đổi cần cho xv6. Chú ý S01: README Minh mới nói header32 byte/con trỏ nhúng, còn thiết kế hiện tại dùng field/index khác; cần review/chốt một layout trước S02.
+- Đã fetch origin/main439e89b, đọc hồ sơ Minh mới; local vẫn c782bb5 vì working tree có báo cáo/bộ nhớ đang sửa. Không tự pull đè thay đổi. Việc này chỉ sửa tài liệu/bộ nhớ, không C/h/S, không commit/push.
+
+## Báo cáo W01
+
+- Linh xác nhận cả ba đã hoàn tất phần khởi động, yêu cầu tạo file DOCX. Đã tạo docs/bao-cao/W01/26118-Progress-Report-W01-2026-10-24.docx, kỳ 19–24/10/2026; 5 mục theo template, summary 261 từ, đóng góp cả ba, TODO dự kiến W02 và phụ lục minh chứng.
+- Đã render qua Microsoft Word thành PDF QA rồi kiểm tra cả 4 ảnh trang; kiểm tra tên/MSSV, 13 hyperlink (8 đích file theo commit), hai ảnh nhúng và DOCX đọc lại được. Renderer đóng gói thiếu LibreOffice trên Windows nên dùng Word export; PDF/PNG/builder chỉ ở temp, không là file nộp. Không chạy xv6 test trong việc tạo tài liệu.
+- Báo cáo và cập nhật tài liệu hiện local, chưa stage/commit/push; Linh chưa yêu cầu công bố báo cáo. Cần nhóm đọc lại và chốt TODO W02 trước nộp. Chưa ghi nhận gửi báo cáo trong thread môn học.
+
+## Đầu ra của thành viên và Git
+
+- Bản local đã đồng bộ c782bb5 ở lượt trước; remote mới439e89b thêm hồ sơ Minh, source allocator không đổi trong diff. Tại c782bb5: PR #10 sửa ảnh, #11 đổi ghi chú Linh thành W1_Linh.md, #13 thêm docs/slab_allocator_design.md của Minh. Không còn bốn ảnh trùng; giữ đúng 01-minh-chung.png và 02-minh-chung.png.
+- Minh có W1_Minh.md, tự ghi đã build/boot, ls/forktest và nhận S01; thiết kế một class đã vào main. Chưa đối chiếu raw log cùng revision, không gán kết quả của Minh cho Linh.
+- Khánh dùng ankhanh2594; hồ sơ được đọc từ codex/khanh-onboarding@7ddc0e2, có W1_Khanh.md, README W01 và hai ảnh. PR #15 xuất hiện trong hồ sơ/ảnh; không dùng trạng thái ảnh thay live state và không tự merge. Khánh ghi rõ thiếu toolchain RISC-V/chưa chạy make qemu; đăng ký K03/T01.
+- Linh có W1_Linh.md, hồ sơ W01 và ảnh PR/History; tổ chức kho mã, cộng tác, tài liệu và báo cáo. Cả hai thành viên đã được thêm theo xác nhận trước; không mời lại.
+- Chưa có implementation per-CPU/slab, ba client động hoặc benchmark. Mốc M0 chung chưa đủ log/môi trường của cả ba. TODO W02 là kế hoạch dự kiến, không là việc đã nghiệm thu.
+
+## Cách theo dõi W02 đã chốt
+
+- Linh không muốn tạo file/hồ sơ `docs/bao-cao/W02` riêng. W02 được theo dõi trực tiếp bằng comment trên Issue N01–N04 và review/PR; mỗi comment ghi đầu ra, revision, lệnh, kết quả, blocker và liên kết bằng chứng.
+- Linh tổng hợp bằng permalink GitHub để chốt W03. Báo cáo W01 đã có không thay đổi; chỉ tạo file nộp ngoài GitHub nếu môn học bắt buộc.
+
+## Giữ an toàn công việc trước
+
+- Chỉ một worktree BTL ổ D, không tạo thêm. Giữ repo VstHelper gốc và dirty work riêng; snapshot tham khảo đã có trên main.
+- Backup xử lý conflict cũ: C:/Users/KimSakota/.codex/backups/BTL-conflicts-20261023-aa7t56qa/. Stash65a2e92 gây xung đột đã sao lưu và bỏ; stash5221c62 cũ vẫn giữ, không áp lại khi không có yêu cầu.
+- Người dùng tự viết C và tự commit/push bài học theo AGENTS.md. Quyền tự commit/push trước đây chỉ cho lần sửa Git/ảnh, không tự mở rộng sang báo cáo hoặc bài code mới.

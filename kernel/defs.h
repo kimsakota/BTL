@@ -188,3 +188,9 @@ void            virtio_disk_intr(void);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))
+
+// slab.c
+void            kmalloc_init(void);
+void*           kmalloc(uint64 size);
+void            kmfree(void *ptr);
+void            slab_test(void);
