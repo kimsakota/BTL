@@ -2,8 +2,8 @@
 
 - Nhóm: 26118 - Slab allocator and per-CPU free lists trên xv6.
 - Tuần dự kiến: 19–25/10/2026.
-- Khoảng ngày báo cáo thực tế: **chưa chốt**. Điền theo ngày làm/ngày tổng hợp thật; không ghi đã làm đến ngày tương lai.
-- Trạng thái: **đang thu thập đóng góp và minh chứng; chưa có bản báo cáo cuối trong thư mục này**.
+- Khoảng ngày của bản Word tổng hợp: **19–24/10/2026**; chốt nội dung ngày 24/10, không ghi kết quả tương lai.
+- Trạng thái: **đã có bản Word tổng hợp để nhóm đọc lại và chốt kế hoạch W02; chưa ghi nhận nộp**.
 - Phạm vi W01 theo xác nhận của Linh: tạo cấu trúc dự án và dùng GitHub. Bổ sung nội dung khác chỉ khi có kết quả thực.
 
 ## Mỗi người cập nhật phần của mình
@@ -16,6 +16,12 @@
 | Minh chứng chung, thông tin nộp | [chung/README.md](chung/README.md) |
 
 Mỗi README cá nhân là khung chờ người đó điền; chưa đại diện cho công việc đã làm. Đặt ảnh/log cạnh README tương ứng, ghi tên file và link PR/review. Không cần lặp lại ảnh dùng chung ở cả ba nơi.
+
+## Bản Word tổng hợp
+
+[Báo cáo W01 ngày 24/10/2026](26118-Progress-Report-W01-2026-10-24.docx) có đủ 5 mục theo mẫu, đóng góp của cả ba, TODO dự kiến W02 và minh chứng. Đã kiểm tra bố cục 4 trang.
+
+Nguồn của Minh là [W1_Minh.md](../../onboarding/W1_Minh.md) và [thiết kế slab](../../slab_allocator_design.md). Hồ sơ Khánh được tổng hợp từ [nhánh đóng góp tại 7ddc0e2](https://github.com/kimsakota/BTL/tree/7ddc0e26eef49bae1a06b53e712cfe3a833ed55a/docs/bao-cao/W01/khanh); không coi khung README còn trống trên main là toàn bộ kết quả của bạn.
 
 ## Tổng hợp báo cáo
 
