@@ -187,7 +187,7 @@ void            virtio_disk_intr(void);
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))
 
 // slab.c
-void            slab_init(uint32 obj_size);
-void*           slab_alloc(void);
-void            slab_free(void *ptr);
+void            kmalloc_init(void);
+void*           kmalloc(uint64 size);
+void            kmfree(void *ptr);
 void            slab_test(void);

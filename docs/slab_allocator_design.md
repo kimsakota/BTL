@@ -60,7 +60,7 @@ Việc tính toán dung lượng (`capacity` tức `total_slots`) phải tuân t
 $$S_{aligned} = \left( \frac{S + A - 1}{A} \right) \times A$$
 
 ### Công Thức Tính Sức Chứa ($N$ - Total Slots):
-Giả sử kích thước tổng cộng của trang là $P$ (ví động $4096$ bytes) và kích thước phần metadata cố định là $M$ (ví dụ $16$ bytes):
+Giả sử kích thước tổng cộng của trang là $P$ (ví động $4096$ bytes) và kích thước phần metadata cố định là $M$ (ví dụ 32$ bytes):
 1. Không gian khả dụng cho dữ liệu: $D = P - M$.
 2. Số lượng slot tối đa tính toán lý thuyết: 
    $$N = \left\lfloor \frac{D}{S_{aligned}} \right\rfloor$$
@@ -70,7 +70,7 @@ Giả sử kích thước tổng cộng của trang là $P$ (ví động $4096$ 
 
 ## 4. Quy Trình Khởi Tạo (`init` Path)
 
-Khi một Slab mới được cấp phát từ hệ thống, hàm khởi tạo (`Slab_Init`) thực hiện các bước sau:
+Khi một Slab mới được cấp phát từ hệ thống, hàm khởi tạo (`kmalloc_init(void)') thực hiện các bước sau:
 
 1. **Kiểm tra tham số đầu vào (Validation):**
    * Đảm bảo con trỏ bộ nhớ trang `void* raw_mem` khác `NULL`.
