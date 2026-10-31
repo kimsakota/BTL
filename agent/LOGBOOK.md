@@ -2,6 +2,16 @@
 
 Cập nhật: 31/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
 
+## L033 - 31/10/2026 - Hoàn thiện và kiểm chứng Slab W02
+
+- request: Linh yêu cầu làm theo `docs/w02_check.md`, sau đó cập nhật file checklist và nhờ kiểm tra lại.
+- branch sync: Đã fetch `origin/main` tại `13c39f3` và phát hiện xung đột ở CURRENT_STATE/RECOVERY_NOTES. WIP được giữ trong `stash@{0}` trước khi merge; nội dung main về W02/P02 được giữ, phần slab được nối vào. Commit merge `3a9612c` do Minhlth tạo khi phiên trước bị ngắt; lượt này chỉ làm việc trên WIP sau merge, không commit/push. Snapshot pre-merge vẫn còn ở stash.
+- code: `main()` gọi `kmalloc_init()` và kế tiếp `slab_test()` sau `kinit()`. Test helper không tự init lại cache. `slab_test()` kiểm tra boundary/NULL, căn lề 8 byte, LIFO reuse, pattern, cấp phát slab thứ hai và fault-injected OOM/retry. Makefile có `SLAB_TEST_CASE=1/2/3` để chạy riêng double-free, misaligned pointer và non-slab pointer panic tests.
+- documentation: Viết lại `docs/slab_allocator_design.md` để khớp embedded freelist, header 32B, stride 64B, capacity 63, alignment 8B, API/failure paths và kết quả kiểm thử. Checklist `docs/w02_check.md` hiện untracked và kết thúc ngay sau mục `make fmt`/`git diff --check`; chưa tự sửa file checklist.
+- verification: `make fmt`, `git diff --check`, `clang-format --dry-run --Werror kernel/main.c kernel/slab.c` đạt. `make clean && make TOOLPREFIX=riscv64-linux-gnu- kernel/kernel fs.img` đạt. QEMU normal boot in `slab_test: ALL PASSED (capacity=63, obj_size=64)` và tiến tới shell. `./test-xv6.py usertests` in `ALL TESTS PASSED`; `./test-xv6.py crash` qua log recovery và hai orphan recovery. Các build panic riêng lần lượt in expected: `panic: kmfree: double free detected`, `panic: kmfree: unaligned slot pointer`, `panic: kmfree: invalid slab magic or corrupted header`.
+- status: Không có conflict marker/unmerged file sau merge. Branch local `codex/slab-allocator_page` có hai commit ahead upstream tại lần đọc cuối; source/docs WIP còn modified và `docs/w02_check.md` untracked. Không stage/commit/push thay Linh. Slab chưa được tích hợp vào client kernel; test hiện là boot test.
+- limits: Checklist hiện tại chỉ liệt kê format/whitespace trong phần mục 4 rồi kết thúc; chưa có yêu cầu log/CI tiếp theo trong nội dung file đang đọc. CI `git diff --exit-code` không được tuyên bố pass vì WIP có thay đổi mong muốn.
+
 ## L032 - 31/10/2026 - Sửa lỗi build slab và kiểm tra CI local
 
 - request: Linh yêu cầu chạy check/test và hỗ trợ sửa lỗi từ ảnh CI đang dừng ở `make fmt && git diff --exit-code`; sau đó yêu cầu chạy kiểm tra lại.

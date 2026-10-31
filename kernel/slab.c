@@ -36,10 +36,16 @@ struct {
   struct slab_header *slabs; // Danh sách các trang Slab đang quản lý
 } slab_cache;
 
+// Lets the boot test exercise the allocation-failure path without exhausting RAM.
+static int slab_test_fail_page_alloc;
+
 // Khởi tạo một trang vật lý 4KB mới thành một trang Slab
 static struct slab_header *
 slab_page_create(void)
 {
+  if (slab_test_fail_page_alloc)
+    return 0;
+
   void *page = kalloc();
   if (page == 0)
     return 0; // OOM: Cạn kiệt RAM vật lý
@@ -179,7 +185,6 @@ void
 slab_test(void)
 {
   printk("slab_test: starting S02 verification...\n");
-  kmalloc_init();
 
   // Kiểm tra hợp đồng biên: size == 0, size > 64 và kmfree(0)
   if (kmalloc(0) != 0 || kmalloc(65) != 0)
@@ -191,23 +196,47 @@ slab_test(void)
   void *p2 = kmalloc(64);
   if (p1 == 0 || p2 == 0 || p1 == p2)
     panic("slab_test: basic alloc failed");
+  if (((uint64)p1 & 7) != 0 || ((uint64)p2 & 7) != 0)
+    panic("slab_test: alignment failed");
 
   kmfree(p1);
   void *p3 = kmalloc(32);
   if (p3 != p1)
     panic("slab_test: LIFO reuse failed");
+  if (((uint64)p3 & 7) != 0)
+    panic("slab_test: reuse alignment failed");
 
   kmfree(p2);
   kmfree(p3);
 
-  // Kiểm tra Pattern Test lấp đầy 1 trang (63 slots)
+  // Fill the first slab, then verify allocation rolls over to a second page.
   void *slots[63];
   for (int i = 0; i < slab_cache.capacity; i++) {
     slots[i] = kmalloc(64);
     if (slots[i] == 0)
       panic("slab_test: full page alloc failed");
+    if (((uint64)slots[i] & 7) != 0)
+      panic("slab_test: slot alignment failed");
     memset(slots[i], (i + 0x20) & 0xFF, 64);
   }
+
+  void *second_slab[63];
+  second_slab[0] = kmalloc(64);
+  if (second_slab[0] == 0)
+    panic("slab_test: second slab alloc failed");
+  if (((uint64)second_slab[0] & 7) != 0)
+    panic("slab_test: second slab alignment failed");
+  if (PGROUNDDOWN((uint64)slots[0]) == PGROUNDDOWN((uint64)second_slab[0]))
+    panic("slab_test: second slab page not created");
+
+  for (int i = 1; i < slab_cache.capacity; i++) {
+    second_slab[i] = kmalloc(64);
+    if (second_slab[i] == 0)
+      panic("slab_test: second slab alloc failed");
+    if (((uint64)second_slab[i] & 7) != 0)
+      panic("slab_test: second slab alignment failed");
+  }
+
   for (int i = 0; i < slab_cache.capacity; i++) {
     uchar *bytes = (uchar *)slots[i];
     uchar expected = (uchar)((i + 0x20) & 0xFF);
@@ -216,10 +245,44 @@ slab_test(void)
         panic("slab_test: pattern corrupted");
     }
   }
+
+  slab_test_fail_page_alloc = 1;
+  if (kmalloc(64) != 0)
+    panic("slab_test: simulated OOM was not reported");
+  slab_test_fail_page_alloc = 0;
+
+  void *retry = kmalloc(64);
+  if (retry == 0 || ((uint64)retry & 7) != 0)
+    panic("slab_test: allocation retry failed");
+
   for (int i = 0; i < slab_cache.capacity; i++) {
     kmfree(slots[i]);
+    kmfree(second_slab[i]);
   }
+  kmfree(retry);
 
   printk("slab_test: ALL PASSED (capacity=%d, obj_size=%d)\n",
          slab_cache.capacity, slab_cache.obj_size);
+
+#if defined(SLAB_TEST_CASE) && SLAB_TEST_CASE == 1
+  void *ptr = kmalloc(64);
+  void *other = kmalloc(64);
+  if (ptr == 0 || other == 0)
+    panic("slab_test: double-free setup failed");
+  kmfree(ptr);
+  kmfree(ptr);
+  panic("slab_test: expected double-free panic did not occur");
+#elif defined(SLAB_TEST_CASE) && SLAB_TEST_CASE == 2
+  void *ptr = kmalloc(64);
+  if (ptr == 0)
+    panic("slab_test: misaligned-pointer setup failed");
+  kmfree((char *)ptr + 1);
+  panic("slab_test: expected misaligned-pointer panic did not occur");
+#elif defined(SLAB_TEST_CASE) && SLAB_TEST_CASE == 3
+  void *page = kalloc();
+  if (page == 0)
+    panic("slab_test: invalid-pointer setup failed");
+  kmfree(page);
+  panic("slab_test: expected invalid-pointer panic did not occur");
+#endif
 }

@@ -4,10 +4,11 @@ Cập nhật: 31/10/2026. Nguồn chuẩn hiện tại: CURRENT_STATE.md và LOG
 
 ## Slab W02 — điểm tiếp tục
 
-- Nhánh `codex/slab-allocator_page` đã gộp `origin/main` mà chưa tạo commit; giữ cập nhật group/P02 từ main và đã hòa slab status vào hai file state. Kiểm tra `git status` trước bước tiếp theo và không commit/push nếu chưa được Linh yêu cầu.
+- Nhánh `codex/slab-allocator_page` đã merge `origin/main` (`13c39f3`) bằng commit `3a9612c` do Minhlth tạo lúc phiên trước bị ngắt. Conflict CURRENT_STATE/RECOVERY_NOTES đã được hòa, giữ nội dung main về nhóm/P02 và nối slab status. WIP được khôi phục từ `stash@{0}` và stash vẫn được giữ làm backup; local branch có 2 commits ahead upstream. Không commit/push thay Linh.
 - `kernel/main.c` gọi `kmalloc_init()` rồi `slab_test()` sau `kinit()`. QEMU boot in `slab_test: ALL PASSED (capacity=63, obj_size=64)`; `usertests` và `crash` qua local ngày 31/10.
-- `docs/w02_check.md` hiện yêu cầu thêm test second slab, OOM/retry, alignment và panic cases. Chưa tuyên bố các ca này đã được test; bổ sung/chạy từng ca, rồi kiểm tra format/build/QEMU.
+- `slab_test()` kiểm tra alignment, slab thứ hai và simulated OOM/retry. `SLAB_TEST_CASE=1/2/3` chọn double-free, misaligned pointer và non-slab pointer panic tests riêng.
 - Sửa tài liệu thiết kế đã đồng bộ với layout 32B header, 64B stride, 63 slots, 8B alignment và freelist nhúng.
+- Checklist hiện tại `docs/w02_check.md` kết thúc sau mục format/whitespace; section 4 chưa có bước test phía sau. Đã kiểm tra normal slab boot test, alignment, second slab, fault-injected OOM/retry, ba panic cases, `usertests` và `crash`.
 
 ## Hồ sơ W01 lịch sử
 

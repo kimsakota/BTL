@@ -65,6 +65,10 @@ OBJDUMP = $(TOOLPREFIX)objdump
 DETFLAGS = "-ffile-prefix-map=$(CURDIR)=."
 
 CFLAGS = -Wall -Werror -Wno-unknown-attributes -O -fno-omit-frame-pointer -ggdb -gdwarf-2
+SLAB_TEST_CASE ?= normal
+ifneq ($(SLAB_TEST_CASE),normal)
+CFLAGS += -DSLAB_TEST_CASE=$(SLAB_TEST_CASE)
+endif
 CFLAGS += $(DETFLAGS)
 CFLAGS += -march=rv64gc
 CFLAGS += -std=gnu99
