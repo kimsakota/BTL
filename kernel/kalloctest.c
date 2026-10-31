@@ -5,6 +5,7 @@
 //   KALLOCTEST_INJECT=1: gia lap loi de chung minh cac ca bat duoc loi
 //   KALLOCTEST_INJECT=2: gia lap allocator tra NULL/dia chi sai/trang trung
 //                        de chung minh harness chan ca khong an toan
+//   KALLOCTEST_INJECT=3: gia lap kalloc tra lai trang da cap trong P07
 // Moi dong log bat dau bang "KT|" de loc bang grep.
 
 #include "types.h"
@@ -31,6 +32,11 @@ static int kt_unsafe;        // 1 = co trang sai/trung, khong duoc ghi vao trang
 static char *kt_pages[KT_N]; // dia chi kalloc tra ve (co the sai khi inject=2)
 static int kt_own[KT_N];     // 1 = trang hop le, duy nhat, test dang so huu
 static char *kt_stash[3];    // inject=2: trang that bi thay the, tra khi don
+
+// P07 ghi nho trang da cap bang bitmap ngoai trang (1 bit/trang), khong ghi
+// gi vao chinh trang: kalloc co the ghi de trang, va trang trung se tao vong.
+#define KT_NPAGES ((PHYSTOP - KERNBASE) / PGSIZE)
+static uchar kt_bm[KT_NPAGES / 8];
 
 // Dia chi hop le: khac 0, chia het PGSIZE, nam trong [PGROUNDUP(end), PHYSTOP)
 static int
@@ -195,31 +201,41 @@ kt_free_fill(void)
   kt_report("P06-free-fill-1", "bytes8_end_are_1", ok, 1, ok);
 }
 
-// P07: cap den khi het (OOM). Kiem tra dia chi truoc khi ghi con tro noi
-// danh sach; gap dia chi sai thi dung vong lap, khong ghi vao do.
+// P07: cap den khi het (OOM). Moi trang phai hop le va chua tung duoc cap
+// trong lan nay (bitmap); gap trang sai hoac trung thi dung vong lap.
+// Don dep: tra moi trang co bit trong bitmap dung mot lan.
 static void
 kt_exhaust(uint64 before)
 {
-  char *head = 0;
-  uint64 got = 0, bad = 0;
-  char *p;
+  uint64 got = 0, bad = 0, dup = 0;
+  char *p, *prev = 0;
   while ((p = kalloc()) != 0) {
     char *q = p;
     if (kt_inject == 2 && got == 10)
       q = p + 8; // gia lap dia chi lech
+    if (kt_inject == 3 && got == 10)
+      q = prev; // gia lap kalloc tra lai trang vua cap
     if (!kt_valid(q)) {
       bad++;
       if (kt_valid(p))
         kfree(p); // trang that van hop le: tra lai
       break;
     }
-    *(char **)q = head;
-    head = q;
+    uint64 idx = ((uint64)q - KERNBASE) / PGSIZE;
+    if (kt_bm[idx / 8] & (1 << (idx % 8))) {
+      dup++;
+      if (q != p && kt_valid(p))
+        kfree(p); // trang that khong nam trong bitmap: tra lai
+      break;
+    }
+    kt_bm[idx / 8] |= 1 << (idx % 8);
+    prev = q;
     got++;
   }
   kt_report("P07a-oom-count", "before", got, before, got == before);
   kt_report("P07b-oom-bad-addr", "0", bad, 0, bad == 0);
-  if (bad) {
+  kt_report("P07e-oom-dup", "0", dup, 0, dup == 0);
+  if (bad || dup) {
     kt_skip("P07c-oom-returns-0");
   } else {
     p = kalloc();
@@ -227,11 +243,11 @@ kt_exhaust(uint64 before)
     if (kt_valid(p))
       kfree(p);
   }
-  while (head) {
-    char *next = *(char **)head;
-    kfree(head);
-    head = next;
-  }
+  for (uint64 idx = 0; idx < KT_NPAGES; idx++)
+    if (kt_bm[idx / 8] & (1 << (idx % 8))) {
+      kt_bm[idx / 8] &= ~(1 << (idx % 8));
+      kfree((char *)(KERNBASE + idx * PGSIZE));
+    }
   uint64 after = kfreepage_count();
   kt_report("P07d-count-after-oom", "before", after, before, after == before);
 }
