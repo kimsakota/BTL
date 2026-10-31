@@ -173,6 +173,20 @@ kt_pattern(void)
   kt_report("P04-pattern-rw", "pages_intact", good, KT_N, good == KT_N);
 }
 
+// 1 neu p da duoc tra o P05: trung trang dang so huu, hoac trung
+// kt_stash[0..n-1] (chi xay ra khi allocator tra trung that su)
+static int
+kt_freed(char *p, int n)
+{
+  for (int i = 0; i < KT_N; i++)
+    if (kt_own[i] && kt_pages[i] == p)
+      return 1;
+  for (int i = 0; i < n; i++)
+    if (kt_stash[i] == p)
+      return 1;
+  return 0;
+}
+
 // P05: dem trang trong: cap N thi giam N; chi tra trang dang so huu
 // (va trang that bi thay the khi inject=2), roi dem lai
 static void
@@ -186,12 +200,13 @@ kt_conserve(uint64 before)
   for (int i = 0; i < KT_N; i++)
     if (kt_own[i] && i != skip)
       kfree(kt_pages[i]);
+  // inject=2: tra trang that bi thay the, tru khi no trung trang da tra
   for (int i = 0; i < 3; i++)
-    if (kt_valid(kt_stash[i]))
+    if (kt_valid(kt_stash[i]) && !kt_freed(kt_stash[i], i))
       kfree(kt_stash[i]);
   uint64 after = kfreepage_count();
   kt_report("P05b-count-after-free", "before", after, before, after == before);
-  if (skip >= 0)
+  if (skip >= 0 && kt_own[skip])
     kfree(kt_pages[skip]); // tra lai de he thong van dung
 }
 
@@ -227,14 +242,14 @@ kt_exhaust(uint64 before)
       q = prev; // gia lap kalloc tra lai trang vua cap
     if (!kt_valid(q)) {
       bad++;
-      if (kt_valid(p))
-        kfree(p); // trang that van hop le: tra lai
+      if (kt_valid(p) && !kt_bm_has(p))
+        kfree(p); // trang that hop le, chua co trong bitmap: tra lai
       break;
     }
     if (kt_bm_has(q)) {
       dup++;
-      if (q != p && kt_valid(p))
-        kfree(p); // trang that khong nam trong bitmap: tra lai
+      if (q != p && kt_valid(p) && !kt_bm_has(p))
+        kfree(p); // trang that chua co trong bitmap: tra lai
       break;
     }
     uint64 idx = ((uint64)q - KERNBASE) / PGSIZE;
