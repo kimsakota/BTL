@@ -1,10 +1,10 @@
 # Trạng thái hiện tại
 
-Cập nhật: 23/10/2026.
+Cập nhật: 31/10/2026.
 
 ## Project status
 
-- Giai đoạn: Đang hoàn thiện hồ sơ báo cáo W01 về cấu trúc dự án và dùng GitHub. Minh/Khánh đã được thêm vào repo theo Linh xác nhận. PR #2/#4/#8/#9 đã merge; main và origin/main ở 5c5fb99. Lượt sửa lỗi hiện tại nằm trên codex/fix-w01-evidence: gỡ xung đột stash, giữ hai ảnh minh-chung và xóa hai ảnh linh-chung đúng yêu cầu. Chưa có slab/per-CPU hoặc benchmark mới.
+- Giai đoạn: Đang làm phần slab allocator trên nhánh local `codex/slab-allocator_page`, HEAD `8241d43`. Có implementation một cache/slab class trong `kernel/slab.c`, nhưng chưa tích hợp allocator vào luồng boot/call sites; `slab_test()` chưa được gọi. Worktree có thay đổi định dạng sẵn có cùng sửa đổi `printf` sang `printk` trong test helper. Chưa có kết quả runtime hoặc benchmark. Lịch sử W01/nhánh codex/fix-w01-evidence được ghi ở L031.
 - Mục tiêu: đề tài 19, Slab allocator and per-CPU free lists trên xv6; nối kiến thức từ BaoKhoaHoc/VstHelper.
 - Người dùng trong chat này: Nguyễn Kim Linh; muốn làm nhiều và hiểu toàn bộ dự án.
 - Nhóm dự án 26118: Nguyễn Kim Linh 20233495, Lê Trần Hiếu Minh 20233528, Nguyễn An Khánh 20224019. Đã có nhân lực; chưa xác nhận deadline, quỹ giờ và phân công với hai bạn.
@@ -18,7 +18,7 @@ Cập nhật: 23/10/2026.
 | CST-003 | Source xv6 phù hợp nằm ở thư mục Exercise được người dùng cung cấp | Cao | docs/Nguon-xv6.md | Import hoặc đổi baseline | 13/10/2026 |
 | CST-004 | Baseline nguồn được kiểm tra là commit 06aad25c735fd3159bdfae5680be4eab7b1668b2 của mit-pdos/xv6-riscv | Cao | docs/Nguon-xv6.md | HEAD nguồn thay đổi | 13/10/2026 |
 | CST-005 | Source đó dùng free list trang chung, PGSIZE=4096, NCPU=8; chưa có slab/stealing trong phần đã kiểm tra | Cao | docs/Nguon-xv6.md và kernel nguồn | Thay allocator hoặc phiên bản | 13/10/2026 |
-| CST-006 | Allocator vẫn một list/lock chung, có kfreepage_count/prototype/caller. Chưa có per-CPU/slab. CI main53872b8 đã qua usertests/crash; chưa có benchmark hoặc test đặc thù cho allocator mới | Cao về source và CI baseline | source hiện tại; GitHub run39212699734; L023 | Source/test mới | 19/10/2026 |
+| CST-006 | Nhánh local hiện có slab một class 64B với một lock/list trong `kernel/slab.c`; chưa có per-CPU free lists hoặc tích hợp vào luồng cấp phát kernel. `slab_test()` chỉ được định nghĩa, chưa được gọi từ `main()`. CI baseline main53872b8 đã qua usertests/crash; chưa có benchmark hoặc runtime test cho slab | Cao về source đã đọc và CI baseline lịch sử | `kernel/slab.c`, `kernel/main.c`, `kernel/defs.h`; GitHub run39212699734; L023/L032 | Tích hợp allocator/test hoặc source/run mới | 31/10/2026 |
 | CST-007 | WSL có Ubuntu 26.04.1 LTS, version 2; Make/RISC-V GCC/QEMU đã tìm thấy. Linh đã cài clang-format, kiểm tra trực tiếp thấy Ubuntu clang-format 21.1.8. Chưa build/boot/test local trong lượt kiểm tra | Cao về phát hiện công cụ | wsl/os-release/command -v và clang-format --version; L017 | Công cụ đổi hoặc trước build/run | 19/10/2026 |
 | CST-008 | Bộ nhớ project-memory Light được tích hợp ở agent/, nối qua AGENTS.md | Cao | agent/README.md và các file bộ nhớ | Đổi bộ khung memory | 13/10/2026 |
 | CST-009 | Git repo BTL có default branch origin/main và tag xv6-baseline local; tag chưa được push lên origin ở lần kiểm tra 19/10 | Cao | Git local, GitHub API ref và git ls-remote --tags origin; L016 | Push tag hoặc đổi nền source | 19/10/2026 |
@@ -47,8 +47,8 @@ Cập nhật: 23/10/2026.
 
 | Area | Current value | Source | Revisit when | Last checked |
 |---|---|---|---|---|
-| Current priority | Phần sửa W01 đã commit và publish trên codex/fix-w01-evidence: README ngắn 3 phần, giữ hai ảnh minh-chung và xóa hai linh-chung. Còn PR/merge vào main và tổng hợp đủ đóng góp nhóm để nộp báo cáo tuần. Linh cho phép tự commit/push riêng lần sửa này, không thành quyền auto-commit các bài học sau | Yêu cầu Linh 23/10; source và Git; L031 | PR/merge sửa lỗi và đủ đóng góp nhóm | 23/10/2026 |
-| Build và runtime | Local chỉ xác nhận style, chưa chạy local build/test. CI main39212699734 tại 53872b8 completed/success: linux format/build/usertests/crash và macos build đạt. Đây là baseline có hàm đếm trang, chưa phải perCPU/slab hoặc benchmark | Plugin GitHub run/jobs; L023 | Source/run mới hoặc thực hành local | 19/10/2026 |
+| Current priority | Formatter, build, xv6 usertests và crash checks đã chạy. Bước kiểm tra tiếp theo riêng cho allocator cần tích hợp/chạy `slab_test()` theo quyết định của Linh; các CI test hiện tại không gọi helper này. Không tự commit/push | Yêu cầu Linh 31/10; source và kết quả L032 | Tích hợp/chạy allocator test hoặc yêu cầu mới | 31/10/2026 |
+| Build và runtime | Build kernel và `fs.img` đạt với `TOOLPREFIX=riscv64-linux-gnu-` và bỏ qua prerequisite header cũ từ toolchain `unknown-elf`. Formatter chạy; `clang-format --dry-run --Werror kernel/slab.c` và `git diff --check` đạt. `./test-xv6.py usertests` đạt `ALL TESTS PASSED`; `./test-xv6.py crash` qua log/orphan recovery. Các test CI này chưa gọi `slab_test()`. Không xác nhận `git diff --exit-code` trên worktree dirty. | Kết quả local L032; GitHub run/jobs L023 | Source/test hoặc run CI mới | 31/10/2026 |
 | Learning progress | Đã xác nhận đọc xong Lesson 0; Lesson 1–3 đã soạn. Hàm đếm đã vào main và CI baseline đạt; chưa suy ra Linh đã hoàn thành các bài thực hành khác | LOGBOOK L011–L014, L023; source và CI | Sau bài học tiếp theo | 19/10/2026 |
 | Next implementation step | Chưa phải việc đang giao: sau khi Linh muốn trở lại học, P02 là pool/mảng rồi M1 giữ pool 0/count; M2 local path sau. Hiện chỉ làm workflow GitHub ba người, không sửa C thay hoặc yêu cầu làm bài C | docs/lessons/03-per-cpu-free-lists.md; yêu cầu Linh L026 | Người dùng quay lại học C | 19/10/2026 |
 

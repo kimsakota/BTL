@@ -1,6 +1,15 @@
 # Nhật ký dự án
 
-Cập nhật: 23/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
+Cập nhật: 31/10/2026. Lưu kết quả có ý nghĩa; transcript nằm riêng trong `history/`.
+
+## L032 - 31/10/2026 - Sửa lỗi build slab và kiểm tra CI local
+
+- request: Linh yêu cầu chạy check/test và hỗ trợ sửa lỗi từ ảnh CI đang dừng ở `make fmt && git diff --exit-code`; sau đó yêu cầu chạy kiểm tra lại.
+- context: Nhánh local `codex/slab-allocator_page`, HEAD `8241d43`; trước khi sửa, working tree đã có thay đổi định dạng trong `kernel/slab.c`. Giữ các thay đổi đó, không stage/commit/push.
+- diagnosis: Sau khi build với `TOOLPREFIX=riscv64-linux-gnu-`, trình biên dịch báo `printf` implicit declaration trong `slab_test()`. Kernel cung cấp `printk()` qua `defs.h`, không phải `printf()`.
+- repair: Đổi hai thông báo trong `slab_test()` sang `printk()`. Không gọi `slab_test()` trong `main()` vì lựa chọn boot/integration chưa được yêu cầu; hiện helper chưa được gọi và các bài `usertests`/`crash` không kiểm tra allocator này.
+- verification: Lần đầu `make -o /usr/lib/gcc/riscv64-unknown-elf/13.2.0/include/stdarg.h TOOLPREFIX=riscv64-linux-gnu- -B kernel/kernel fs.img` hoàn tất với exit 0. Lần chạy lại, `make fmt` chạy hai lần; `clang-format --dry-run --Werror kernel/slab.c` và `git diff --check` đều đạt. `make kernel/kernel fs.img` báo cả hai target up to date (binary đã build thành công ở lượt đầu). `./test-xv6.py usertests` in `ALL TESTS PASSED`; `./test-xv6.py crash` qua log recovery, orphan recovery và in `OK` cho cả hai test orphan. Sau kiểm tra đã dừng QEMU process còn sót do script và file FUSE tạm biến mất; không còn artifact đó trong status.
+- limits: `make fmt && git diff --exit-code` nguyên dạng không được xác nhận pass vì worktree có thay đổi code/docs có chủ đích. Formatter ổn định được kiểm tra bằng lần chạy lặp, dry-run file slab và whitespace check. CI usertests/crash không gọi `slab_test()`; chưa có runtime test trực tiếp cho slab. Lệnh build mặc định local trước đó chọn toolchain `unknown-elf` và bị dependency `.d` cũ trỏ tới header không tồn tại; build thành công khi ép toolchain Linux và bỏ qua prerequisite đó.
 
 ## L031 - 23/10/2026 - Gỡ xung đột local và giữ đúng hai ảnh minh chứng
 

@@ -1,6 +1,17 @@
 # Điểm tiếp tục
 
-Cập nhật: 23/10/2026. Nguồn chuẩn hiện tại: CURRENT_STATE.md và LOGBOOK L031. Các checkpoint cũ là lịch sử, không áp lại trạng thái nhánh/PR hoặc tên ảnh đã đổi.
+Cập nhật: 31/10/2026. Nguồn chuẩn hiện tại: CURRENT_STATE.md và LOGBOOK L032.
+
+## Kiểm tra slab mới nhất
+
+- Nhánh local `codex/slab-allocator_page`, HEAD `8241d43`; working tree có thay đổi trong `kernel/slab.c`. Không stage/commit/push nếu chưa được Linh yêu cầu.
+- Sửa compile error của `slab_test()` bằng `printf` → `printk`, đúng API kernel. Build `kernel/kernel` và `fs.img` qua với `TOOLPREFIX=riscv64-linux-gnu-`, bỏ qua prerequisite `.d` cũ tại `/usr/lib/gcc/riscv64-unknown-elf/13.2.0/include/stdarg.h`.
+- Kiểm tra lại 31/10: formatter chạy, `clang-format --dry-run --Werror kernel/slab.c` và `git diff --check` đạt; `./test-xv6.py usertests` đạt `ALL TESTS PASSED`; `./test-xv6.py crash` đạt log recovery và hai orphan recovery. Không chạy được `git diff --exit-code` vì worktree có các sửa đổi có chủ đích. Đã dừng QEMU process còn sót; file FUSE tạm biến mất.
+- `slab_test()` chưa được gọi từ `main()`; usertests/crash hiện tại không kiểm thử implementation slab. Hỏi/hướng dẫn Linh quyết định bước test/integration tiếp theo, không tự nối vào boot.
+
+## Hồ sơ W01 lịch sử
+
+Các ghi chú dưới đây phản ánh lần sửa W01 ngày 23/10, không phải trạng thái nhánh hiện tại. Nguồn cập nhật mới nhất là L032/CURRENT_STATE.
 
 ## Trạng thái sau sửa lỗi local
 

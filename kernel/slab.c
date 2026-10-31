@@ -18,12 +18,12 @@ struct slab_slot {
 
 // Metadata Header 32 bytes đặt tại đầu mỗi trang Slab (offset 0x000)
 struct slab_header {
-  uint32 magic;               // 4 bytes: SLAB_MAGIC
-  uint16 obj_size;            // 2 bytes: Kích thước mỗi slot sau căn lề 8B (stride = 64)
-  uint16 capacity;            // 2 bytes: Tổng số slot trong trang (63)
-  uint16 free_count;          // 2 bytes: Số lượng slot hiện đang trống (0..63)
-  uint16 _pad;                // 2 bytes: Đệm căn lề
-  uint32 _reserved;           // 4 bytes: Dự phòng mở rộng (đủ 16B đầu)
+  uint32 magic;      // 4 bytes: SLAB_MAGIC
+  uint16 obj_size;   // 2 bytes: Kích thước mỗi slot sau căn lề 8B (stride = 64)
+  uint16 capacity;   // 2 bytes: Tổng số slot trong trang (63)
+  uint16 free_count; // 2 bytes: Số lượng slot hiện đang trống (0..63)
+  uint16 _pad;       // 2 bytes: Đệm căn lề
+  uint32 _reserved;  // 4 bytes: Dự phòng mở rộng (đủ 16B đầu)
   struct slab_slot *freelist; // 8 bytes: Con trỏ tới slot trống đầu tiên
   struct slab_header *next;   // 8 bytes: Nối tới trang Slab tiếp theo
 };
@@ -37,11 +37,11 @@ struct {
 } slab_cache;
 
 // Khởi tạo một trang vật lý 4KB mới thành một trang Slab
-static struct slab_header*
+static struct slab_header *
 slab_page_create(void)
 {
   void *page = kalloc();
-  if(page == 0)
+  if (page == 0)
     return 0; // OOM: Cạn kiệt RAM vật lý
 
   struct slab_header *hdr = (struct slab_header *)page;
@@ -56,8 +56,9 @@ slab_page_create(void)
 
   char *slot_base = (char *)page + sizeof(struct slab_header);
 
-  for(int i = hdr->capacity - 1; i >= 0; i--) {
-    struct slab_slot *s = (struct slab_slot *)(slot_base + (uint64)i * hdr->obj_size);
+  for (int i = hdr->capacity - 1; i >= 0; i--) {
+    struct slab_slot *s =
+      (struct slab_slot *)(slot_base + (uint64)i * hdr->obj_size);
     s->next = hdr->freelist;
     hdr->freelist = s;
   }
@@ -71,35 +72,39 @@ kmalloc_init(void)
 {
   initlock(&slab_cache.lock, "slab_cache");
 
-  uint32 s_min = SLAB_CLASS_SIZE < sizeof(struct slab_slot) ? sizeof(struct slab_slot) : SLAB_CLASS_SIZE;
+  uint32 s_min = SLAB_CLASS_SIZE < sizeof(struct slab_slot)
+                   ? sizeof(struct slab_slot)
+                   : SLAB_CLASS_SIZE;
   uint32 s_aligned = ALIGN_UP(s_min, 8);
 
-  if(sizeof(struct slab_header) != 32 || sizeof(struct slab_header) + s_aligned > PGSIZE)
+  if (sizeof(struct slab_header) != 32 ||
+      sizeof(struct slab_header) + s_aligned > PGSIZE)
     panic("kmalloc_init: invalid header or object size");
 
   slab_cache.obj_size = (uint16)s_aligned;
-  slab_cache.capacity = (uint16)((PGSIZE - sizeof(struct slab_header)) / s_aligned);
+  slab_cache.capacity =
+    (uint16)((PGSIZE - sizeof(struct slab_header)) / s_aligned);
   slab_cache.slabs = 0;
 }
 
 // 2. Hàm cấp phát 1 đối tượng từ Slab (Allocate Path)
-void*
+void *
 kmalloc(uint64 size)
 {
   // Kiểm tra size theo hợp đồng: chỉ nhận 1..64, sai trả về 0
-  if(size == 0 || size > slab_cache.obj_size)
+  if (size == 0 || size > slab_cache.obj_size)
     return 0;
 
   acquire(&slab_cache.lock);
 
   struct slab_header *curr = slab_cache.slabs;
-  while(curr != 0 && curr->free_count == 0) {
+  while (curr != 0 && curr->free_count == 0) {
     curr = curr->next;
   }
 
-  if(curr == 0) {
+  if (curr == 0) {
     curr = slab_page_create();
-    if(curr == 0) {
+    if (curr == 0) {
       release(&slab_cache.lock);
       return 0;
     }
@@ -113,8 +118,8 @@ kmalloc(uint64 size)
 
   release(&slab_cache.lock);
 
-  memset((void*)slot, 0, slab_cache.obj_size);
-  return (void*)slot;
+  memset((void *)slot, 0, slab_cache.obj_size);
+  return (void *)slot;
 }
 
 // 3. Hàm thu hồi đối tượng về lại Slab (Free & Failure Paths)
@@ -122,11 +127,11 @@ void
 kmfree(void *ptr)
 {
   // Hợp đồng API: kmfree(NULL) là no-op (không làm gì cả)
-  if(ptr == 0)
+  if (ptr == 0)
     return;
 
   // Kiểm tra con trỏ nằm ngoài vùng RAM vật lý hợp lệ
-  if((char*)ptr < end || (uint64)ptr >= PHYSTOP)
+  if ((char *)ptr < end || (uint64)ptr >= PHYSTOP)
     panic("kmfree: pointer out of physical memory range");
 
   // Tìm địa chỉ đầu trang 4KB chứa con trỏ ptr bằng PGROUNDDOWN
@@ -135,24 +140,25 @@ kmfree(void *ptr)
   acquire(&slab_cache.lock);
 
   // Kiểm tra chữ ký SLAB_MAGIC ở đầu trang
-  if(hdr->magic != SLAB_MAGIC || hdr->obj_size != slab_cache.obj_size)
+  if (hdr->magic != SLAB_MAGIC || hdr->obj_size != slab_cache.obj_size)
     panic("kmfree: invalid slab magic or corrupted header");
 
   // Kiểm tra con trỏ có nằm đúng biên bắt đầu của 1 Slot không
   uint64 slot_base = (uint64)hdr + sizeof(struct slab_header);
-  if((uint64)ptr < slot_base)
+  if ((uint64)ptr < slot_base)
     panic("kmfree: pointer inside header");
 
   uint64 offset = (uint64)ptr - slot_base;
-  if((offset % hdr->obj_size) != 0 || (offset / hdr->obj_size) >= hdr->capacity)
+  if ((offset % hdr->obj_size) != 0 ||
+      (offset / hdr->obj_size) >= hdr->capacity)
     panic("kmfree: unaligned slot pointer");
 
   // Kiểm tra giải phóng kép (Double Free) bằng cả free_count lẫn duyệt danh sách freelist
-  if(hdr->free_count >= hdr->capacity)
+  if (hdr->free_count >= hdr->capacity)
     panic("kmfree: free_count overflow");
 
-  for(struct slab_slot *cur = hdr->freelist; cur != 0; cur = cur->next) {
-    if((void *)cur == ptr)
+  for (struct slab_slot *cur = hdr->freelist; cur != 0; cur = cur->next) {
+    if ((void *)cur == ptr)
       panic("kmfree: double free detected");
   }
 
@@ -172,23 +178,23 @@ kmfree(void *ptr)
 void
 slab_test(void)
 {
-  printf("slab_test: starting S02 verification...\n");
+  printk("slab_test: starting S02 verification...\n");
   kmalloc_init();
 
   // Kiểm tra hợp đồng biên: size == 0, size > 64 và kmfree(0)
-  if(kmalloc(0) != 0 || kmalloc(65) != 0)
+  if (kmalloc(0) != 0 || kmalloc(65) != 0)
     panic("slab_test: size validation failed");
   kmfree(0); // Phải là no-op, không được panic
 
   // Kiểm tra cấp phát và LIFO Reuse
   void *p1 = kmalloc(16);
   void *p2 = kmalloc(64);
-  if(p1 == 0 || p2 == 0 || p1 == p2)
+  if (p1 == 0 || p2 == 0 || p1 == p2)
     panic("slab_test: basic alloc failed");
 
   kmfree(p1);
   void *p3 = kmalloc(32);
-  if(p3 != p1)
+  if (p3 != p1)
     panic("slab_test: LIFO reuse failed");
 
   kmfree(p2);
@@ -196,24 +202,24 @@ slab_test(void)
 
   // Kiểm tra Pattern Test lấp đầy 1 trang (63 slots)
   void *slots[63];
-  for(int i = 0; i < slab_cache.capacity; i++) {
+  for (int i = 0; i < slab_cache.capacity; i++) {
     slots[i] = kmalloc(64);
-    if(slots[i] == 0)
+    if (slots[i] == 0)
       panic("slab_test: full page alloc failed");
     memset(slots[i], (i + 0x20) & 0xFF, 64);
   }
-  for(int i = 0; i < slab_cache.capacity; i++) {
+  for (int i = 0; i < slab_cache.capacity; i++) {
     uchar *bytes = (uchar *)slots[i];
     uchar expected = (uchar)((i + 0x20) & 0xFF);
-    for(int j = 0; j < 64; j++) {
-      if(bytes[j] != expected)
+    for (int j = 0; j < 64; j++) {
+      if (bytes[j] != expected)
         panic("slab_test: pattern corrupted");
     }
   }
-  for(int i = 0; i < slab_cache.capacity; i++) {
+  for (int i = 0; i < slab_cache.capacity; i++) {
     kmfree(slots[i]);
   }
 
-  printf("slab_test: ALL PASSED (capacity=%d, obj_size=%d)\n",
+  printk("slab_test: ALL PASSED (capacity=%d, obj_size=%d)\n",
          slab_cache.capacity, slab_cache.obj_size);
 }
