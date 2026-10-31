@@ -6,6 +6,8 @@
 //   KALLOCTEST_INJECT=2: gia lap allocator tra NULL/dia chi sai/trang trung
 //                        de chung minh harness chan ca khong an toan
 //   KALLOCTEST_INJECT=3: gia lap kalloc tra lai trang da cap trong P07
+//   KALLOCTEST_INJECT=4: gia lap kalloc khong tra 0 khi het ma tra lai trang
+//                        da co trong bitmap (P07c)
 // Moi dong log bat dau bang "KT|" de loc bang grep.
 
 #include "types.h"
@@ -37,6 +39,14 @@ static char *kt_stash[3];    // inject=2: trang that bi thay the, tra khi don
 // gi vao chinh trang: kalloc co the ghi de trang, va trang trung se tao vong.
 #define KT_NPAGES ((PHYSTOP - KERNBASE) / PGSIZE)
 static uchar kt_bm[KT_NPAGES / 8];
+
+// 1 neu trang hop le p da duoc danh dau trong bitmap
+static int
+kt_bm_has(char *p)
+{
+  uint64 idx = ((uint64)p - KERNBASE) / PGSIZE;
+  return (kt_bm[idx / 8] & (1 << (idx % 8))) != 0;
+}
 
 // Dia chi hop le: khac 0, chia het PGSIZE, nam trong [PGROUNDUP(end), PHYSTOP)
 static int
@@ -221,13 +231,13 @@ kt_exhaust(uint64 before)
         kfree(p); // trang that van hop le: tra lai
       break;
     }
-    uint64 idx = ((uint64)q - KERNBASE) / PGSIZE;
-    if (kt_bm[idx / 8] & (1 << (idx % 8))) {
+    if (kt_bm_has(q)) {
       dup++;
       if (q != p && kt_valid(p))
         kfree(p); // trang that khong nam trong bitmap: tra lai
       break;
     }
+    uint64 idx = ((uint64)q - KERNBASE) / PGSIZE;
     kt_bm[idx / 8] |= 1 << (idx % 8);
     prev = q;
     got++;
@@ -239,8 +249,12 @@ kt_exhaust(uint64 before)
     kt_skip("P07c-oom-returns-0");
   } else {
     p = kalloc();
+    if (kt_inject == 4)
+      p = prev; // gia lap kalloc tra trang da co trong bitmap thay vi 0
     kt_report("P07c-oom-returns-0", "0", (uint64)p, 0, p == 0);
-    if (kt_valid(p))
+    // Chi tra trang chua co trong bitmap; trang da co se duoc tra 1 lan
+    // o buoc don dep ben duoi, khong tra 2 lan.
+    if (kt_valid(p) && !kt_bm_has(p))
       kfree(p);
   }
   for (uint64 idx = 0; idx < KT_NPAGES; idx++)
