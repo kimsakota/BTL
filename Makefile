@@ -96,6 +96,10 @@ CFLAGS += -DSLABTEST -DSLABTEST_INJECT=$(SLABTEST_INJECT)
 CFLAGS += -DST_CPUS=$(or $(CPUS),3) -DST_REV=\"$(shell git describe --always --dirty 2>/dev/null)\"
 endif
 
+ifeq ($(BUFTEST),1)
+CFLAGS += -DBUFTEST
+endif
+
 ifeq ($(PAGESTRESS),1)
 OBJS += $K/pagestress.o
 PAGESTRESS_INJECT ?= 0

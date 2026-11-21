@@ -32,10 +32,11 @@ struct {
   struct buf head;
 } bcache;
 
+// Hàm khởi tạo bộ đệm (buffer cache) và kiểm tra tính toàn vẹn của nó.
 void
 binit(void)
 {
-  struct buf *b;
+  struct buf *b; // Con trỏ đến một buffer trong bộ đệm.
 
   initlock(&bcache.lock, "bcache");
 
@@ -49,6 +50,34 @@ binit(void)
     bcache.head.next->prev = b;
     bcache.head.next = b;
   }
+
+#ifdef BUFTEST // Chỉ biên dịch khi BUFTEST đã được bật
+  int seen = 0;
+
+  for (b = bcache.head.next; b != &bcache.head; b = b->next) {
+    // Kiểm tra liên kết kế tiếp và liên kết trước của buffer có bị null hay không.
+    if (b == 0 || b->next == 0 || b->prev == 0)
+      panic("buftest: null link");
+
+    // Kiểm tra hai chiều của danh sách có khớp hay không
+    if (b->next->prev != b || b->prev->next != b)
+      panic("buftest: broken links");
+
+    // Kiểm tra trạng thái ban đầu của buffer có đúng hay không
+    if (b->refcnt != 0 || b->valid != 0 || b->disk != 0)
+      panic("buftest: unexpected initial state");
+
+    seen++;
+    if (seen > NBUF)
+      panic("buftest: cycle");
+  }
+
+  if (seen != NBUF)
+    panic("buftest: wrong count");
+
+  printk("I04|phase=init|buf_B=%lu|align_B=%lu|count=%d|result=PASS\n",
+         (uint64)sizeof(struct buf), (uint64) _Alignof(struct buf), seen);
+#endif
 }
 
 // Look through buffer cache for block on device dev.
