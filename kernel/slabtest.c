@@ -1,4 +1,4 @@
-// T03: harness kiem thu tang object (kmalloc/kmfree), hop dong slab64/128.
+// T03: harness kiem thu tang object (kmalloc/kmfree), slab 64/128/256/1280.
 // Chay tren CPU 0 ngay sau slab_test(), truoc khi cac CPU khac khoi dong.
 // Khong goi lai kmalloc_init(). Cache co the da giu san trang slab trong
 // do slab_test() tao ra, nen harness chi so voi so dem luc bat dau.
@@ -26,10 +26,10 @@
 #define ST_CPUS 0
 #endif
 
-#define ST_CONTRACT "slab64/128"
+#define ST_CONTRACT "slab64/128/256/1280"
 #define ST_MAGIC    0x534C4142U
 #define ST_HDR      32  // kich thuoc header slab (S01)
-#define ST_N        200 // so object song cung luc, tron hai class
+#define ST_N        200 // so object song cung luc, tron bon class
 #define ST_CYCLES   5   // so chu ky do sau warm-up (O06)
 #define ST_NSTASH   8   // so o cat object that bi thay the khi inject
 
@@ -40,12 +40,18 @@ extern char end[]; // dia chi dau tien sau kernel (kernel.ld)
 static struct {
   uint64 size;
   uint64 cls;
-} st_bounds[] = {{0, 0},     {1, 64},    {64, 64}, {65, 128},
-                 {127, 128}, {128, 128}, {129, 0}};
+} st_bounds[] = {{0, 0},      {1, 64},      {64, 64},   {65, 128},
+                 {127, 128},  {128, 128},   {129, 256}, {256, 256},
+                 {257, 1280}, {1280, 1280}, {1281, 0}};
 
-// Kich thuoc yeu cau cua workload, lap vong theo chi so object:
-// 6 size class64 va 4 size class128, nen ST_N object co ca hai class song.
-static uint64 st_sizes[] = {1, 8, 13, 32, 63, 64, 65, 100, 127, 128};
+// Cac class theo hop dong, tu nho den lon
+static uint64 st_classes[] = {64, 128, 256, 1280};
+#define ST_NCLASSES (sizeof(st_classes) / sizeof(st_classes[0]))
+
+// Kich thuoc yeu cau cua workload, lap vong theo chi so object: 4 size
+// class64, 2 size moi class con lai, nen ca bon class deu co object song
+// vuot mot slab (80/40/40/40 object voi capacity 63/31/15/3).
+static uint64 st_sizes[] = {1, 8, 32, 64, 65, 128, 129, 256, 257, 1280};
 #define ST_NSIZES (sizeof(st_sizes) / sizeof(st_sizes[0]))
 
 static int st_pass, st_fail;
@@ -101,11 +107,14 @@ st_valid(char *p, uint64 size)
   return (off % objsz) == 0 && (off / objsz) < cap;
 }
 
-// obj_size cua class phai nhan size theo hop dong: 1..64 -> 64, 65..128 -> 128
+// obj_size cua class nho nhat chua duoc size theo hop dong
 static uint64
 st_want(uint64 size)
 {
-  return size <= 64 ? 64 : 128;
+  for (int k = 0; k < ST_NCLASSES; k++)
+    if (size <= st_classes[k])
+      return st_classes[k];
+  return 0;
 }
 
 // obj_size ghi trong header trang chua p; chi goi khi st_valid(p) dung
@@ -348,7 +357,7 @@ st_realloc_fault(int i, char *p)
 // O04: tra roi cap lai cung size.
 // a) moi class: object cap sau cung cua class do (nam o trang slab dau tien
 //    con slot trong cua class) tra ve phai duoc cap lai dung slot do (LIFO)
-// b) tra 10 object cua ca hai class roi cap lai: moi object cap lai phai hop
+// b) tra 10 object cua cac class roi cap lai: moi object cap lai phai hop
 //    le, dung class, khong chong lan object khac, va so trang trong khong doi
 // c) sau b: ghi mau vao object cap lai, roi kiem mau cua moi object so huu
 // Object cap lai chi duoc so huu neu hop le va khong chong lan object khac.
@@ -356,7 +365,8 @@ static void
 st_reuse(void)
 {
   int same = 0;
-  for (uint64 cls = 64; cls <= 128; cls += 64) {
+  for (int c = 0; c < ST_NCLASSES; c++) {
+    uint64 cls = st_classes[c];
     int L = ST_N - 1;
     while (L >= 0 && st_want(st_sz[L]) != cls)
       L--;
@@ -369,7 +379,8 @@ st_reuse(void)
     st_new[L] = st_own[L];
     same += st_obj[L] == a;
   }
-  st_report("O04a-reuse-same-slot", "classes_same_addr", same, 2, same == 2);
+  st_report("O04a-reuse-same-slot", "classes_same_addr", same, ST_NCLASSES,
+            same == ST_NCLASSES);
 
   int tried = 0, good = 0;
   uint64 before = kfreepage_count();
@@ -406,19 +417,22 @@ st_reuse(void)
             intact == own);
 }
 
-// O05: workload vuot 1 slab o ca hai class. Capacity lay tu header trang
-// (hien tai 63 cho class64, 31 cho class128), khong viet cung.
+// O05: workload vuot 1 slab o moi class. Capacity lay tu header trang
+// (hien tai 63/31/15/3 cho class 64/128/256/1280), khong viet cung.
 // a) moi class: so object song > capacity, nam tren it nhat ceil(n/cap)
 //    trang, va khong trang nao giu qua capacity object
-// b) so trang lay them tu kalloc khong vuot tong ceil(n/cap) cua hai class
+// b) so trang lay them tu kalloc khong vuot tong ceil(n/cap) cua cac class
 //    (cache co the da co trang trong cua slab_test, nen co the lay it hon)
 static void
 st_span(uint64 before, uint64 mid)
 {
   static char *pages[ST_N];
   static int cnt[ST_N];
+  static char *id[] = {"O05a-span-pages-c64", "O05a-span-pages-c128",
+                       "O05a-span-pages-c256", "O05a-span-pages-c1280"};
   uint64 need_all = 0;
-  for (uint64 cls = 64; cls <= 128; cls += 64) {
+  for (int c = 0; c < ST_NCLASSES; c++) {
+    uint64 cls = st_classes[c];
     int npg = 0, n = 0, over = 0, cap = 0;
     for (int i = 0; i < ST_N; i++) {
       if (!st_own[i] || st_want(st_sz[i]) != cls)
@@ -442,8 +456,7 @@ st_span(uint64 before, uint64 mid)
     need_all += need;
     printk("KT|info|o05_class=%lu|objects=%d|capacity=%d|pages=%d\n", cls, n,
            cap, npg);
-    st_report(cls == 64 ? "O05a-span-pages-c64" : "O05a-span-pages-c128",
-              "pages>=ceil(n/cap)", npg, need,
+    st_report(id[c], "pages>=ceil(n/cap)", npg, need,
               n > cap && npg >= need && over == 0);
   }
   uint64 taken = before - mid;
