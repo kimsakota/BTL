@@ -131,3 +131,15 @@ Hàm nội bộ `static int slab_get_class_stats(int idx, struct slab_class_stat
    ```bash
    make clean && make qemu CPUS=1 SLAB_STATS_TEST=1
    ```
+
+## 6. Tích Hợp Lát Cắt File Động (`filealloc` / `fileclose` — W05 `#45`)
+
+- **Phân bổ & giới hạn tài nguyên:** `struct file` (`sizeof = 40 B`, `alignment = 8 B`) được cấp phát động từ `class64` qua `kmalloc(sizeof(struct file))` và thu hồi bằng `kmfree(f)`. Tổng số file sống toàn hệ thống giới hạn bởi `ftable.open_count < NFILE` (`100`).
+- **Chuyển quyền sở hữu (Ownership Lifecycle):**
+  1. `filealloc()` giữ suất `open_count++`, nhận slot đã zero-fill từ `class64`, đặt `f->ref = 1`, `f->type = FD_NONE` và chuyển quyền sở hữu cho caller (`sys_open`, `pipealloc`).
+  2. `filedup()` (`dup` / `fork`) tăng đồng sở hữu `f->ref++` dưới `ftable.lock`.
+  3. `fileclose()` giảm `--f->ref` dưới `ftable.lock`; nếu `> 0` thì thoát. Chỉ ở lần đóng cuối (`ref == 0`) mới sao chép `ff = *f` ra stack, đặt `f->type = FD_NONE`, giảm `ftable.open_count--`, nhả `ftable.lock`, trả slot về Slab bằng `kmfree(f)`, rồi giải phóng `pipeclose()` hoặc `begin_op(); iput(); end_op();`.
+- **Thứ tự khóa & Rollback OOM:**
+  - `ftable.lock` hoàn toàn tách rời `slab_c64.lock` và `sleeplock`: không giữ `ftable.lock` khi gọi `kmalloc()`, `kmfree()`, `pipeclose()` hay `begin_op()`/`iput()`/`end_op()`.
+  - Khi `kmalloc()` trả về `0` (OOM), `filealloc()` lấy lại `ftable.lock` để rollback `ftable.open_count--` rồi trả về `0`. Khi caller lỗi giữa chừng (như `fdalloc() < 0` trong `sys_open` hoặc `pipealloc` lỗi ở `f1`/`pi`), caller gọi `fileclose(f)` với `f->type == FD_NONE` nên chỉ thu hồi `open_count--` và `kmfree(f)`.
+- **Kiểm thử:** `make clean && make qemu CPUS=1 FILE_TEST=1`.
