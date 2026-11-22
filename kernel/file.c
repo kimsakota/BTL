@@ -16,34 +16,48 @@
 struct devsw devsw[NDEV];
 struct {
   struct spinlock lock;
-  struct file file[NFILE];
+  int open_count; // Giữ giới hạn tối đa NFILE file sống toàn hệ thống
 } ftable;
 
 void
 fileinit(void)
 {
   initlock(&ftable.lock, "ftable");
+  ftable.open_count = 0;
 }
 
-// Allocate a file structure.
+// Allocate a file structure dynamically from Slab (class64).
 struct file *
 filealloc(void)
 {
   struct file *f;
 
+  // 1. Giữ suất tài nguyên dưới ftable.lock (chặn vượt NFILE)
   acquire(&ftable.lock);
-  for (f = ftable.file; f < ftable.file + NFILE; f++) {
-    if (f->ref == 0) {
-      f->ref = 1;
-      release(&ftable.lock);
-      return f;
-    }
+  if (ftable.open_count >= NFILE) {
+    release(&ftable.lock);
+    return 0;
   }
+  ftable.open_count++;
   release(&ftable.lock);
-  return 0;
+
+  // 2. Gọi kmalloc NGOÀI ftable.lock để không lồng khóa (ftable.lock vs slab.lock)
+  f = (struct file *)kmalloc(sizeof(struct file));
+  if (f == 0) {
+    // 3. Rollback an toàn khi Slab OOM
+    acquire(&ftable.lock);
+    ftable.open_count--;
+    release(&ftable.lock);
+    return 0;
+  }
+
+  // 4. Thiết lập trạng thái ban đầu (slot đã được kmalloc zero-fill)
+  f->ref = 1;
+  f->type = FD_NONE;
+  return f;
 }
 
-// Increment ref count for file f.
+// Increment ref count for file f (dùng cho dup và fork).
 struct file *
 filedup(struct file *f)
 {
@@ -55,7 +69,7 @@ filedup(struct file *f)
   return f;
 }
 
-// Close file f.  (Decrement ref count, close when reaches 0.)
+// Close file f. (Decrement ref count, close and kmfree when reaches 0.)
 void
 fileclose(struct file *f)
 {
@@ -68,11 +82,20 @@ fileclose(struct file *f)
     release(&ftable.lock);
     return;
   }
+
+  // Lần đóng cuối cùng (ref == 0): sao chép ra stack và trả suất NFILE
   ff = *f;
   f->ref = 0;
   f->type = FD_NONE;
+  if (ftable.open_count < 1)
+    panic("fileclose: open_count");
+  ftable.open_count--;
   release(&ftable.lock);
 
+  // Trả struct file về lại Slab ngoài ftable.lock
+  kmfree(f);
+
+  // Đóng tài nguyên liên kết (pipe / inode) ngoài ftable.lock
   if (ff.type == FD_PIPE) {
     pipeclose(ff.pipe, ff.writable);
   } else if (ff.type == FD_INODE || ff.type == FD_DEVICE) {
@@ -177,3 +200,111 @@ filewrite(struct file *f, uint64 addr, int n)
 
   return ret;
 }
+#if defined(FILE_TEST) && FILE_TEST
+struct kpage_node {
+  struct kpage_node *next;
+};
+
+void
+file_test(void)
+{
+  static struct file *files[NFILE];
+  static void *drain64[512];
+
+  printk("file_test: starting file lifecycle, NFILE & OOM verification...\n");
+
+  // [1/3] Kiem tra filealloc -> filedup -> fileclose (chi kmfree o lan dong cuoi)
+  struct file *f = filealloc();
+  if (f == 0 || ((uint64)f % 8) != 0 || f->ref != 1 || f->type != FD_NONE)
+    panic("file_test: initial filealloc failed");
+  if (ftable.open_count != 1)
+    panic("file_test: open_count != 1 after filealloc");
+
+  if (filedup(f) != f || f->ref != 2 || ftable.open_count != 1)
+    panic("file_test: filedup failed");
+
+  fileclose(f); // Giam ref: 2 -> 1 (chua duoc kmfree)
+  if (f->ref != 1 || ftable.open_count != 1)
+    panic("file_test: intermediate fileclose state mismatch");
+
+  fileclose(f); // Lan dong cuoi: ref 1 -> 0 -> open_count=0 va kmfree(f)
+  if (ftable.open_count != 0)
+    panic("file_test: open_count != 0 after final fileclose");
+
+  // Cap lai ngay: xac nhan slot da ve class64 (LIFO reuse + zero-fill)
+  struct file *f_re = filealloc();
+  if (f_re != f || f_re->ref != 1 || f_re->type != FD_NONE)
+    panic("file_test: slab LIFO reuse after final fileclose failed");
+  fileclose(f_re);
+  if (ftable.open_count != 0)
+    panic("file_test: open_count != 0 after reuse close");
+  printk("file_test: [1/3] alloc/dup/final-close & slab reuse OK\n");
+
+  // [2/3] Kiem tra gioi han tai nguyen NFILE
+  for (int i = 0; i < NFILE; i++) {
+    files[i] = filealloc();
+    if (files[i] == 0)
+      panic("file_test: failed before reaching NFILE");
+  }
+  if (ftable.open_count != NFILE)
+    panic("file_test: open_count != NFILE at limit");
+  if (filealloc() != 0)
+    panic("file_test: exceeded NFILE limit");
+  if (ftable.open_count != NFILE)
+    panic("file_test: open_count changed after NFILE rejection");
+
+  for (int i = 0; i < NFILE; i++)
+    fileclose(files[i]);
+  if (ftable.open_count != 0)
+    panic("file_test: open_count != 0 after closing NFILE");
+  printk("file_test: [2/3] NFILE limit (%d) & cleanup OK\n", NFILE);
+
+  // [3/3] Kiem tra OOM thuc te & rollback open_count + retry
+  struct kpage_node *oom_pages = 0;
+  void *pg;
+  while ((pg = kalloc()) != 0) {
+    struct kpage_node *node = (struct kpage_node *)pg;
+    node->next = oom_pages;
+    oom_pages = node;
+  }
+
+  // Hut het cac slot ranh dang con trong class64 den khi kmalloc(64) tra 0
+  int drain_cnt = 0;
+  void *s;
+  while ((s = kmalloc(64)) != 0) {
+    if (drain_cnt >= 512)
+      panic("file_test: drain64 overflow");
+    drain64[drain_cnt++] = s;
+  }
+
+  // Luc nay class64 het slot va kalloc() can -> filealloc() phai tra 0 va rollback
+  if (filealloc() != 0 || filealloc() != 0)
+    panic("file_test: expected 0 on slab OOM");
+  if (ftable.open_count != 0)
+    panic("file_test: open_count leaked after OOM rollback");
+
+  // Hoan tra RAM va slot tam
+  while (oom_pages != 0) {
+    struct kpage_node *next = oom_pages->next;
+    kfree((void *)oom_pages);
+    oom_pages = next;
+  }
+  for (int i = 0; i < drain_cnt; i++)
+    kmfree(drain64[i]);
+
+  // Retry sau OOM: cap du NFILE de chung minh khong hut suat nao
+  for (int i = 0; i < NFILE; i++) {
+    files[i] = filealloc();
+    if (files[i] == 0)
+      panic("file_test: retry alloc after OOM failed");
+  }
+  for (int i = 0; i < NFILE; i++)
+    fileclose(files[i]);
+  if (ftable.open_count != 0)
+    panic("file_test: open_count != 0 after OOM retry cleanup");
+
+  printk("file_test: [3/3] OOM (drained %d c64 slots), rollback & retry OK\n",
+         drain_cnt);
+  printk("file_test: ALL PASSED\n");
+}
+#endif

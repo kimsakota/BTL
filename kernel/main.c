@@ -26,16 +26,19 @@ main()
     slabtest(SLABTEST_INJECT); // T03: harness tang object
 #endif
     printk("free pages after slab test: %lu\n", kfreepage_count());
-    kvminit();          // create kernel page table
-    kvminithart();      // turn on paging
-    procinit();         // process table
-    trapinit();         // trap vectors
-    trapinithart();     // install kernel trap vector
-    plicinit();         // set up interrupt controller
-    plicinithart();     // ask PLIC for device interrupts
-    binit();            // buffer cache
-    iinit();            // inode table
-    fileinit();         // file table
+    kvminit();      // create kernel page table
+    kvminithart();  // turn on paging
+    procinit();     // process table
+    trapinit();     // trap vectors
+    trapinithart(); // install kernel trap vector
+    plicinit();     // set up interrupt controller
+    plicinithart(); // ask PLIC for device interrupts
+    binit();        // buffer cache
+    iinit();        // inode table
+    fileinit();
+#if defined(FILE_TEST) && FILE_TEST
+    file_test(); // W05: kiem tra filealloc/filedup/fileclose, NFILE va OOM
+#endif           // file table
     virtio_disk_init(); // emulated hard disk
     userinit();         // first user process
 

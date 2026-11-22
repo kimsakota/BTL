@@ -73,6 +73,10 @@ SLAB_STATS_TEST ?= 0
 ifneq ($(SLAB_STATS_TEST),0)
 CFLAGS += -DSLAB_STATS_TEST=$(SLAB_STATS_TEST)
 endif
+FILE_TEST ?= 0
+ifneq ($(FILE_TEST),0)
+CFLAGS += -DFILE_TEST=$(FILE_TEST)
+endif
 CFLAGS += $(DETFLAGS)
 CFLAGS += -march=rv64gc
 CFLAGS += -std=gnu99

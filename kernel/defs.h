@@ -35,6 +35,10 @@ int             fileread(struct file*, uint64, int n);
 int             filestat(struct file*, uint64 addr);
 int             filewrite(struct file*, uint64, int n);
 
+#if defined(FILE_TEST) && FILE_TEST
+void            file_test(void);
+#endif
+
 // fs.c
 void            fsinit(int);
 int             dirlink(struct inode*, char*, uint);
