@@ -14,27 +14,35 @@ Bộ cấp phát đối tượng Slab (`kmalloc` / `kmfree`) hoạt động như
 
 ---
 
-## 2. Hợp Đồng API & Bảng Phân Lớp Kích Thước (`64 B` và `128 B`)
+## 2. Hợp Đồng API & Bảng Phân Lớp Kích Thước (`{64, 128, 256, 1280} B`)
 
 ### 2.1. Giao diện hàm (API Contract)
-- `void kmalloc_init(void);` — Khởi tạo cấu hình và `spinlock` riêng cho từng size class (`slab_c64`, `slab_c128`).
+- `void kmalloc_init(void);` — Khởi tạo cấu hình và `spinlock` riêng cho từng size class (`slab_c64`, `slab_c128`, `slab_c256`, `slab_c1280`).
 - `void *kmalloc(uint64 size);` — Cấp phát 1 đối tượng thuộc class nhỏ nhất đủ chứa `size`.
 - `void kmfree(void *ptr);` — Giải phóng đối tượng về lại trang Slab sở hữu (`kmfree(0)` là `no-op`).
 
-### 2.2. Bảng phân lớp kích thước (`S03a`)
+### 2.2. Kết quả đo client structs & Bảng phân lớp kích thước (`W05` — `#45`)
+
+Đo bằng toolchain RISC-V của dự án trên revision `7715b36` (`kernel/kernel`):
+- `struct file`: `sizeof = 40 B`, `alignment = 8 B` -> `class64`.
+- `struct inode`: `sizeof = 136 B`, `alignment = 8 B` -> `class256`.
+- `struct buf`: `sizeof = 1112 B`, `alignment = 8 B` -> `class1280`.
 
 | Kích thước yêu cầu (`size`) | Class được chọn | `class_idx` | `stride` (`obj_size`) | Công thức `capacity` | `capacity` thực tế | Phần dư cuối trang (`tail_padding`) | Hành vi trả về |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
 | `size == 0` | Không hợp lệ | — | — | — | — | — | Trả về `0` (`NULL`) |
-| **`1 .. 64 B`** | **`class64`** | `0` | `64 B` | `(4096 - 32) / 64` | **`63` slots** | `32 B` | Con trỏ slot `64 B` (zero-filled) |
-| **`65 .. 128 B`** | **`class128`** | `1` | `128 B` | `(4096 - 32) / 128` | **`31` slots** | `96 B` | Con trỏ slot `128 B` (zero-filled) |
-| `size > 128 B` (`129..`) | Vượt ngưỡng | — | — | — | — | — | Trả về `0` (`NULL`) |
+| **`1 .. 64 B`** | **`class64`** | `0` | `64 B` | `(4096 - 32) / 64` | **`63` slots** | `32 B` | Con trỏ slot `64 B` (zero-filled, align `8 B`) |
+| **`65 .. 128 B`** | **`class128`** | `1` | `128 B` | `(4096 - 32) / 128` | **`31` slots** | `96 B` | Con trỏ slot `128 B` (zero-filled, align `8 B`) |
+| **`129 .. 256 B`** | **`class256`** | `2` | `256 B` | `(4096 - 32) / 256` | **`15` slots** | `224 B` | Con trỏ slot `256 B` (zero-filled, align `8 B`) |
+| **`257 .. 1280 B`** | **`class1280`** | `3` | `1280 B` | `(4096 - 32) / 1280` | **`3` slots** | `224 B` | Con trỏ slot `1280 B` (zero-filled, align `8 B`) |
+| `size > 1280 B` (`1281..`) | Vượt ngưỡng | — | — | — | — | — | Trả về `0` (`NULL`) |
 
 ---
 
 ## 3. Bố Trí Bộ Nhớ (Memory Layout) & Quy Ước Fill (`0` / `1`)
 
 ### 3.1. Cấu trúc `struct slab_header` (`32 Bytes` cố định ở đầu mỗi trang Slab)
+
 ```c
 struct slab_slot {
   struct slab_slot *next; // 8 B nhúng ở đầu mỗi slot đang rảnh
@@ -50,13 +58,14 @@ struct slab_header {
   struct slab_slot *freelist; // 8 B: Con trỏ tới slot trống đầu tiên
   struct slab_header *next;   // 8 B: Con trỏ nối sang trang Slab tiếp theo
 }; // Tổng kích thước: 32 Bytes
+```
 
 ### 3.2. Quy ước Fill vùng nhớ (Memory Poisoning & Zero-fill)
 
 1. Khi tạo trang Slab mới (`slab_NewPage`) và khi giải phóng (`kmfree`):
-   * Toàn bộ vùng nhớ slot được lấp đầy bằng mẫu byte `1` (`0x01`, `SLAB_FREE_BYTE`) qua `memset(ptr, 1, c->obj_size)` trước khi ghi con trỏ nhúng `slot->next` vào 8 byte đầu tiên để nối vào đầu `hdr->freelist` (theo cơ chế LIFO).
+   - Toàn bộ vùng nhớ slot được lấp đầy bằng mẫu byte `1` (`0x01`, `SLAB_FREE_BYTE`) qua `memset(ptr, 1, c->obj_size)` trước khi ghi con trỏ nhúng `slot->next` vào 8 byte đầu tiên để nối vào đầu `hdr->freelist` (theo cơ chế LIFO).
 2. Khi cấp phát đối tượng (`kmalloc`):
-   * Sau khi rút `slot` từ đầu `curr->freelist` và nhả khóa `c->lock`, toàn bộ vùng nhớ đối tượng được xóa trắng về `0` (`memset(slot, 0, obj_size)`) trước khi trả về cho người gọi.
+   - Sau khi rút `slot` từ đầu `curr->freelist` và nhả khóa `c->lock`, toàn bộ vùng nhớ đối tượng được xóa trắng về `0` (`memset(slot, 0, obj_size)`) trước khi trả về cho người gọi.
 
 ### 3.3. Kiểm tra an toàn trong `kmfree(void *ptr)`
 
@@ -66,14 +75,16 @@ struct slab_header {
 4. Con trỏ nằm trong vùng header (`< hdr + 32`), lệch biên (`offset % obj_size != 0`), hoặc rơi vào vùng dư cuối trang (`slot_idx >= capacity`, chặn 32 B dư của `class64` và 96 B dư của `class128`): gọi `panic`.
 5. Trang không thuộc danh sách `c->slabs` của class hoặc phát hiện giải phóng kép (`double free` khi `free_count >= capacity` hoặc `ptr` đã có trong `hdr->freelist`): nhả khóa và gọi `panic`.
 
-### 4. Thống Kê Theo Từng Class (`S04a` — `#38`)
+---
 
-Hàm nội bộ `static int slab_get_class_stats(int idx, struct slab_class_stats *out)` chỉ hợp lệ sau khi `kmalloc_init()` đã chạy (trả về `0` khi thành công, `-1` nếu chưa khởi tạo, `idx` ngoài miền `0..1`, hoặc `out == 0`). Dữ liệu được tính trực tiếp từ danh sách `c->slabs` dưới khóa `c->lock` của từng class và nhả khóa trước khi in:
+## 4. Thống Kê Theo Từng Class (`S04a` — `#38`)
+
+Hàm nội bộ `static int slab_get_class_stats(int idx, struct slab_class_stats *out)` chỉ hợp lệ sau khi `kmalloc_init()` đã chạy (trả về `0` khi thành công, `-1` nếu chưa khởi tạo, `idx` ngoài miền `0..3`, hoặc `out == 0`). Dữ liệu được tính trực tiếp từ danh sách `c->slabs` dưới khóa `c->lock` của từng class và nhả khóa trước khi in:
 
 | Trường trong `slab_class_stats` | Đơn vị | Công thức tính | Ý nghĩa |
 | :--- | :--- | :--- | :--- |
-| `class_size` | `bytes` | `c->obj_size` (`64` hoặc `128`) | Bước nhảy mỗi slot (stride). |
-| `cap_per_slab` | `slots/slab` | `c->capacity` (`63` hoặc `31`) | Số slot tối đa trên mỗi trang Slab. |
+| `class_size` | `bytes` | `c->obj_size` (`64 / 128 / 256 / 1280`) | Bước nhảy mỗi slot (stride). |
+| `cap_per_slab` | `slots/slab` | `c->capacity` (`63 / 31 / 15 / 3`) | Số slot tối đa trên mỗi trang Slab. |
 | `slab_pages` | `pages` | Số trang trong `c->slabs` | Tổng số trang 4KB cache đang giữ. |
 | `empty_slabs` | `pages` | Số trang có `free_count == capacity` | Số trang Slab hoàn toàn rỗng đang giữ lại trong cache. |
 | `total_capacity` | `slots` | `slab_pages * cap_per_slab` | Tổng số slot của class hiện có. |
@@ -84,30 +95,39 @@ Hàm nội bộ `static int slab_get_class_stats(int idx, struct slab_class_stat
 | `live_obj_bytes` | `bytes` | `live * class_size` | Tổng số byte theo stride của các object đang sống. |
 | `metadata_bytes` | `bytes` | `slab_pages * 32` | Tổng số byte `slab_header` (chỉ tính header 32 B/trang). |
 
-### 5. Hướng Dẫn Chạy Các Chế Độ Kiểm Thử (`slab_test`)
+---
 
-1. **Chế độ mặc định (`SLAB_TEST_CASE=0`, `SLAB_STATS_TEST=0`):**
-   * Chạy tự động self-test `S03a` khi boot (kiểm tra biên `0, 1, 64, 65, 128, 129`, zero-fill, mẫu byte `1` khi free, LIFO reuse, multi-slab, và OOM/retry):
+## 5. Hướng Dẫn Chạy Các Chế Độ Kiểm Thử (`slab_test`)
+
+1. **Chế độ mặc định (`SLAB_TEST_CASE=normal`, `SLAB_STATS_TEST=0`):**
+   - Chạy tự động self-test `S03a` khi boot (kiểm tra biên `0, 1, 64, 65, 128, 129`, zero-fill, mẫu byte `1` khi free, LIFO reuse, multi-slab, và OOM/retry):
+
    ```bash
    make clean && make qemu CPUS=1
    ```
 
 2. **Chế độ kiểm thử 3 ca lỗi bắt buộc dừng máy (`SLAB_TEST_CASE=1/2/3`):**
-   * `SLAB_TEST_CASE=1` (Double free):
+   - `SLAB_TEST_CASE=1` (Double free):
+
    ```bash
-   make clean && make qemu CPUS=1 CC="riscv64-unknown-elf-gcc -DSLAB_TEST_CASE=1"
+   make clean && make qemu CPUS=1 SLAB_TEST_CASE=1
    ```
-   * `SLAB_TEST_CASE=2` (Con trỏ lệch biên slot):
+
+   - `SLAB_TEST_CASE=2` (Con trỏ lệch biên slot):
+
    ```bash
-   make clean && make qemu CPUS=1 CC="riscv64-unknown-elf-gcc -DSLAB_TEST_CASE=2"
+   make clean && make qemu CPUS=1 SLAB_TEST_CASE=2
    ```
-   * `SLAB_TEST_CASE=3` (Trang không phải Slab / sai magic):
+
+   - `SLAB_TEST_CASE=3` (Trang không phải Slab / sai magic):
+
    ```bash
-   make clean && make qemu CPUS=1 CC="riscv64-unknown-elf-gcc -DSLAB_TEST_CASE=3"
+   make clean && make qemu CPUS=1 SLAB_TEST_CASE=3
    ```
 
 3. **Chế độ kiểm thử thống kê `S04a` (`SLAB_STATS_TEST=1`):**
-   * Bật cờ `SLAB_STATS_TEST=1` để đối chiếu và in `expected/actual` tại mốc `init`, các mốc vượt slot trống (`before` -> `live` -> `after_free`) và lượt lặp lại vừa khít `free_slots` sau warm-up (`reuse_live` -> `reuse_free`):
+   - Bật cờ `SLAB_STATS_TEST=1` qua `Makefile` để đối chiếu và in `expected/actual` tại mốc `init`, các mốc vượt slot trống (`before` -> `live` -> `after_free`) và lượt lặp lại vừa khít `free_slots` sau warm-up (`reuse_live` -> `reuse_free`):
+
    ```bash
-   make clean && make qemu CPUS=1 CC="riscv64-unknown-elf-gcc -DSLAB_STATS_TEST=1"
+   make clean && make qemu CPUS=1 SLAB_STATS_TEST=1
    ```

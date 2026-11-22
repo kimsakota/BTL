@@ -7,8 +7,8 @@
 
 #define SLAB_MAGIC     0x534C4142U // Chu ky "SLAB" nhan dien trang Slab
 #define SLAB_ALIGN     8U          // Can le toi thieu 8 bytes
-#define SLAB_NCLASSES  2           // S03a/S04a: 2 classes (64 B va 128 B)
-#define SLAB_FREE_BYTE 1           // Mau byte 1 khi free (giong S02)
+#define SLAB_NCLASSES  4 // W05: 4 classes (64 B, 128 B, 256 B, 1280 B)
+#define SLAB_FREE_BYTE 1 // Mau byte 1 khi free (giong S02)
 
 #ifndef SLAB_TEST_CASE
 #define SLAB_TEST_CASE 0
@@ -22,9 +22,9 @@
 
 extern char end[]; // Dia chi ket thuc vung nho nhan tu kernel.ld
 
-// Bang kich thuoc chuan: class 0 = 64 B, class 1 = 128 B
-static const uint16 slab_class_sizes[SLAB_NCLASSES] = {64U, 128U};
-
+static const uint16 slab_class_sizes[SLAB_NCLASSES] = {64U, 128U, 256U, 1280U};
+static char *slab_lock_names[SLAB_NCLASSES] = {"slab_c64", "slab_c128",
+                                               "slab_c256", "slab_c1280"};
 // Con tro nhung trong 8 B dau cua moi slot dang trong
 struct slab_slot {
   struct slab_slot *next;
@@ -44,7 +44,8 @@ struct slab_header {
 
 // Cau truc quan ly Cache theo tung Size Class
 struct slab_cache {
-  struct spinlock lock;      // Khoa rieng ("slab_c64", "slab_c128")
+  struct spinlock
+    lock; // Khoa rieng ("slab_c64", "slab_c128", "slab_c256", "slab_c1280")
   uint16 obj_size;           // 64 hoac 128
   uint16 capacity;           // 63 hoac 31
   uint16 class_idx;          // 0 hoac 1
@@ -53,10 +54,10 @@ struct slab_cache {
 
 // S04a (#38): Snapshot thong ke theo tung class (doc duoi khoa tung class)
 struct slab_class_stats {
-  uint32 class_size;         // bytes: stride cua class (64 hoac 128)
-  uint32 cap_per_slab;       // slots/slab: 63 (class64) hoac 31 (class128)
-  uint32 slab_pages;         // pages: tong so trang slab cache dang giu
-  uint32 empty_slabs;        // pages: so trang slab rong dang tai su dung
+  uint32 class_size;   // bytes: stride cua class (64 hoac 128)
+  uint32 cap_per_slab; // slots/slab: 63 (c64), 31 (c128), 15 (c256), 3 (c1280)
+  uint32 slab_pages;   // pages: tong so trang slab cache dang giu
+  uint32 empty_slabs;  // pages: so trang slab rong dang tai su dung
   uint32 total_capacity;     // slots: slab_pages * cap_per_slab
   uint32 live;               // objects: so object dang song
   uint32 free_slots;         // slots: so slot dang ranh
@@ -72,8 +73,11 @@ static int slab_oom_sim = 0;
 
 // Chon class nho nhat du chua yeu cau:
 // - size == 0 hoac size > 128 -> tra -1
-// - 1 <= size <= 64           -> tra 0 (class64)
+/// - 1 <= size <= 64           -> tra 0 (class64)
 // - 65 <= size <= 128         -> tra 1 (class128)
+// - 129 <= size <= 256        -> tra 2 (class256)
+// - 257 <= size <= 1280       -> tra 3 (class1280)
+// - size == 0 hoac > 1280     -> tra -1
 static int
 slab_FindClassIndex(uint64 size)
 {
@@ -179,7 +183,7 @@ kmalloc_init(void)
     if (sizeof(struct slab_header) + stride > PGSIZE)
       panic("kmalloc_init: invalid class stride");
 
-    initlock(&slab_caches[i].lock, i == 0 ? "slab_c64" : "slab_c128");
+    initlock(&slab_caches[i].lock, slab_lock_names[i]);
     slab_caches[i].obj_size = (uint16)stride;
     slab_caches[i].capacity =
       (uint16)((PGSIZE - sizeof(struct slab_header)) / stride);
@@ -427,17 +431,23 @@ slab_test(void)
 {
   static void *c64_objs[64];
   static void *c128_objs[32];
+  static void *c256_objs[16];
+  static void *c1280_objs[4];
   static void *fill128[64];
 
-  printk("slab_test: starting verification (class64 & class128)...\n");
+  printk("slab_test: starting verification (64, 128, 256, 1280)...\n");
   if (!slab_initialized)
     kmalloc_init();
 
-  // 1. Kiem tra cau hinh stride & capacity cua 2 class
+  // 1. Kiem tra cau hinh stride & capacity cua 4 class
   if (slab_caches[0].obj_size != 64 || slab_caches[0].capacity != 63)
     panic("slab_test: wrong class64 config");
   if (slab_caches[1].obj_size != 128 || slab_caches[1].capacity != 31)
     panic("slab_test: wrong class128 config");
+  if (slab_caches[2].obj_size != 256 || slab_caches[2].capacity != 15)
+    panic("slab_test: wrong class256 config");
+  if (slab_caches[3].obj_size != 1280 || slab_caches[3].capacity != 3)
+    panic("slab_test: wrong class1280 config");
 
   // Cac ca kiem thu am tinh SLAB_TEST_CASE=1/2/3
 #if SLAB_TEST_CASE == 1
@@ -472,28 +482,43 @@ slab_test(void)
     panic("slab_test: invalid getter args must return -1");
 
 #if SLAB_STATS_TEST
-  slab_check_expected(0, "init", 0, 0, 0, 0, 0);
-  slab_check_expected(1, "init", 0, 0, 0, 0, 0);
+  for (int idx = 0; idx < SLAB_NCLASSES; idx++)
+    slab_check_expected(idx, "init", 0, 0, 0, 0, 0);
 #endif
 
-  // 2. Kiem tra 6 moc bien (0, 1, 64, 65, 128, 129), kmfree(0) & zero-fill
+  // 2. Kiem tra cac moc bien (0, 1, 40, 64, 65, 128, 129, 136, 256, 257, 1112, 1280, 1281), kmfree(0) & zero-fill
   kmfree(0);
   if (kmalloc(0) != 0)
     panic("slab_test: kmalloc(0) must return 0");
-  if (kmalloc(129) != 0)
-    panic("slab_test: kmalloc(129) must return 0");
+  if (kmalloc(1281) != 0)
+    panic("slab_test: kmalloc(1281) must return 0");
 
+  // Giu nguyen 4 moc cu (class64 & class128) + bo sung cac moc moi (file, inode, buf)
   void *b1 = kmalloc(1);
+  void *b40 = kmalloc(40);
   void *b64 = kmalloc(64);
   void *b65 = kmalloc(65);
   void *b128 = kmalloc(128);
-  if (!b1 || !b64 || !b65 || !b128)
-    panic("slab_test: boundary valid alloc failed");
+  void *b129 = kmalloc(129);
+  void *b136 = kmalloc(136);
+  void *b256 = kmalloc(256);
+  void *b257 = kmalloc(257);
+  void *b1112 = kmalloc(1112);
+  void *b1280 = kmalloc(1280);
 
-  if (((uint64)b1 % 8) != 0 || ((uint64)b64 % 8) != 0 ||
-      ((uint64)b65 % 8) != 0 || ((uint64)b128 % 8) != 0)
+  if (!b1 || !b40 || !b64 || !b65 || !b128 || !b129 || !b136 || !b256 ||
+      !b257 || !b1112 || !b1280)
+    panic("slab_test: boundary alloc failed");
+
+  if (((uint64)b1 % 8) != 0 || ((uint64)b40 % 8) != 0 ||
+      ((uint64)b64 % 8) != 0 || ((uint64)b65 % 8) != 0 ||
+      ((uint64)b128 % 8) != 0 || ((uint64)b129 % 8) != 0 ||
+      ((uint64)b136 % 8) != 0 || ((uint64)b256 % 8) != 0 ||
+      ((uint64)b257 % 8) != 0 || ((uint64)b1112 % 8) != 0 ||
+      ((uint64)b1280 % 8) != 0)
     panic("slab_test: alignment < 8B");
 
+  // Kiem tra zero-fill cho ca 4 class
   unsigned char *zb64 = (unsigned char *)b64;
   for (int i = 0; i < 64; i++) {
     if (zb64[i] != 0)
@@ -504,19 +529,55 @@ slab_test(void)
     if (zb128[i] != 0)
       panic("slab_test: class128 alloc not zero-filled");
   }
+  unsigned char *zb256 = (unsigned char *)b256;
+  for (int i = 0; i < 256; i++) {
+    if (zb256[i] != 0)
+      panic("slab_test: class256 alloc not zero-filled");
+  }
+  unsigned char *zb1280 = (unsigned char *)b1280;
+  for (int i = 0; i < 1280; i++) {
+    if (zb1280[i] != 0)
+      panic("slab_test: class1280 alloc not zero-filled");
+  }
 
+  // Kiem tra dinh tuyen class qua PGROUNDDOWN
   struct slab_header *h1 = (struct slab_header *)PGROUNDDOWN((uint64)b1);
+  struct slab_header *h40 = (struct slab_header *)PGROUNDDOWN((uint64)b40);
   struct slab_header *h64 = (struct slab_header *)PGROUNDDOWN((uint64)b64);
   struct slab_header *h65 = (struct slab_header *)PGROUNDDOWN((uint64)b65);
   struct slab_header *h128 = (struct slab_header *)PGROUNDDOWN((uint64)b128);
+  struct slab_header *h129 = (struct slab_header *)PGROUNDDOWN((uint64)b129);
+  struct slab_header *h136 = (struct slab_header *)PGROUNDDOWN((uint64)b136);
+  struct slab_header *h256 = (struct slab_header *)PGROUNDDOWN((uint64)b256);
+  struct slab_header *h257 = (struct slab_header *)PGROUNDDOWN((uint64)b257);
+  struct slab_header *h1112 = (struct slab_header *)PGROUNDDOWN((uint64)b1112);
+  struct slab_header *h1280 = (struct slab_header *)PGROUNDDOWN((uint64)b1280);
 
-  if (h1->obj_size != 64 || h64->obj_size != 64 || h1->class_idx != 0)
+  if (h1->obj_size != 64 || h40->obj_size != 64 || h64->obj_size != 64 ||
+      h1->class_idx != 0 || h40->class_idx != 0 || h64->class_idx != 0)
     panic("slab_test: 1..64 not routed to class64");
-  if (h65->obj_size != 128 || h128->obj_size != 128 || h65->class_idx != 1)
+  if (h65->obj_size != 128 || h128->obj_size != 128 || h65->class_idx != 1 ||
+      h128->class_idx != 1)
     panic("slab_test: 65..128 not routed to class128");
-  printk("slab_test: [1/4] boundary (0,1,64,65,128,129) & routing OK\n");
+  if (h129->obj_size != 256 || h136->obj_size != 256 || h256->obj_size != 256 ||
+      h129->class_idx != 2 || h136->class_idx != 2 || h256->class_idx != 2)
+    panic("slab_test: 129..256 not routed to class256");
+  if (h257->obj_size != 1280 || h1112->obj_size != 1280 ||
+      h1280->obj_size != 1280 || h257->class_idx != 3 ||
+      h1112->class_idx != 3 || h1280->class_idx != 3)
+    panic("slab_test: 257..1280 not routed to class1280");
 
-  // 3. Kiem tra mau byte 1 khi free & LIFO Reuse tren ca 2 class
+  // Giai phong ngay cac moc bien phu de khong bi sot live object
+  kmfree(b40);
+  kmfree(b129);
+  kmfree(b136);
+  kmfree(b257);
+  kmfree(b1112);
+
+  printk(
+    "slab_test: [1/4] boundary (0,1,40,64,65,128,129,136,256,257,1112,1280,1281) & routing OK\n");
+
+  // 3. Kiem tra mau byte 1 khi free & LIFO Reuse tren ca 4 class
   memset(b64, 0x55, 64);
   kmfree(b64);
   for (int i = (int)sizeof(struct slab_slot); i < 64; i++) {
@@ -545,13 +606,43 @@ slab_test(void)
       panic("slab_test: class128 reuse not zero-filled");
   }
 
+  memset(b256, 0x77, 256);
+  kmfree(b256);
+  for (int i = (int)sizeof(struct slab_slot); i < 256; i++) {
+    if (zb256[i] != SLAB_FREE_BYTE)
+      panic("slab_test: class256 free did not fill byte 1");
+  }
+  void *b256_re = kmalloc(256);
+  if (b256_re != b256)
+    panic("slab_test: class256 LIFO reuse failed");
+  for (int i = 0; i < 256; i++) {
+    if (zb256[i] != 0)
+      panic("slab_test: class256 reuse not zero-filled");
+  }
+
+  memset(b1280, 0x88, 1280);
+  kmfree(b1280);
+  for (int i = (int)sizeof(struct slab_slot); i < 1280; i++) {
+    if (zb1280[i] != SLAB_FREE_BYTE)
+      panic("slab_test: class1280 free did not fill byte 1");
+  }
+  void *b1280_re = kmalloc(1280);
+  if (b1280_re != b1280)
+    panic("slab_test: class1280 LIFO reuse failed");
+  for (int i = 0; i < 1280; i++) {
+    if (zb1280[i] != 0)
+      panic("slab_test: class1280 reuse not zero-filled");
+  }
+
   kmfree(b1);
   kmfree(b64_re);
   kmfree(b65);
   kmfree(b128_re);
-  printk("slab_test: [2/4] LIFO reuse for class64 & class128 OK\n");
+  kmfree(b256_re);
+  kmfree(b1280_re);
+  printk("slab_test: [2/4] LIFO reuse for 4 classes OK\n");
 
-  // 4. Kiem tra Multi-Slab & Pattern Isolation (Khong de du lieu giua 2 class)
+  // 4. Kiem tra Multi-Slab & Pattern Isolation (Khong de du lieu giua 4 class)
   for (int i = 0; i < 64; i++) {
     c64_objs[i] = kmalloc((i % 2 == 0) ? 1 : 64);
     if (c64_objs[i] == 0)
@@ -566,10 +657,28 @@ slab_test(void)
     memset(c128_objs[i], (char)(0xA0 + i), 128);
   }
 
+  for (int i = 0; i < 16; i++) {
+    c256_objs[i] = kmalloc((i % 2 == 0) ? 129 : 256);
+    if (c256_objs[i] == 0)
+      panic("slab_test: class256 multi-slab alloc failed");
+    memset(c256_objs[i], (char)(0x40 + i), 256);
+  }
+
+  for (int i = 0; i < 4; i++) {
+    c1280_objs[i] = kmalloc((i % 2 == 0) ? 1112 : 1280);
+    if (c1280_objs[i] == 0)
+      panic("slab_test: class1280 multi-slab alloc failed");
+    memset(c1280_objs[i], (char)(0x60 + i), 1280);
+  }
+
   if (PGROUNDDOWN((uint64)c64_objs[0]) == PGROUNDDOWN((uint64)c64_objs[63]))
     panic("slab_test: class64 did not allocate second slab page");
   if (PGROUNDDOWN((uint64)c128_objs[0]) == PGROUNDDOWN((uint64)c128_objs[31]))
     panic("slab_test: class128 did not allocate second slab page");
+  if (PGROUNDDOWN((uint64)c256_objs[0]) == PGROUNDDOWN((uint64)c256_objs[15]))
+    panic("slab_test: class256 did not allocate second slab page");
+  if (PGROUNDDOWN((uint64)c1280_objs[0]) == PGROUNDDOWN((uint64)c1280_objs[3]))
+    panic("slab_test: class1280 did not allocate second slab page");
 
   for (int i = 0; i < 64; i++) {
     unsigned char *p = (unsigned char *)c64_objs[i];
@@ -589,11 +698,34 @@ slab_test(void)
     }
   }
 
+  for (int i = 0; i < 16; i++) {
+    unsigned char *p = (unsigned char *)c256_objs[i];
+    unsigned char exp = (unsigned char)(0x40 + i);
+    for (int b = 0; b < 256; b++) {
+      if (p[b] != exp)
+        panic("slab_test: class256 pattern corrupted");
+    }
+  }
+
+  for (int i = 0; i < 4; i++) {
+    unsigned char *p = (unsigned char *)c1280_objs[i];
+    unsigned char exp = (unsigned char)(0x60 + i);
+    for (int b = 0; b < 1280; b++) {
+      if (p[b] != exp)
+        panic("slab_test: class1280 pattern corrupted");
+    }
+  }
+
   for (int i = 0; i < 64; i++)
     kmfree(c64_objs[i]);
   for (int i = 0; i < 32; i++)
     kmfree(c128_objs[i]);
-  printk("slab_test: [3/4] multi-slab expansion & pattern isolation OK\n");
+  for (int i = 0; i < 16; i++)
+    kmfree(c256_objs[i]);
+  for (int i = 0; i < 4; i++)
+    kmfree(c1280_objs[i]);
+  printk(
+    "slab_test: [3/4] multi-slab expansion & pattern isolation (4 classes) OK\n");
 
   // 5. Kiem tra OOM & Retry (giu nguyen live64, live128, fill128 va retry128)
   void *live64 = kmalloc(64);
@@ -654,13 +786,51 @@ slab_test(void)
     kmfree(fill128[i]);
   kmfree(live128);
   kmfree(live64);
-  printk("slab_test: [4/4] OOM (filled %d slots of class128) & retry OK\n",
-         fill128_cnt + 1);
+  // Kiem tra them OOM & retry cho class1280 (phuc vu struct buf = 1112 B)
+  static void *fill1280[32];
+  int fill1280_cnt = 0;
+  while (slab_ClassFreeSlots(3) > 0) {
+    if (fill1280_cnt >= 32)
+      panic("slab_test: fill1280 overflow");
+    fill1280[fill1280_cnt] = kmalloc(1280);
+    if (fill1280[fill1280_cnt] == 0)
+      panic("slab_test: failed to fill existing class1280 slots");
+    memset(fill1280[fill1280_cnt], (char)(0x20 + fill1280_cnt), 1280);
+    fill1280_cnt++;
+  }
+  if (slab_ClassFreeSlots(3) != 0)
+    panic("slab_test: class1280 still has free slots before OOM");
+
+  slab_oom_sim = 1;
+  if (kmalloc(1280) != 0 || kmalloc(1112) != 0)
+    panic("slab_test: expected 0 on OOM when class1280 requests new page");
+  slab_oom_sim = 0;
+
+  void *retry1280 = kmalloc(1280);
+  if (retry1280 == 0)
+    panic("slab_test: retry alloc new page after OOM (class1280) failed");
+  memset(retry1280, 0x6D, 1280);
+
+  for (int i = 0; i < fill1280_cnt; i++) {
+    unsigned char *p = (unsigned char *)fill1280[i];
+    unsigned char exp = (unsigned char)(0x20 + i);
+    for (int b = 0; b < 1280; b++) {
+      if (p[b] != exp)
+        panic("slab_test: fill1280 slot corrupted across OOM");
+    }
+  }
+
+  kmfree(retry1280);
+  for (int i = 0; i < fill1280_cnt; i++)
+    kmfree(fill1280[i]);
+
+  printk("slab_test: [4/4] OOM (c128=%d, c1280=%d) & retry OK\n",
+         fill128_cnt + 1, fill1280_cnt);
 
 #if SLAB_STATS_TEST
   // S04a (#38): Kiem tra thong ke khi bat co SLAB_STATS_TEST=1
   slab_run_stats_workload();
 #endif
 
-  printk("slab_test: ALL PASSED (class64 cap=63, class128 cap=31)\n");
+  printk("slab_test: ALL PASSED (c64=63, c128=31, c256=15, c1280=3)\n");
 }

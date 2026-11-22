@@ -69,6 +69,10 @@ SLAB_TEST_CASE ?= normal
 ifneq ($(SLAB_TEST_CASE),normal)
 CFLAGS += -DSLAB_TEST_CASE=$(SLAB_TEST_CASE)
 endif
+SLAB_STATS_TEST ?= 0
+ifneq ($(SLAB_STATS_TEST),0)
+CFLAGS += -DSLAB_STATS_TEST=$(SLAB_STATS_TEST)
+endif
 CFLAGS += $(DETFLAGS)
 CFLAGS += -march=rv64gc
 CFLAGS += -std=gnu99
