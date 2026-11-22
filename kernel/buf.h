@@ -4,7 +4,7 @@ struct buf {
   uint dev;
   uint blockno;
   struct sleeplock lock;
-  uint refcnt;
+  uint refcnt;      // biến đếm số lượng tham chiếu đến buffer
   struct buf *prev; // LRU cache list
   struct buf *next;
   uchar data[BSIZE];

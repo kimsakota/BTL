@@ -18,6 +18,7 @@ initsleeplock(struct sleeplock *lk, char *name)
   lk->pid = 0;
 }
 
+// Hàm này được sử dụng để lấy một khóa ngủ (sleep lock) và đảm bảo rằng tiến trình hiện tại có quyền truy cập vào tài nguyên được bảo vệ bởi khóa đó. Nếu khóa đã bị khóa bởi một tiến trình khác, tiến trình hiện tại sẽ ngủ cho đến khi khóa được giải phóng.
 void
 acquiresleep(struct sleeplock *lk)
 {

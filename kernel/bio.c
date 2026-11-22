@@ -24,18 +24,25 @@
 
 struct {
   struct spinlock lock;
-  struct buf buf[NBUF];
-
-  // Linked list of all buffers, through prev/next.
-  // Sorted by how recently the buffer was used.
-  // head.next is most recent, head.prev is least.
+  int nbuf;
   struct buf head;
 } bcache;
 
+// Hàm khởi tạo bộ đệm (buffer cache) và kiểm tra tính toàn vẹn của nó.
 void
 binit(void)
 {
-  struct buf *b;
+  initlock(&bcache.lock, "bcache");
+
+  bcache.nbuf = 0;
+  bcache.head.prev = &bcache.head;
+  bcache.head.next = &bcache.head;
+
+#ifdef BUFTEST
+  printk("I04|phase=init|cached=%d\n", bcache.nbuf);
+#endif // BUFTEST
+
+  /*  struct buf *b; // Con trỏ đến một buffer trong bộ đệm.
 
   initlock(&bcache.lock, "bcache");
 
@@ -48,7 +55,35 @@ binit(void)
     initsleeplock(&b->lock, "buffer");
     bcache.head.next->prev = b;
     bcache.head.next = b;
+  }*/
+
+  /*#ifdef BUFTEST // Chỉ biên dịch khi BUFTEST đã được bật
+  int seen = 0;
+
+  for (b = bcache.head.next; b != &bcache.head; b = b->next) {
+    // Kiểm tra liên kết kế tiếp và liên kết trước của buffer có bị null hay không.
+    if (b == 0 || b->next == 0 || b->prev == 0)
+      panic("buftest: null link");
+
+    // Kiểm tra hai chiều của danh sách có khớp hay không
+    if (b->next->prev != b || b->prev->next != b)
+      panic("buftest: broken links");
+
+    // Kiểm tra trạng thái ban đầu của buffer có đúng hay không
+    if (b->refcnt != 0 || b->valid != 0 || b->disk != 0)
+      panic("buftest: unexpected initial state");
+
+    seen++;
+    if (seen > NBUF)
+      panic("buftest: cycle");
   }
+
+  if (seen != NBUF)
+    panic("buftest: wrong count");
+
+  printk("I04|phase=init|buf_B=%lu|align_B=%lu|count=%d|result=PASS\n",
+         (uint64)sizeof(struct buf), (uint64) _Alignof(struct buf), seen);
+#endif*/
 }
 
 // Look through buffer cache for block on device dev.
@@ -73,6 +108,32 @@ bget(uint dev, uint blockno)
 
   // Not cached.
   // Recycle the least recently used (LRU) unused buffer.
+  if (bcache.nbuf < NBUF) {
+    b = kmalloc(sizeof(*b));
+    if (b != 0) {
+      initsleeplock(&b->lock, "buffer");
+      b->dev = dev;
+      b->blockno = blockno;
+      b->valid = 0;
+      b->disk = 0;
+      b->refcnt = 1;
+
+      // head.next là buffer đầu tiên, head chỉ là buffer giả lập để quản lý danh sách liên kết
+      b->next = bcache.head.next;
+      b->prev = &bcache.head;
+      bcache.head.next->prev = b;
+      bcache.head.next = b;
+      bcache.nbuf++;
+
+      release(&bcache.lock);
+
+      // Hàm này sẽ khóa buffer mới được cấp phát để đảm bảo rằng tiến trình hiện tại có quyền truy cập vào dữ liệu của buffer đó.
+      acquiresleep(&b->lock);
+      return b;
+    }
+  }
+
+  // If all buffers are in use, wait for one to become free
   for (b = bcache.head.prev; b != &bcache.head; b = b->prev) {
     if (b->refcnt == 0) {
       b->dev = dev;
