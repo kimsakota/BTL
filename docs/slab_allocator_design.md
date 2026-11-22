@@ -14,21 +14,28 @@ Bộ cấp phát đối tượng Slab (`kmalloc` / `kmfree`) hoạt động như
 
 ---
 
-## 2. Hợp Đồng API & Bảng Phân Lớp Kích Thước (`64 B` và `128 B`)
+## 2. Hợp Đồng API & Bảng Phân Lớp Kích Thước (`{64, 128, 256, 1280} B`)
 
 ### 2.1. Giao diện hàm (API Contract)
-- `void kmalloc_init(void);` — Khởi tạo cấu hình và `spinlock` riêng cho từng size class (`slab_c64`, `slab_c128`).
+- `void kmalloc_init(void);` — Khởi tạo cấu hình và `spinlock` riêng cho từng size class (`slab_c64`, `slab_c128`, `slab_c256`, `slab_c1280`).
 - `void *kmalloc(uint64 size);` — Cấp phát 1 đối tượng thuộc class nhỏ nhất đủ chứa `size`.
 - `void kmfree(void *ptr);` — Giải phóng đối tượng về lại trang Slab sở hữu (`kmfree(0)` là `no-op`).
 
-### 2.2. Bảng phân lớp kích thước (`S03a`)
+### 2.2. Kết quả đo client structs & Bảng phân lớp kích thước (`W05` — `#45`)
+
+Đo bằng toolchain RISC-V của dự án trên revision `7715b36` (`kernel/kernel`):
+- `struct file`: `sizeof = 40 B`, `alignment = 8 B` -> `class64`.
+- `struct inode`: `sizeof = 136 B`, `alignment = 8 B` -> `class256`.
+- `struct buf`: `sizeof = 1112 B`, `alignment = 8 B` -> `class1280`.
 
 | Kích thước yêu cầu (`size`) | Class được chọn | `class_idx` | `stride` (`obj_size`) | Công thức `capacity` | `capacity` thực tế | Phần dư cuối trang (`tail_padding`) | Hành vi trả về |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
 | `size == 0` | Không hợp lệ | — | — | — | — | — | Trả về `0` (`NULL`) |
-| **`1 .. 64 B`** | **`class64`** | `0` | `64 B` | `(4096 - 32) / 64` | **`63` slots** | `32 B` | Con trỏ slot `64 B` (zero-filled) |
-| **`65 .. 128 B`** | **`class128`** | `1` | `128 B` | `(4096 - 32) / 128` | **`31` slots** | `96 B` | Con trỏ slot `128 B` (zero-filled) |
-| `size > 128 B` (`129..`) | Vượt ngưỡng | — | — | — | — | — | Trả về `0` (`NULL`) |
+| **`1 .. 64 B`** | **`class64`** | `0` | `64 B` | `(4096 - 32) / 64` | **`63` slots** | `32 B` | Con trỏ slot `64 B` (zero-filled, align `8 B`) |
+| **`65 .. 128 B`** | **`class128`** | `1` | `128 B` | `(4096 - 32) / 128` | **`31` slots** | `96 B` | Con trỏ slot `128 B` (zero-filled, align `8 B`) |
+| **`129 .. 256 B`** | **`class256`** | `2` | `256 B` | `(4096 - 32) / 256` | **`15` slots** | `224 B` | Con trỏ slot `256 B` (zero-filled, align `8 B`) |
+| **`257 .. 1280 B`** | **`class1280`** | `3` | `1280 B` | `(4096 - 32) / 1280` | **`3` slots** | `224 B` | Con trỏ slot `1280 B` (zero-filled, align `8 B`) |
+| `size > 1280 B` (`1281..`) | Vượt ngưỡng | — | — | — | — | — | Trả về `0` (`NULL`) |
 
 ---
 
@@ -72,12 +79,12 @@ struct slab_header {
 
 ## 4. Thống Kê Theo Từng Class (`S04a` — `#38`)
 
-Hàm nội bộ `static int slab_get_class_stats(int idx, struct slab_class_stats *out)` chỉ hợp lệ sau khi `kmalloc_init()` đã chạy (trả về `0` khi thành công, `-1` nếu chưa khởi tạo, `idx` ngoài miền `0..1`, hoặc `out == 0`). Dữ liệu được tính trực tiếp từ danh sách `c->slabs` dưới khóa `c->lock` của từng class và nhả khóa trước khi in:
+Hàm nội bộ `static int slab_get_class_stats(int idx, struct slab_class_stats *out)` chỉ hợp lệ sau khi `kmalloc_init()` đã chạy (trả về `0` khi thành công, `-1` nếu chưa khởi tạo, `idx` ngoài miền `0..3`, hoặc `out == 0`). Dữ liệu được tính trực tiếp từ danh sách `c->slabs` dưới khóa `c->lock` của từng class và nhả khóa trước khi in:
 
 | Trường trong `slab_class_stats` | Đơn vị | Công thức tính | Ý nghĩa |
 | :--- | :--- | :--- | :--- |
-| `class_size` | `bytes` | `c->obj_size` (`64` hoặc `128`) | Bước nhảy mỗi slot (stride). |
-| `cap_per_slab` | `slots/slab` | `c->capacity` (`63` hoặc `31`) | Số slot tối đa trên mỗi trang Slab. |
+| `class_size` | `bytes` | `c->obj_size` (`64 / 128 / 256 / 1280`) | Bước nhảy mỗi slot (stride). |
+| `cap_per_slab` | `slots/slab` | `c->capacity` (`63 / 31 / 15 / 3`) | Số slot tối đa trên mỗi trang Slab. |
 | `slab_pages` | `pages` | Số trang trong `c->slabs` | Tổng số trang 4KB cache đang giữ. |
 | `empty_slabs` | `pages` | Số trang có `free_count == capacity` | Số trang Slab hoàn toàn rỗng đang giữ lại trong cache. |
 | `total_capacity` | `slots` | `slab_pages * cap_per_slab` | Tổng số slot của class hiện có. |
