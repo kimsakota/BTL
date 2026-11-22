@@ -1,6 +1,6 @@
 # Thiết kế inode động (I03) — Khánh
 
-Issue: #46 (W05, cha #43). Bản thiết kế đầu ngày 20/11/2026, đọc trên `main` `7715b36`. Chưa có code: inode chưa vào được slab vì blocker ở mục 6.
+Issue: #46 (W05, cha #43). Bản thiết kế đầu ngày 20/11/2026, đọc trên `main` `7715b36`. Cập nhật 22/11/2026 theo review #48: chốt class 256 B cho inode (#45), đo lại trên `93f319b`, cụ thể hóa N03 và N06. Chưa có code: chờ PR class (#52) vào `main`.
 
 ## 1. Hiện trạng trong `kernel/fs.c`
 
@@ -79,28 +79,29 @@ Bước đầu giữ hành vi cũ: `kmalloc` trả 0 thì `panic("iget: out of m
 
 ## 5. Ca kiểm thử
 
-Chạy trong harness kernel sau cờ riêng (dạng `INODETEST`), tạo tiến trình người dùng khi cần, hoặc qua `usertests`. Log theo schema `KT|` của test matrix.
+Chạy trong harness kernel sau cờ riêng (dạng `INODETEST`), tạo tiến trình người dùng khi cần, hoặc qua `usertests`. Log theo schema `KT|` của test matrix. Các ca cần nhìn vào bảng inode (N03, N06) dùng một hàm đếm chỉ có khi bật `INODETEST`: giữ `itable.lock`, trả số inode có khóa `(dev, inum)` cho trước, `ref` của inode đó và `live`.
 
 | ID | Kiểm tra | Cách làm | Expected |
 |---|---|---|---|
 | N01 | Lookup duy nhất | `iget` cùng `(dev, inum)` hai lần | Cùng con trỏ, `ref = 2`; sau hai `iput` thì `live` về mức đầu |
 | N02 | Inode khác nhau | `iget` hai `inum` khác nhau | Hai con trỏ khác nhau, không chồng vùng |
-| N03 | Lookup đồng thời | Nhiều tiến trình trên `CPUS=2` cùng mở/đóng một file nhiều vòng | Không panic; trong lúc chạy chỉ có một inode cho `(dev, inum)` đó; `live` về mức đầu |
+| N03 | Lookup đồng thời | Trên `CPUS=2`, K worker cùng mở một file rồi dừng ở điểm đồng bộ (barrier) khi vẫn giữ file mở. Tại đó: mỗi worker báo con trỏ inode nhận được; hàm đếm giữ `itable.lock` đếm số inode có khóa `(dev, inum)` của file. Sau đó các worker đóng file; lặp nhiều vòng | Mọi worker nhận cùng một con trỏ; đúng 1 inode cho khóa đó; `ref` = K + số tham chiếu khác đang giữ; không panic; đóng hết thì `live` về mức đầu |
 | N04 | Refcount qua fork | Tiến trình con dùng `cwd` qua `idup`, rồi thoát | `ref` của `cwd` tăng rồi giảm đúng; `live` về mức đầu |
 | N05 | Tham chiếu cuối của file đã xóa | Tạo file, mở, `unlink`, đóng | `itrunc` + `ifree` chạy đúng một lần; inode bị `kmfree`; `inum` cấp lại được |
-| N06 | Vượt 50 inode cũ | Giữ mở hơn 50 file khác nhau cùng lúc | Không panic; đóng hết thì `live` về mức đầu |
+| N06 | Vượt 50 inode cũ | Mỗi tiến trình chỉ mở được `NOFILE = 16` file (3 fd đầu đã dùng), toàn hệ thống `NFILE = 100` `struct file`. Dùng 5 tiến trình, mỗi tiến trình giữ mở 12 file khác nhau (60 file, 60 inode khác nhau), chờ ở điểm đồng bộ rồi đọc `live` qua hàm đếm | Mọi `open` thành công; `live` tăng ít nhất 60 so với mức đầu, vượt 50 inode cũ; không panic; đóng hết thì `live` về mức đầu. `open` trả -1 do hết descriptor hoặc `struct file` thì ghi riêng, không tính là lỗi inode |
 | N07 | Reuse ổn định | Lặp mở/đóng cùng workload sau warm-up | Số trang của class chứa inode không tăng mãi |
 | N08 | Hết bộ nhớ | Giả lập `kmalloc` trả 0 trong `iget` | Panic có thông điệp đúng (bước đầu) |
 | R01 | Hồi quy | `usertests -q` với `CPUS=2` | Toàn bộ OK |
 
-## 6. Blocker
+## 6. Class cho inode
 
-- `sizeof(struct inode)` = 136 B trên RV64 (đo tại `7715b36`); thêm `next` thành 144 B. Class lớn nhất hiện là 128 B nên `kmalloc` trả 0. Cần class ≥ 144 B (ví dụ 192 B: 21 object/trang, hoặc 256 B: 15 object/trang). Chờ Minh chốt class.
-- I05 cần ít nhất một client đã ghép; hiện chưa có client nào trên `main`.
+- Đo lại trên `main` `93f319b` bằng toolchain RISC-V: `sizeof(struct inode)` = 136 B, căn lề 8 B; thêm `next` thành 144 B.
+- Bảng class đã chốt ở #45 là 64/128/256/1280 B (PR #52 của Minh). Inode vào class 256 B: header 32 B, vùng slot 4064 B, 15 object/trang, dư 224 B cuối trang; mỗi inode để trống 112 B trong slot.
+- Còn chờ: PR #52 vào `main` thì mới viết được code inode động. I05 cần ít nhất một client đã ghép; hiện chưa có client nào trên `main`.
 
 ## 7. Kế hoạch
 
-1. Linh review mục 4 (lookup, thứ tự khóa, đường cuối vòng đời).
-2. Khi Minh có class ≥ 144 B: PR nhỏ đổi `itable` sang danh sách động theo mục 3–4.6, kèm harness N01–N08 và log `CPUS=1`/`CPUS=2`.
-3. Cập nhật `slabtest.c` theo class mới (biên, capacity, OOM/retry, nhiều slab, reuse).
+1. Linh đã đồng ý hướng lookup, reference và giải phóng ở mục 4 (#48).
+2. Sau khi PR #52 (class 256 B) vào `main`: PR nhỏ đổi `itable` sang danh sách động theo mục 3–4.6, kèm harness N01–N08 và log `CPUS=1`/`CPUS=2`.
+3. Cập nhật `slabtest.c` theo bảng 64/128/256/1280 B: `kmalloc(129)` vào class 256, ngưỡng trả 0 thành 1281; thêm biên, capacity, OOM/retry, nhiều slab, reuse cho 4 class.
 4. Chạy R01/I05 trên revision có client đã ghép.
