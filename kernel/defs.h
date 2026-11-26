@@ -206,3 +206,7 @@ void            slab_test(void);
 
 // slabtest.c
 void            slabtest(int);
+
+#ifdef BUFTEST
+int buftest_run(int, uint, uint*, int);
+#endif
