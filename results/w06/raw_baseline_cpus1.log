@@ -10,10 +10,10 @@ slab_test: [4/4] OOM (c128=62, c1280=6) & retry OK
 slab_test: ALL PASSED (c64=63, c128=31, c256=15, c1280=3)
 free pages after slab test: 32728
 AB|meta|backend=baseline|cpus=1|workers_cfg=1|time_unit=riscv_time_ticks|clock_hz=10000000|op_def=1_alloc_free_pair|batch=32|iters=250|warmup=1|runs=3|ram_mb=128
-AB_PAGE|backend=baseline|cpus=1|workers=1|obs_mask=0x1|workload=page_batch_af|run=0|warmup=1|time_ticks=1180284|ops=8000|alloc_ok=8000|alloc_fail=0|local_hit=0|local_miss=0|steal_attempts=0|steal_success=0|free_before=32555|free_after=32555|err=0|status=PASS
-AB_PAGE|backend=baseline|cpus=1|workers=1|obs_mask=0x1|workload=page_batch_af|run=1|warmup=0|time_ticks=1154331|ops=8000|alloc_ok=8000|alloc_fail=0|local_hit=0|local_miss=0|steal_attempts=0|steal_success=0|free_before=32555|free_after=32555|err=0|status=PASS
-AB_PAGE|backend=baseline|cpus=1|workers=1|obs_mask=0x1|workload=page_batch_af|run=2|warmup=0|time_ticks=1081489|ops=8000|alloc_ok=8000|alloc_fail=0|local_hit=0|local_miss=0|steal_attempts=0|steal_success=0|free_before=32555|free_after=32555|err=0|status=PASS
-AB_PAGE|backend=baseline|cpus=1|workers=1|obs_mask=0x1|workload=page_batch_af|run=3|warmup=0|time_ticks=1211709|ops=8000|alloc_ok=8000|alloc_fail=0|local_hit=0|local_miss=0|steal_attempts=0|steal_success=0|free_before=32555|free_after=32555|err=0|status=PASS
+AB_PAGE|backend=baseline|cpus=1|workers=1|obs_mask=0x1|workload=page_batch_af|run=0|warmup=1|time_ticks=1071208|ops=8000|alloc_ok=8000|alloc_fail=0|local_hit=0|local_miss=0|steal_attempts=0|steal_success=0|free_before=32555|free_after=32555|err=0|status=PASS
+AB_PAGE|backend=baseline|cpus=1|workers=1|obs_mask=0x1|workload=page_batch_af|run=1|warmup=0|time_ticks=1233210|ops=8000|alloc_ok=8000|alloc_fail=0|local_hit=0|local_miss=0|steal_attempts=0|steal_success=0|free_before=32555|free_after=32555|err=0|status=PASS
+AB_PAGE|backend=baseline|cpus=1|workers=1|obs_mask=0x1|workload=page_batch_af|run=2|warmup=0|time_ticks=1106400|ops=8000|alloc_ok=8000|alloc_fail=0|local_hit=0|local_miss=0|steal_attempts=0|steal_success=0|free_before=32555|free_after=32555|err=0|status=PASS
+AB_PAGE|backend=baseline|cpus=1|workers=1|obs_mask=0x1|workload=page_batch_af|run=3|warmup=0|time_ticks=1211136|ops=8000|alloc_ok=8000|alloc_fail=0|local_hit=0|local_miss=0|steal_attempts=0|steal_success=0|free_before=32555|free_after=32555|err=0|status=PASS
 slab_dump [w06_clients_active] (per-class lock snapshot, non-atomic across kernel; hdr=32B align=8B; live_B=live*stride != req_payload):
   c64 (cap=63): slabs=2 empty=1 total_cap=126 live=1 free=125 | page_B=8192 cap_B=8064 live_B=64 free_B=8000 meta_B=64 tail_B=64 retained_B=4096
   c128 (cap=31): slabs=3 empty=3 total_cap=93 live=0 free=93 | page_B=12288 cap_B=11904 live_B=0 free_B=11904 meta_B=96 tail_B=288 retained_B=12288
