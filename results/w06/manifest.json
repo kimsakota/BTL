@@ -1,11 +1,12 @@
 {
-  "generated_at": "2026-11-27T16:27:31.291710",
-  "git_sha": "fad974d",
+  "generated_at": "2026-11-27T18:47:21.581886",
+  "git_sha": "d2f817f",
   "git_dirty": true,
   "gcc_version": "riscv64-unknown-elf-gcc (14.2.0+19) 14.2.0",
   "qemu_version": "QEMU emulator version 10.2.1 (Debian 1:10.2.1+ds-1ubuntu3.3)",
   "config": {
     "ram_mb": 128,
+    "qemu_timeout_sec": 0.5,
     "time_unit": "riscv time CSR ticks (10 MHz on QEMU virt)",
     "throughput_formula": "ops / (time_ticks / 10_000_000.0), 1 op = 1 kalloc()+kfree() pair",
     "page_warmup_runs": 1,
@@ -27,8 +28,8 @@
       "kalloc_baseline_flag": 1,
       "command": "make qemu CPUS=1 KALLOC_BASELINE=1 ALLOC_BENCH=1",
       "raw_log": "results/w06/raw_baseline_cpus1.log",
-      "status": "PASS",
-      "reason": "OK",
+      "status": "FAIL",
+      "reason": "TIMEOUT",
       "meta": {
         "_tag": "AB",
         "backend": "baseline",
@@ -50,8 +51,8 @@
       "kalloc_baseline_flag": 1,
       "command": "make qemu CPUS=2 KALLOC_BASELINE=1 ALLOC_BENCH=1",
       "raw_log": "results/w06/raw_baseline_cpus2.log",
-      "status": "PASS",
-      "reason": "OK",
+      "status": "FAIL",
+      "reason": "TIMEOUT",
       "meta": {
         "_tag": "AB",
         "backend": "baseline",
@@ -73,8 +74,8 @@
       "kalloc_baseline_flag": 0,
       "command": "make qemu CPUS=1 KALLOC_BASELINE=0 ALLOC_BENCH=1",
       "raw_log": "results/w06/raw_percpu_cpus1.log",
-      "status": "PASS",
-      "reason": "OK",
+      "status": "FAIL",
+      "reason": "TIMEOUT",
       "meta": {
         "_tag": "AB",
         "backend": "percpu",
@@ -96,8 +97,8 @@
       "kalloc_baseline_flag": 0,
       "command": "make qemu CPUS=2 KALLOC_BASELINE=0 ALLOC_BENCH=1",
       "raw_log": "results/w06/raw_percpu_cpus2.log",
-      "status": "PASS",
-      "reason": "OK",
+      "status": "FAIL",
+      "reason": "TIMEOUT",
       "meta": {
         "_tag": "AB",
         "backend": "percpu",
@@ -116,24 +117,20 @@
   ],
   "pass_summary": {
     "baseline_cpus1": {
-      "valid_runs": 3,
-      "mean_ops_s": 64104.38,
-      "median_ops_s": 66281.79
+      "valid_runs": 0,
+      "note": "NO_VALID_PASS_DATA"
     },
     "baseline_cpus2": {
-      "valid_runs": 3,
-      "mean_ops_s": 105324.91,
-      "median_ops_s": 107656.89
+      "valid_runs": 0,
+      "note": "NO_VALID_PASS_DATA"
     },
     "percpu_cpus1": {
-      "valid_runs": 3,
-      "mean_ops_s": 60612.53,
-      "median_ops_s": 60629.39
+      "valid_runs": 0,
+      "note": "NO_VALID_PASS_DATA"
     },
     "percpu_cpus2": {
-      "valid_runs": 3,
-      "mean_ops_s": 117236.38,
-      "median_ops_s": 114709.48
+      "valid_runs": 0,
+      "note": "NO_VALID_PASS_DATA"
     }
   }
 }

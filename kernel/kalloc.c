@@ -23,7 +23,8 @@ struct page_pool {
   struct run *freelist;
 };
 
-// Counter theo tung CPU (dem tron 64B tranh false sharing, khong dung khoa toan cuc)
+#if defined(ALLOC_BENCH) && ALLOC_BENCH
+// Counter theo tung CPU (chi bat khi chay benchmark, dem tron 64B tranh false sharing)
 struct kalloc_cpu_counters {
   uint64 alloc_ok;
   uint64 alloc_fail;
@@ -38,6 +39,11 @@ static struct kalloc_cpu_counters kstats[NCPU];
 
 #define KSTAT_INC(cpu, field)                                                  \
   __atomic_fetch_add(&kstats[(cpu)].field, 1, __ATOMIC_RELAXED)
+#else
+#define KSTAT_INC(cpu, field)                                                  \
+  do {                                                                         \
+  } while (0)
+#endif
 
 #if defined(KALLOC_BASELINE) && KALLOC_BASELINE
 
@@ -84,7 +90,6 @@ void *
 kalloc(void)
 {
   struct run *r;
-  int id;
 
   acquire(&kmem.lock);
   r = kmem.freelist;
@@ -92,13 +97,15 @@ kalloc(void)
     kmem.freelist = r->next;
   release(&kmem.lock);
 
+#if defined(ALLOC_BENCH) && ALLOC_BENCH
   push_off();
-  id = cpuid();
+  int id = cpuid();
   if (r)
     KSTAT_INC(id, alloc_ok);
   else
     KSTAT_INC(id, alloc_fail);
   pop_off();
+#endif
 
   if (r)
     memset((char *)r, 5, PGSIZE); // fill with junk
@@ -216,10 +223,12 @@ kalloc(void)
     }
   }
 
+#if defined(ALLOC_BENCH) && ALLOC_BENCH
   if (r)
     KSTAT_INC(id, alloc_ok);
   else
     KSTAT_INC(id, alloc_fail);
+#endif
 
   pop_off(); // Bat lai ngat
 
@@ -259,6 +268,7 @@ kalloc_get_stats(struct kalloc_stats *out)
   if (out == 0)
     return;
   memset(out, 0, sizeof(*out));
+#if defined(ALLOC_BENCH) && ALLOC_BENCH
   for (int i = 0; i < NCPU; i++) {
     out->alloc_ok += __atomic_load_n(&kstats[i].alloc_ok, __ATOMIC_RELAXED);
     out->alloc_fail += __atomic_load_n(&kstats[i].alloc_fail, __ATOMIC_RELAXED);
@@ -269,12 +279,14 @@ kalloc_get_stats(struct kalloc_stats *out)
     out->steal_success +=
       __atomic_load_n(&kstats[i].steal_success, __ATOMIC_RELAXED);
   }
+#endif
 }
 
 // Dat lai counter ve 0 truoc moi luot do
 void
 kalloc_reset_stats(void)
 {
+#if defined(ALLOC_BENCH) && ALLOC_BENCH
   for (int i = 0; i < NCPU; i++) {
     __atomic_store_n(&kstats[i].alloc_ok, 0, __ATOMIC_RELAXED);
     __atomic_store_n(&kstats[i].alloc_fail, 0, __ATOMIC_RELAXED);
@@ -283,4 +295,5 @@ kalloc_reset_stats(void)
     __atomic_store_n(&kstats[i].steal_attempts, 0, __ATOMIC_RELAXED);
     __atomic_store_n(&kstats[i].steal_success, 0, __ATOMIC_RELAXED);
   }
+#endif
 }

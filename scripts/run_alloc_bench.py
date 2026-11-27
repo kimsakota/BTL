@@ -5,12 +5,13 @@ import csv
 import datetime
 import json
 import os
-import re
 import signal
 import statistics
 import subprocess
 import sys
 import time
+import argparse
+import select
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -43,11 +44,14 @@ def parse_kv_line(line):
     return data
 
 
-def run_case(backend, cpus, baseline_flag, sha):
-    build_cmd = [
-        "make", "clean",
-    ]
-    subprocess.run(build_cmd, cwd=ROOT, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+def run_case(backend, cpus, baseline_flag, sha, timeout_sec=QEMU_TIMEOUT_SEC):
+    subprocess.run(
+        ["make", "clean"],
+        cwd=ROOT,
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT,
+    )
 
     compile_cmd = [
         "make", "kernel/kernel", "fs.img",
@@ -64,7 +68,7 @@ def run_case(backend, cpus, baseline_flag, sha):
         f"KALLOC_BASELINE={baseline_flag}",
         "ALLOC_BENCH=1",
     ]
-    print(f"[RUN  ] {' '.join(run_cmd)} (timeout={QEMU_TIMEOUT_SEC}s)")
+    print(f"[RUN  ] {' '.join(run_cmd)} (timeout={timeout_sec}s)")
 
     raw_lines = []
     timed_out = False
@@ -77,47 +81,66 @@ def run_case(backend, cpus, baseline_flag, sha):
         stdin=subprocess.DEVNULL,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
-        text=True,
-        errors="replace",
+        bufsize=0,
         start_new_session=True,
     )
 
-    deadline = time.monotonic() + QEMU_TIMEOUT_SEC
+    pgid = proc.pid
+    fd = proc.stdout.fileno()
+    buf = b""
+    deadline = time.monotonic() + timeout_sec
+
     try:
         while True:
-            if time.monotonic() > deadline:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
                 timed_out = True
                 break
-            line = proc.stdout.readline()
-            if not line:
+
+            ready, _, _ = select.select([fd], [], [], min(remaining, 0.2))
+            if not ready:
                 if proc.poll() is not None:
                     break
-                time.sleep(0.05)
                 continue
-            raw_lines.append(line)
-            low = line.lower()
-            if "panic:" in low or "assertion" in low or "scause" in low:
-                saw_panic = True
+
+            chunk = os.read(fd, 4096)
+            if not chunk:
                 break
-            if line.startswith("AB|done|"):
-                saw_done = True
+
+            buf += chunk
+            while b"\n" in buf:
+                raw_line, buf = buf.split(b"\n", 1)
+                line = (raw_line + b"\n").decode("utf-8", errors="replace")
+                raw_lines.append(line)
+                low = line.lower()
+                if "panic:" in low or "assertion" in low or "scause" in low:
+                    saw_panic = True
+                    break
+                if line.startswith("AB|done|"):
+                    saw_done = True
+                    break
+
+            if saw_panic or saw_done:
                 break
+
+        if buf:
+            raw_lines.append(buf.decode("utf-8", errors="replace"))
     finally:
         try:
-            os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
-        except ProcessLookupError:
+            os.killpg(pgid, signal.SIGTERM)
+        except (ProcessLookupError, PermissionError, OSError):
             pass
         try:
-            proc.wait(timeout=5)
+            proc.wait(timeout=3)
         except subprocess.TimeoutExpired:
             try:
-                os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
-            except ProcessLookupError:
+                os.killpg(pgid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError, OSError):
                 pass
             proc.wait()
+        proc.stdout.close()
 
     raw_path = OUT_DIR / f"raw_{backend}_cpus{cpus}.log"
-    raw_path.write_text("".join(raw_lines), encoding="utf-8")
 
     meta = {}
     page_rows = []
@@ -257,6 +280,15 @@ def write_csv(path, fieldnames, rows):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="W06 allocator benchmark runner")
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=QEMU_TIMEOUT_SEC,
+        help="Timeout per QEMU run in seconds (default: %(default)s)",
+    )
+    args = parser.parse_args()
+
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     sha = cmd_out(["git", "rev-parse", "--short", "HEAD"])
     dirty = bool(cmd_out(["git", "status", "--porcelain"]))
@@ -265,11 +297,21 @@ def main():
     all_page_rows = []
     all_obj_rows = []
 
-    for backend, cpus, bflag in MATRIX:
-        cinfo, prows, orows = run_case(backend, cpus, bflag, sha)
-        all_cases.append(cinfo)
-        all_page_rows.extend(prows)
-        all_obj_rows.extend(orows)
+    try:
+        for backend, cpus, bflag in MATRIX:
+            cinfo, prows, orows = run_case(backend, cpus, bflag, sha, timeout_sec=args.timeout)
+            all_cases.append(cinfo)
+            all_page_rows.extend(prows)
+            all_obj_rows.extend(orows)
+    finally:
+        # Don build ALLOC_BENCH=1 de lan chay test-xv6.py ke tiep luon dung build mac dinh
+        subprocess.run(
+            ["make", "clean"],
+            cwd=ROOT,
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
+        )
 
     page_fields = [
         "sha", "backend", "cpus", "workers", "workload", "run", "warmup",
@@ -319,6 +361,7 @@ def main():
         "qemu_version": cmd_out(["qemu-system-riscv64", "--version"]).splitlines()[0],
         "config": {
             "ram_mb": 128,
+            "qemu_timeout_sec": args.timeout,
             "time_unit": "riscv time CSR ticks (10 MHz on QEMU virt)",
             "throughput_formula": "ops / (time_ticks / 10_000_000.0), 1 op = 1 kalloc()+kfree() pair",
             "page_warmup_runs": 1,
