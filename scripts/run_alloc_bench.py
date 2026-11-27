@@ -141,7 +141,7 @@ def run_case(backend, cpus, baseline_flag, sha, timeout_sec=QEMU_TIMEOUT_SEC):
         proc.stdout.close()
 
     raw_path = OUT_DIR / f"raw_{backend}_cpus{cpus}.log"
-
+    raw_path.write_text("".join(raw_lines), encoding="utf-8")
     meta = {}
     page_rows = []
     obj_rows = []
