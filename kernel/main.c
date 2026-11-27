@@ -56,5 +56,10 @@ main()
 #ifdef PAGESTRESS
   pagestress();
 #endif
+
+#if defined(ALLOC_BENCH) && ALLOC_BENCH
+  alloc_bench();
+#endif
+
   scheduler();
 }

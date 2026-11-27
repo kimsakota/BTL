@@ -1,0 +1,57 @@
+qemu-system-riscv64 -machine virt -bios none -kernel kernel/kernel -m 128M -smp 2 -nographic -global virtio-mmio.force-legacy=false -drive file=fs.img,if=none,format=raw,id=x0 -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
+
+xv6 kernel is booting
+
+slab_test: starting verification (64, 128, 256, 1280)...
+slab_test: [1/4] boundary (0,1,40,64,65,128,129,136,256,257,1112,1280,1281) & routing OK
+slab_test: [2/4] LIFO reuse for 4 classes OK
+slab_test: [3/4] multi-slab expansion & pattern isolation (4 classes) OK
+slab_test: [4/4] OOM (c128=62, c1280=6) & retry OK
+slab_test: ALL PASSED (c64=63, c128=31, c256=15, c1280=3)
+free pages after slab test: 32728
+hart 1 starting
+AB|meta|backend=baseline|cpus=2|workers_cfg=2|time_unit=riscv_time_ticks|clock_hz=10000000|op_def=1_alloc_free_pair|batch=32|iters=250|warmup=1|runs=3|ram_mb=128
+AB_PAGE|backend=baseline|cpus=2|workers=2|obs_mask=0x3|workload=page_batch_af|run=0|warmup=1|time_ticks=1344951|ops=16000|alloc_ok=16000|alloc_fail=0|local_hit=0|local_miss=0|steal_attempts=0|steal_success=0|free_before=32555|free_after=32555|err=0|status=PASS
+AB_PAGE|backend=baseline|cpus=2|workers=2|obs_mask=0x3|workload=page_batch_af|run=1|warmup=0|time_ticks=1462932|ops=16000|alloc_ok=16000|alloc_fail=0|local_hit=0|local_miss=0|steal_attempts=0|steal_success=0|free_before=32555|free_after=32555|err=0|status=PASS
+AB_PAGE|backend=baseline|cpus=2|workers=2|obs_mask=0x3|workload=page_batch_af|run=2|warmup=0|time_ticks=1486203|ops=16000|alloc_ok=16000|alloc_fail=0|local_hit=0|local_miss=0|steal_attempts=0|steal_success=0|free_before=32555|free_after=32555|err=0|status=PASS
+AB_PAGE|backend=baseline|cpus=2|workers=2|obs_mask=0x3|workload=page_batch_af|run=3|warmup=0|time_ticks=1617004|ops=16000|alloc_ok=16000|alloc_fail=0|local_hit=0|local_miss=0|steal_attempts=0|steal_success=0|free_before=32555|free_after=32555|err=0|status=PASS
+slab_dump [w06_clients_active] (per-class lock snapshot, non-atomic across kernel; hdr=32B align=8B; live_B=live*stride != req_payload):
+  c64 (cap=63): slabs=2 empty=1 total_cap=126 live=1 free=125 | page_B=8192 cap_B=8064 live_B=64 free_B=8000 meta_B=64 tail_B=64 retained_B=4096
+  c128 (cap=31): slabs=3 empty=3 total_cap=93 live=0 free=93 | page_B=12288 cap_B=11904 live_B=0 free_B=11904 meta_B=96 tail_B=288 retained_B=12288
+  c256 (cap=15): slabs=2 empty=2 total_cap=30 live=0 free=30 | page_B=8192 cap_B=7680 live_B=0 free_B=7680 meta_B=64 tail_B=448 retained_B=8192
+  c1280 (cap=3): slabs=3 empty=3 total_cap=9 live=0 free=9 | page_B=12288 cap_B=11520 live_B=0 free_B=11520 meta_B=96 tail_B=672 retained_B=12288
+slab_dump [w06_obj_baseline] (per-class lock snapshot, non-atomic across kernel; hdr=32B align=8B; live_B=live*stride != req_payload):
+  c64 (cap=63): slabs=2 empty=2 total_cap=126 live=0 free=126 | page_B=8192 cap_B=8064 live_B=0 free_B=8064 meta_B=64 tail_B=64 retained_B=8192
+  c128 (cap=31): slabs=3 empty=3 total_cap=93 live=0 free=93 | page_B=12288 cap_B=11904 live_B=0 free_B=11904 meta_B=96 tail_B=288 retained_B=12288
+  c256 (cap=15): slabs=2 empty=2 total_cap=30 live=0 free=30 | page_B=8192 cap_B=7680 live_B=0 free_B=7680 meta_B=64 tail_B=448 retained_B=8192
+  c1280 (cap=3): slabs=3 empty=3 total_cap=9 live=0 free=9 | page_B=12288 cap_B=11520 live_B=0 free_B=11520 meta_B=96 tail_B=672 retained_B=12288
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=0|warmup=1|class=64|cap=63|req_size=40|test_objs=70|req_payload_B=2800|stride_B=4480|rounding_B=1680|meta_B=64|tail_pad_B=64|base_live=0|peak_live=70|after_live=0|slab_pages=2|empty_slabs=2|retained_B=8192|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=0|warmup=1|class=128|cap=31|req_size=100|test_objs=35|req_payload_B=3500|stride_B=4480|rounding_B=980|meta_B=96|tail_pad_B=288|base_live=0|peak_live=35|after_live=0|slab_pages=3|empty_slabs=3|retained_B=12288|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=0|warmup=1|class=256|cap=15|req_size=136|test_objs=18|req_payload_B=2448|stride_B=4608|rounding_B=2160|meta_B=64|tail_pad_B=448|base_live=0|peak_live=18|after_live=0|slab_pages=2|empty_slabs=2|retained_B=8192|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=0|warmup=1|class=1280|cap=3|req_size=1112|test_objs=5|req_payload_B=5560|stride_B=6400|rounding_B=840|meta_B=96|tail_pad_B=672|base_live=0|peak_live=5|after_live=0|slab_pages=3|empty_slabs=3|retained_B=12288|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=1|warmup=0|class=64|cap=63|req_size=40|test_objs=70|req_payload_B=2800|stride_B=4480|rounding_B=1680|meta_B=64|tail_pad_B=64|base_live=0|peak_live=70|after_live=0|slab_pages=2|empty_slabs=2|retained_B=8192|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=1|warmup=0|class=128|cap=31|req_size=100|test_objs=35|req_payload_B=3500|stride_B=4480|rounding_B=980|meta_B=96|tail_pad_B=288|base_live=0|peak_live=35|after_live=0|slab_pages=3|empty_slabs=3|retained_B=12288|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=1|warmup=0|class=256|cap=15|req_size=136|test_objs=18|req_payload_B=2448|stride_B=4608|rounding_B=2160|meta_B=64|tail_pad_B=448|base_live=0|peak_live=18|after_live=0|slab_pages=2|empty_slabs=2|retained_B=8192|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=1|warmup=0|class=1280|cap=3|req_size=1112|test_objs=5|req_payload_B=5560|stride_B=6400|rounding_B=840|meta_B=96|tail_pad_B=672|base_live=0|peak_live=5|after_live=0|slab_pages=3|empty_slabs=3|retained_B=12288|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=2|warmup=0|class=64|cap=63|req_size=40|test_objs=70|req_payload_B=2800|stride_B=4480|rounding_B=1680|meta_B=64|tail_pad_B=64|base_live=0|peak_live=70|after_live=0|slab_pages=2|empty_slabs=2|retained_B=8192|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=2|warmup=0|class=128|cap=31|req_size=100|test_objs=35|req_payload_B=3500|stride_B=4480|rounding_B=980|meta_B=96|tail_pad_B=288|base_live=0|peak_live=35|after_live=0|slab_pages=3|empty_slabs=3|retained_B=12288|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=2|warmup=0|class=256|cap=15|req_size=136|test_objs=18|req_payload_B=2448|stride_B=4608|rounding_B=2160|meta_B=64|tail_pad_B=448|base_live=0|peak_live=18|after_live=0|slab_pages=2|empty_slabs=2|retained_B=8192|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=2|warmup=0|class=1280|cap=3|req_size=1112|test_objs=5|req_payload_B=5560|stride_B=6400|rounding_B=840|meta_B=96|tail_pad_B=672|base_live=0|peak_live=5|after_live=0|slab_pages=3|empty_slabs=3|retained_B=12288|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=3|warmup=0|class=64|cap=63|req_size=40|test_objs=70|req_payload_B=2800|stride_B=4480|rounding_B=1680|meta_B=64|tail_pad_B=64|base_live=0|peak_live=70|after_live=0|slab_pages=2|empty_slabs=2|retained_B=8192|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=3|warmup=0|class=128|cap=31|req_size=100|test_objs=35|req_payload_B=3500|stride_B=4480|rounding_B=980|meta_B=96|tail_pad_B=288|base_live=0|peak_live=35|after_live=0|slab_pages=3|empty_slabs=3|retained_B=12288|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=3|warmup=0|class=256|cap=15|req_size=136|test_objs=18|req_payload_B=2448|stride_B=4608|rounding_B=2160|meta_B=64|tail_pad_B=448|base_live=0|peak_live=18|after_live=0|slab_pages=2|empty_slabs=2|retained_B=8192|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=3|warmup=0|class=1280|cap=3|req_size=1112|test_objs=5|req_payload_B=5560|stride_B=6400|rounding_B=840|meta_B=96|tail_pad_B=672|base_live=0|peak_live=5|after_live=0|slab_pages=3|empty_slabs=3|retained_B=12288|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=4|warmup=0|class=64|cap=63|req_size=40|test_objs=70|req_payload_B=2800|stride_B=4480|rounding_B=1680|meta_B=64|tail_pad_B=64|base_live=0|peak_live=70|after_live=0|slab_pages=2|empty_slabs=2|retained_B=8192|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=4|warmup=0|class=128|cap=31|req_size=100|test_objs=35|req_payload_B=3500|stride_B=4480|rounding_B=980|meta_B=96|tail_pad_B=288|base_live=0|peak_live=35|after_live=0|slab_pages=3|empty_slabs=3|retained_B=12288|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=4|warmup=0|class=256|cap=15|req_size=136|test_objs=18|req_payload_B=2448|stride_B=4608|rounding_B=2160|meta_B=64|tail_pad_B=448|base_live=0|peak_live=18|after_live=0|slab_pages=2|empty_slabs=2|retained_B=8192|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=4|warmup=0|class=1280|cap=3|req_size=1112|test_objs=5|req_payload_B=5560|stride_B=6400|rounding_B=840|meta_B=96|tail_pad_B=672|base_live=0|peak_live=5|after_live=0|slab_pages=3|empty_slabs=3|retained_B=12288|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=5|warmup=0|class=64|cap=63|req_size=40|test_objs=70|req_payload_B=2800|stride_B=4480|rounding_B=1680|meta_B=64|tail_pad_B=64|base_live=0|peak_live=70|after_live=0|slab_pages=2|empty_slabs=2|retained_B=8192|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=5|warmup=0|class=128|cap=31|req_size=100|test_objs=35|req_payload_B=3500|stride_B=4480|rounding_B=980|meta_B=96|tail_pad_B=288|base_live=0|peak_live=35|after_live=0|slab_pages=3|empty_slabs=3|retained_B=12288|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=5|warmup=0|class=256|cap=15|req_size=136|test_objs=18|req_payload_B=2448|stride_B=4608|rounding_B=2160|meta_B=64|tail_pad_B=448|base_live=0|peak_live=18|after_live=0|slab_pages=2|empty_slabs=2|retained_B=8192|status=PASS
+AB_OBJ|backend=baseline|cpus=2|workload=obj_4class_5r|round=5|warmup=0|class=1280|cap=3|req_size=1112|test_objs=5|req_payload_B=5560|stride_B=6400|rounding_B=840|meta_B=96|tail_pad_B=672|base_live=0|peak_live=5|after_live=0|slab_pages=3|empty_slabs=3|retained_B=12288|status=PASS
+slab_dump [w06_obj_final] (per-class lock snapshot, non-atomic across kernel; hdr=32B align=8B; live_B=live*stride != req_payload):
+  c64 (cap=63): slabs=2 empty=2 total_cap=126 live=0 free=126 | page_B=8192 cap_B=8064 live_B=0 free_B=8064 meta_B=64 tail_B=64 retained_B=8192
+  c128 (cap=31): slabs=3 empty=3 total_cap=93 live=0 free=93 | page_B=12288 cap_B=11904 live_B=0 free_B=11904 meta_B=96 tail_B=288 retained_B=12288
+  c256 (cap=15): slabs=2 empty=2 total_cap=30 live=0 free=30 | page_B=8192 cap_B=7680 live_B=0 free_B=7680 meta_B=64 tail_B=448 retained_B=8192
+  c1280 (cap=3): slabs=3 empty=3 total_cap=9 live=0 free=9 | page_B=12288 cap_B=11520 live_B=0 free_B=11520 meta_B=96 tail_B=672 retained_B=12288
+AB|done|backend=baseline|cpus=2|status=PASS
