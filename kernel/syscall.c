@@ -106,6 +106,9 @@ extern uint64 sys_close(void);
 extern uint64 sys_buftest(void);
 #endif
 extern uint64 sys_sync(void);
+#ifdef INODETEST
+extern uint64 sys_inodestat(void);
+#endif
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -135,6 +138,9 @@ static uint64 (*syscalls[])(void) = {
   [SYS_sync]    = sys_sync,
 #ifdef BUFTEST
   [SYS_buftest] = sys_buftest,
+#endif
+#ifdef INODETEST
+  [SYS_inodestat] = sys_inodestat,
 #endif
   // clang-format on
 };

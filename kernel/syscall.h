@@ -23,3 +23,5 @@
 #define SYS_sync   22
 
 #define SYS_buftest 23
+
+#define SYS_inodestat 24 // INODETEST only
