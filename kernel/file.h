@@ -18,6 +18,7 @@ struct inode {
   uint dev;              // Device number
   uint inum;             // Inode number
   int ref;               // Reference count
+  struct inode *next;    // itable list, protected by itable.lock
   struct sleeplock lock; // protects everything below here
   int valid;             // inode has been read from disk?
 

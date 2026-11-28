@@ -166,10 +166,11 @@ bfree(int dev, uint b)
 // have locked the inodes involved; this lets callers create
 // multi-step atomic operations.
 //
-// The itable.lock spin-lock protects the allocation of itable
-// entries. Since ip->ref indicates whether an entry is free,
-// and ip->dev and ip->inum indicate which i-node an entry
-// holds, one must hold itable.lock while using any of those fields.
+// In-memory inodes are allocated with kmalloc and kept on the
+// itable.head list while ip->ref > 0 (I03, docs/inode_dynamic_design.md).
+// The itable.lock spin-lock protects the list, itable.live and
+// ip->ref, ip->dev, ip->inum and ip->next; one must hold itable.lock
+// while using any of those fields.
 //
 // An ip->lock sleep-lock protects all ip-> fields other than ref,
 // dev, and inum.  One must hold ip->lock in order to
@@ -177,18 +178,16 @@ bfree(int dev, uint b)
 
 struct {
   struct spinlock lock;
-  struct inode inode[NINODE];
+  struct inode *head; // live inodes (ref > 0)
+  int live;           // number of inodes on the list
 } itable;
 
 void
 iinit()
 {
-  int i = 0;
-
   initlock(&itable.lock, "itable");
-  for (i = 0; i < NINODE; i++) {
-    initsleeplock(&itable.inode[i].lock, "inode");
-  }
+  itable.head = 0;
+  itable.live = 0;
 }
 
 static struct inode *iget(uint dev, uint inum);
@@ -245,34 +244,36 @@ iupdate(struct inode *ip)
 // Find the inode with number inum on device dev
 // and return the in-memory copy. Does not lock
 // the inode and does not read it from disk.
+// Lookup and insert happen under one hold of itable.lock,
+// so each (dev, inum) has at most one in-memory inode.
 static struct inode *
 iget(uint dev, uint inum)
 {
-  struct inode *ip, *empty;
+  struct inode *ip;
 
   acquire(&itable.lock);
 
-  // Is the inode already in the table?
-  empty = 0;
-  for (ip = &itable.inode[0]; ip < &itable.inode[NINODE]; ip++) {
-    if (ip->ref > 0 && ip->dev == dev && ip->inum == inum) {
+  // Is the inode already in memory?
+  for (ip = itable.head; ip != 0; ip = ip->next) {
+    if (ip->dev == dev && ip->inum == inum) {
       ip->ref++;
       release(&itable.lock);
       return ip;
     }
-    if (empty == 0 && ip->ref == 0) // Remember empty slot.
-      empty = ip;
   }
 
-  // Recycle an inode entry.
-  if (empty == 0)
-    panic("iget: no inodes");
-
-  ip = empty;
+  ip = kmalloc(sizeof(struct inode));
+  if (ip == 0)
+    panic("iget: out of memory");
+  memset(ip, 0, sizeof(*ip));
+  initsleeplock(&ip->lock, "inode");
   ip->dev = dev;
   ip->inum = inum;
   ip->ref = 1;
   ip->valid = 0;
+  ip->next = itable.head;
+  itable.head = ip;
+  itable.live++;
   release(&itable.lock);
 
   return ip;
@@ -340,8 +341,8 @@ ifree(uint dev, uint inum)
 }
 
 // Drop a reference to an in-memory inode.
-// If that was the last reference, the inode table entry can
-// be recycled.
+// If that was the last reference, the inode is removed from
+// itable and its memory returned with kmfree.
 // If that was the last reference and the inode has no links
 // to it, free the inode (and its content) on disk.
 // All calls to iput() must be inside a transaction in
@@ -349,11 +350,13 @@ ifree(uint dev, uint inum)
 void
 iput(struct inode *ip)
 {
+  struct inode **pp;
+  int drop = 0;
+
   acquire(&itable.lock);
 
   // Last reference of an unlinked inode?  Capture dev/inum before ref--,
-  // since once ref hits 0, ip may be recycled by a concurrent iget()
-  // for a different inum.
+  // since once ref hits 0, ip is freed and must not be read again.
   int last = (ip->ref == 1 && ip->valid && ip->nlink == 0);
   uint dev = ip->dev, inum = ip->inum;
 
@@ -371,10 +374,22 @@ iput(struct inode *ip)
   }
 
   ip->ref--;
+  if (ip->ref == 0) {
+    for (pp = &itable.head; *pp != ip; pp = &(*pp)->next)
+      if (*pp == 0)
+        panic("iput: inode not in itable");
+    *pp = ip->next;
+    itable.live--;
+    drop = 1;
+  }
   release(&itable.lock);
 
-  if (last)
+  if (drop) {
+    kmfree(ip);
+  }
+  if (last) {
     ifree(dev, inum); // now clear type on disk: inum becomes allocatable
+  }
 }
 
 // Common idiom: unlock, then put.
