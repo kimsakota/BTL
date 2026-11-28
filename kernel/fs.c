@@ -37,6 +37,10 @@ readsb(int dev, struct superblock *sb)
   brelse(bp);
 }
 
+#ifdef INODETEST
+static void inodetest(int dev);
+#endif
+
 // Init fs
 void
 fsinit(int dev)
@@ -46,6 +50,9 @@ fsinit(int dev)
     panic("invalid file system");
   initlog(dev, &sb);
   ireclaim(dev);
+#ifdef INODETEST
+  inodetest(dev);
+#endif
 }
 
 // Zero a block.
@@ -191,6 +198,11 @@ iinit()
 }
 
 static struct inode *iget(uint dev, uint inum);
+#ifdef INODETEST
+static int it_oom;    // N08: make iget see kmalloc fail
+static int it_nfree;  // N05: inodes returned with kmfree
+static int it_nifree; // N05: ifree calls
+#endif
 
 // Allocate an inode on device dev.
 // Mark it as allocated by  giving it type type.
@@ -263,6 +275,12 @@ iget(uint dev, uint inum)
   }
 
   ip = kmalloc(sizeof(struct inode));
+#ifdef INODETEST
+  if (it_oom) {
+    kmfree(ip);
+    ip = 0;
+  }
+#endif
   if (ip == 0)
     panic("iget: out of memory");
   memset(ip, 0, sizeof(*ip));
@@ -386,9 +404,15 @@ iput(struct inode *ip)
 
   if (drop) {
     kmfree(ip);
+#ifdef INODETEST
+    __atomic_fetch_add(&it_nfree, 1, __ATOMIC_RELAXED);
+#endif
   }
   if (last) {
     ifree(dev, inum); // now clear type on disk: inum becomes allocatable
+#ifdef INODETEST
+    __atomic_fetch_add(&it_nifree, 1, __ATOMIC_RELAXED);
+#endif
   }
 }
 
@@ -754,3 +778,185 @@ nameiparent(char *path, char *name)
 {
   return namex(path, 1, name);
 }
+
+#ifdef INODETEST
+// Inode test harness (W06, I03). Built only with INODETEST=1.
+// Log lines start with "KT|" like the other harnesses.
+
+#ifndef IT_REV
+#define IT_REV "unknown"
+#endif
+#ifndef IT_CPUS
+#define IT_CPUS 0
+#endif
+#ifndef INODETEST_OOM
+#define INODETEST_OOM 0
+#endif
+
+#define IT_N      60   // inodes alive at once, more than the old NINODE = 50
+#define IT_BASE   1000 // fake inums above sb.ninodes: never ilock'ed, no disk I/O
+#define IT_CYCLES 5
+
+static int it_pass, it_fail;
+static struct inode *it_ip[IT_N];
+
+static void
+it_report(char *id, char *expected, uint64 want, uint64 actual, int ok)
+{
+  if (ok)
+    it_pass++;
+  else
+    it_fail++;
+  printk("KT|case=%s|expected=%s|want=%lu|actual=%lu|result=%s\n", id, expected,
+         want, actual, ok ? "PASS" : "FAIL");
+}
+
+// Test-only view of itable, under itable.lock.
+// out[0] = fip (or 0), out[1] = inode found for (dev, inum) (or 0),
+// out[2] = number of live inodes with that key, out[3] = its ref,
+// out[4] = itable.live, out[5] = list length (must equal out[4]),
+// out[6] = inodes freed with kmfree so far, out[7] = ifree calls so far.
+void
+inodestat(struct inode *fip, uint dev, uint inum, uint64 *out)
+{
+  struct inode *ip;
+  int i;
+
+  for (i = 0; i < 8; i++)
+    out[i] = 0;
+  acquire(&itable.lock);
+  if (fip) { // caller holds a ref, so fip is alive
+    dev = fip->dev;
+    inum = fip->inum;
+    out[0] = (uint64)fip;
+  }
+  for (ip = itable.head; ip != 0; ip = ip->next) {
+    out[5]++;
+    if (ip->dev == dev && ip->inum == inum) {
+      out[1] = (uint64)ip;
+      out[2]++;
+      out[3] = ip->ref;
+    }
+  }
+  out[4] = itable.live;
+  release(&itable.lock);
+  out[6] = __atomic_load_n(&it_nfree, __ATOMIC_RELAXED);
+  out[7] = __atomic_load_n(&it_nifree, __ATOMIC_RELAXED);
+}
+
+// Get IT_N fake inodes, check they are distinct, return how many were bad.
+static int
+it_get_all(int dev)
+{
+  int i, j, bad = 0;
+
+  for (i = 0; i < IT_N; i++)
+    it_ip[i] = iget(dev, IT_BASE + i);
+  for (i = 0; i < IT_N; i++) {
+    if (it_ip[i] == 0)
+      bad++;
+    for (j = 0; j < i; j++)
+      if (it_ip[i] == it_ip[j])
+        bad++;
+  }
+  return bad;
+}
+
+static void
+it_put_all(void)
+{
+  int i;
+
+  begin_op();
+  for (i = 0; i < IT_N; i++)
+    iput(it_ip[i]);
+  end_op();
+}
+
+static void
+inodetest(int dev)
+{
+  uint64 st[8], live0, ref0;
+  struct inode *a, *b;
+
+  inodestat(0, dev, ROOTINO, st);
+  live0 = st[4];
+  ref0 = st[3];
+  printk("KT|begin|harness=inode|rev=%s|cpus=%d|oom=%d|n=%d|live_before=%lu|"
+         "free_before=%lu\n",
+         IT_REV, IT_CPUS, INODETEST_OOM, IT_N, live0, kfreepage_count());
+  printk("KT|info|sizeof=%lu|align=%lu|class=256|capacity=%lu\n",
+         sizeof(struct inode), (uint64) _Alignof(struct inode),
+         (uint64)((PGSIZE - 32) / 256));
+  it_report("S01-sizeof-class256", "129..256", 256, sizeof(struct inode),
+            sizeof(struct inode) > 128 && sizeof(struct inode) <= 256);
+
+  // N01: same (dev, inum) twice -> same object, ref + 2, one entry.
+  a = iget(dev, ROOTINO);
+  b = iget(dev, ROOTINO);
+  inodestat(0, dev, ROOTINO, st);
+  it_report("N01-same-pointer", "equal", 1, a == b, a == b);
+  it_report("N01-one-entry", "count", 1, st[2], st[2] == 1);
+  it_report("N01-ref", "ref0+2", ref0 + 2, st[3], st[3] == ref0 + 2);
+  begin_op();
+  iput(a);
+  iput(b);
+  end_op();
+  inodestat(0, dev, ROOTINO, st);
+  it_report("N01-live-back", "live0", live0, st[4], st[4] == live0);
+
+  // N02: two inums -> two objects that do not overlap.
+  a = iget(dev, IT_BASE);
+  b = iget(dev, IT_BASE + 1);
+  uint64 gap = a > b ? (uint64)a - (uint64)b : (uint64)b - (uint64)a;
+  it_report("N02-distinct", "gap>=sizeof", sizeof(struct inode), gap,
+            gap >= sizeof(struct inode));
+  begin_op();
+  iput(a);
+  iput(b);
+  end_op();
+
+  // N06k: more than 50 inodes alive at once.
+  int bad = it_get_all(dev);
+  inodestat(0, dev, ROOTINO, st);
+  it_report("N06k-distinct", "bad", 0, bad, bad == 0);
+  it_report("N06k-live", "live0+60", live0 + IT_N, st[4],
+            st[4] == live0 + IT_N && st[5] == st[4]);
+  it_put_all();
+  inodestat(0, dev, ROOTINO, st);
+  it_report("N06k-live-back", "live0", live0, st[4], st[4] == live0);
+
+  // N07: after the warm-up above, get/put cycles keep the page count.
+  uint64 base = kfreepage_count(), mid = 0;
+  int changed = 0, c;
+  for (c = 0; c < IT_CYCLES; c++) {
+    bad += it_get_all(dev);
+    if (c == 0)
+      mid = kfreepage_count();
+    else if (kfreepage_count() != mid)
+      changed++;
+    it_put_all();
+    if (kfreepage_count() != base)
+      changed++;
+  }
+  printk("KT|info|n07_base=%lu|n07_mid=%lu|cycles=%d|bad=%d\n", base, mid,
+         IT_CYCLES, bad);
+  it_report("N07-pages-stable", "changed", 0, changed,
+            changed == 0 && bad == 0);
+
+  inodestat(0, dev, ROOTINO, st);
+  printk("KT|end|harness=inode|pass=%d|fail=%d|live_after=%lu|free_after=%lu|"
+         "summary=%s\n",
+         it_pass, it_fail, st[4], kfreepage_count(),
+         it_fail ? "HAS_FAIL" : "ALL_PASS");
+
+  if (INODETEST_OOM) {
+    // N08: expected result is panic("iget: out of memory").
+    printk("KT|info|n08=inject_oom|expect=panic: iget: out of memory\n");
+    it_oom = 1;
+    iget(dev, IT_BASE + IT_N);
+    printk("KT|case=N08-oom-panic|result=FAIL|note=no_panic\n");
+    it_oom = 0;
+  }
+}
+#endif

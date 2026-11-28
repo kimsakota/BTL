@@ -104,6 +104,12 @@ CFLAGS += -DSLABTEST -DSLABTEST_INJECT=$(SLABTEST_INJECT)
 CFLAGS += -DST_CPUS=$(or $(CPUS),3) -DST_REV=\"$(shell git describe --always --dirty 2>/dev/null)\"
 endif
 
+ifdef INODETEST
+INODETEST_OOM ?= 0
+CFLAGS += -DINODETEST -DINODETEST_OOM=$(INODETEST_OOM)
+CFLAGS += -DIT_CPUS=$(or $(CPUS),3) -DIT_REV=\"$(shell git describe --always --dirty 2>/dev/null)\"
+endif
+
 ifeq ($(BUFTEST),1)
 CFLAGS += -DBUFTEST
 endif
