@@ -64,13 +64,34 @@ void            inodestat(struct inode*, uint, uint, uint64*);
 #endif
 
 // kalloc.c
-void*           kalloc(void); // Allocates one 4096-byte page of physical memory.   
+// Don vi counter trang (W06):
+//   alloc_ok, alloc_fail : so lan goi kalloc() thanh cong / that bai (calls)
+//   local_hit, local_miss: so lan lay duoc / khong lay duoc ngay tren freelist CPU hien tai (calls)
+//   steal_attempts       : so luot khoa va thu muon tu 1 CPU donor khac (attempts)
+//   steal_success        : so lan muon thanh cong = so trang muon duoc tu donor (pages/successes)
+// Ghi chu: o backend baseline (single lock), khong co freelist cuc bo nen
+//   local_hit = local_miss = steal_attempts = steal_success = 0.
+struct kalloc_stats {
+  uint64 alloc_ok;
+  uint64 alloc_fail;
+  uint64 local_hit;
+  uint64 local_miss;
+  uint64 steal_attempts;
+  uint64 steal_success;
+};
+
+void*           kalloc(void); // Allocates one 4096-byte page of physical memory.
 void            kfree(void *);
 void            kinit(void);
 uint64          kfreepage_count(void); // Returns the number of free pages in the physical memory.
+void            kalloc_get_stats(struct kalloc_stats *out);
+void            kalloc_reset_stats(void);
 
 // kalloctest.c
 void            kalloctest(int);
+
+// alloc_bench.c
+void            alloc_bench(void);
 
 // pagestress.c
 #ifdef PAGESTRESS
@@ -206,6 +227,29 @@ void            kmalloc_init(void);
 void*           kmalloc(uint64 size);
 void            kmfree(void *ptr);
 void            slab_test(void);
+struct slab_class_stats {
+  uint32 class_size;         // bytes: stride cua class (64, 128, 256, 1280)
+  uint32 cap_per_slab;       // slots/slab: 63, 31, 15, 3
+  uint32 slab_pages;         // pages: tong so trang slab cache dang giu
+  uint32 empty_slabs;        // pages: so trang slab rong dang giu lai (retained)
+  uint32 total_capacity;     // slots: slab_pages * cap_per_slab
+  uint32 live;               // objects: so object dang song
+  uint32 free_slots;         // slots: so slot dang ranh
+  uint32 page_bytes;         // bytes: slab_pages * PGSIZE (4096 B)
+  uint32 obj_capacity_bytes; // bytes: total_capacity * class_size
+  uint32 live_obj_bytes;     // bytes: live * class_size (theo stride, chua phai payload thuc)
+  uint32 free_slot_bytes;    // bytes: free_slots * class_size
+  uint32 metadata_bytes;     // bytes: slab_pages * sizeof(slab_header) (32 B)
+  uint32 tail_padding_bytes; // bytes: slab_pages * (PGSIZE - 32 - cap_per_slab * class_size)
+  uint32 retained_bytes;     // bytes: empty_slabs * PGSIZE (khong goi la leak)
+};
+
+int             slab_get_class_stats(int idx, struct slab_class_stats *out);
+void            slab_dump_stats(const char *tag);
 
 // slabtest.c
 void            slabtest(int);
+
+#ifdef BUFTEST
+int buftest_run(int, uint, uint*, int);
+#endif

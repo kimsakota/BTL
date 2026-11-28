@@ -73,6 +73,15 @@ SLAB_STATS_TEST ?= 0
 ifneq ($(SLAB_STATS_TEST),0)
 CFLAGS += -DSLAB_STATS_TEST=$(SLAB_STATS_TEST)
 endif
+KALLOC_BASELINE ?= 0
+ifneq ($(KALLOC_BASELINE),0)
+CFLAGS += -DKALLOC_BASELINE=$(KALLOC_BASELINE)
+endif
+ALLOC_BENCH ?= 0
+ifneq ($(ALLOC_BENCH),0)
+OBJS += $K/alloc_bench.o
+CFLAGS += -DALLOC_BENCH=$(ALLOC_BENCH) -DBENCH_CPUS=$(CPUS)
+endif
 FILE_TEST ?= 0
 ifneq ($(FILE_TEST),0)
 CFLAGS += -DFILE_TEST=$(FILE_TEST)
@@ -193,6 +202,12 @@ UPROGS=\
 	$U/_forphan\
 	$U/_dorphan\
 	$U/_sync\
+
+ifeq ($(BUFTEST),1)
+UPROGS += $U/_buftest $U/_bufdata
+$U/_bufdata: $K/buftest.h
+	python3 -c 'import sys; n = int(sys.argv[1]); sys.stdout.buffer.write(b"".join(bytes([i + 1]) * 1024 for i in range(n)))' $(shell awk '/^#define BUFTEST_BLOCKS /{print $$3}' $K/buftest.h) > $@
+endif
 
 ifdef INODETEST
 UPROGS += $U/_inodetest

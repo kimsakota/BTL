@@ -1,0 +1,140 @@
+{
+  "generated_at": "2026-11-27T21:38:53.850564",
+  "git_sha": "5160852",
+  "git_dirty": false,
+  "gcc_version": "riscv64-unknown-elf-gcc (14.2.0+19) 14.2.0",
+  "qemu_version": "QEMU emulator version 10.2.1 (Debian 1:10.2.1+ds-1ubuntu3.3)",
+  "config": {
+    "ram_mb": 128,
+    "qemu_timeout_sec": 90,
+    "time_unit": "riscv time CSR ticks (10 MHz on QEMU virt)",
+    "throughput_formula": "ops / (time_ticks / 10_000_000.0), 1 op = 1 kalloc()+kfree() pair",
+    "page_warmup_runs": 1,
+    "page_measured_runs": 3,
+    "obj_warmup_rounds": 1,
+    "obj_measured_rounds": 5,
+    "baseline_method": "Same commit/source/slab/client/toolchain, switched via KALLOC_BASELINE=1",
+    "counter_units": {
+      "alloc_ok/alloc_fail/local_hit/local_miss": "kalloc() calls",
+      "steal_attempts": "donor pool lock+try attempts",
+      "steal_success": "successful 1-page steals (pages == successes)",
+      "baseline_note": "single global lock has no local freelist -> local_hit/miss/steal = 0"
+    }
+  },
+  "cases": [
+    {
+      "backend": "baseline",
+      "cpus": 1,
+      "kalloc_baseline_flag": 1,
+      "command": "make qemu CPUS=1 KALLOC_BASELINE=1 ALLOC_BENCH=1",
+      "raw_log": "results/w06/raw_baseline_cpus1.log",
+      "status": "PASS",
+      "reason": "OK",
+      "meta": {
+        "_tag": "AB",
+        "backend": "baseline",
+        "cpus": "1",
+        "workers_cfg": "1",
+        "time_unit": "riscv_time_ticks",
+        "clock_hz": "10000000",
+        "op_def": "1_alloc_free_pair",
+        "batch": "32",
+        "iters": "250",
+        "warmup": "1",
+        "runs": "3",
+        "ram_mb": "128"
+      }
+    },
+    {
+      "backend": "baseline",
+      "cpus": 2,
+      "kalloc_baseline_flag": 1,
+      "command": "make qemu CPUS=2 KALLOC_BASELINE=1 ALLOC_BENCH=1",
+      "raw_log": "results/w06/raw_baseline_cpus2.log",
+      "status": "PASS",
+      "reason": "OK",
+      "meta": {
+        "_tag": "AB",
+        "backend": "baseline",
+        "cpus": "2",
+        "workers_cfg": "2",
+        "time_unit": "riscv_time_ticks",
+        "clock_hz": "10000000",
+        "op_def": "1_alloc_free_pair",
+        "batch": "32",
+        "iters": "250",
+        "warmup": "1",
+        "runs": "3",
+        "ram_mb": "128"
+      }
+    },
+    {
+      "backend": "percpu",
+      "cpus": 1,
+      "kalloc_baseline_flag": 0,
+      "command": "make qemu CPUS=1 KALLOC_BASELINE=0 ALLOC_BENCH=1",
+      "raw_log": "results/w06/raw_percpu_cpus1.log",
+      "status": "PASS",
+      "reason": "OK",
+      "meta": {
+        "_tag": "AB",
+        "backend": "percpu",
+        "cpus": "1",
+        "workers_cfg": "1",
+        "time_unit": "riscv_time_ticks",
+        "clock_hz": "10000000",
+        "op_def": "1_alloc_free_pair",
+        "batch": "32",
+        "iters": "250",
+        "warmup": "1",
+        "runs": "3",
+        "ram_mb": "128"
+      }
+    },
+    {
+      "backend": "percpu",
+      "cpus": 2,
+      "kalloc_baseline_flag": 0,
+      "command": "make qemu CPUS=2 KALLOC_BASELINE=0 ALLOC_BENCH=1",
+      "raw_log": "results/w06/raw_percpu_cpus2.log",
+      "status": "PASS",
+      "reason": "OK",
+      "meta": {
+        "_tag": "AB",
+        "backend": "percpu",
+        "cpus": "2",
+        "workers_cfg": "2",
+        "time_unit": "riscv_time_ticks",
+        "clock_hz": "10000000",
+        "op_def": "1_alloc_free_pair",
+        "batch": "32",
+        "iters": "250",
+        "warmup": "1",
+        "runs": "3",
+        "ram_mb": "128"
+      }
+    }
+  ],
+  "pass_summary": {
+    "baseline_cpus1": {
+      "valid_runs": 3,
+      "mean_ops_s": 67743.87,
+      "median_ops_s": 66053.69
+    },
+    "baseline_cpus2": {
+      "valid_runs": 3,
+      "mean_ops_s": 134684.93,
+      "median_ops_s": 134180.46
+    },
+    "percpu_cpus1": {
+      "valid_runs": 3,
+      "mean_ops_s": 70381.3,
+      "median_ops_s": 70438.16
+    },
+    "percpu_cpus2": {
+      "valid_runs": 3,
+      "mean_ops_s": 121126.19,
+      "median_ops_s": 118207.06
+    }
+  }
+}

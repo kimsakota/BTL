@@ -102,6 +102,9 @@ extern uint64 sys_unlink(void);
 extern uint64 sys_link(void);
 extern uint64 sys_mkdir(void);
 extern uint64 sys_close(void);
+#ifdef BUFTEST
+extern uint64 sys_buftest(void);
+#endif
 extern uint64 sys_sync(void);
 #ifdef INODETEST
 extern uint64 sys_inodestat(void);
@@ -133,6 +136,9 @@ static uint64 (*syscalls[])(void) = {
   [SYS_mkdir]   = sys_mkdir,
   [SYS_close]   = sys_close,
   [SYS_sync]    = sys_sync,
+#ifdef BUFTEST
+  [SYS_buftest] = sys_buftest,
+#endif
 #ifdef INODETEST
   [SYS_inodestat] = sys_inodestat,
 #endif

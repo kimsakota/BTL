@@ -16,6 +16,11 @@
 #include "file.h"
 #include "fcntl.h"
 
+#ifdef BUFTEST
+#include "buf.h"
+#include "buftest.h"
+#endif
+
 // Fetch the nth word-sized system call argument as a file descriptor
 // and return both the descriptor and the corresponding struct file.
 static int
@@ -528,6 +533,43 @@ sys_pipe(void)
   }
   return 0;
 }
+
+#ifdef BUFTEST
+uint64
+sys_buftest(void)
+{
+  int mode, slot;
+  struct file *f;
+  uint blocks[BUFTEST_BLOCKS];
+  argint(1, &mode);
+  argint(2, &slot);
+  if (mode == BUFTEST_PING)
+    return buftest_run(mode, 0, 0, slot);
+  if (argfd(0, 0, &f) < 0 || f->type != FD_INODE || !f->readable)
+    return -1;
+
+  struct inode *ip = f->ip;
+  ilock(ip);
+  if (ip->type != T_FILE || ip->size != BUFTEST_BLOCKS * BSIZE ||
+      ip->addrs[NDIRECT] == 0) {
+    iunlock(ip);
+    return -1;
+  }
+  uint dev = ip->dev;
+  for (int i = 0; i < NDIRECT; i++)
+    blocks[i] = ip->addrs[i];
+  struct buf *indirect = bread(dev, ip->addrs[NDIRECT]);
+  memmove(blocks + NDIRECT, indirect->data,
+          (BUFTEST_BLOCKS - NDIRECT) * sizeof(blocks[0]));
+  brelse(indirect);
+  iunlock(ip);
+
+  for (int i = 0; i < BUFTEST_BLOCKS; i++)
+    if (blocks[i] == 0)
+      return -1;
+  return buftest_run(mode, dev, blocks, slot);
+}
+#endif
 
 #ifdef INODETEST
 // Test-only: inodestat(fd, inum, out) copies 8 uint64 from inodestat().
