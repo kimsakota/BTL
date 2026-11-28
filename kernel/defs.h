@@ -246,3 +246,7 @@ void            slab_dump_stats(const char *tag);
 
 // slabtest.c
 void            slabtest(int);
+
+#ifdef BUFTEST
+int buftest_run(int, uint, uint*, int);
+#endif

@@ -197,6 +197,12 @@ UPROGS=\
 	$U/_dorphan\
 	$U/_sync\
 
+ifeq ($(BUFTEST),1)
+UPROGS += $U/_buftest $U/_bufdata
+$U/_bufdata: $K/buftest.h
+	python3 -c 'import sys; n = int(sys.argv[1]); sys.stdout.buffer.write(b"".join(bytes([i + 1]) * 1024 for i in range(n)))' $(shell awk '/^#define BUFTEST_BLOCKS /{print $$3}' $K/buftest.h) > $@
+endif
+
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
 
