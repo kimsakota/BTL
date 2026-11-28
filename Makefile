@@ -194,6 +194,10 @@ UPROGS=\
 	$U/_dorphan\
 	$U/_sync\
 
+ifdef INODETEST
+UPROGS += $U/_inodetest
+endif
+
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
 

@@ -528,3 +528,30 @@ sys_pipe(void)
   }
   return 0;
 }
+
+#ifdef INODETEST
+// Test-only: inodestat(fd, inum, out) copies 8 uint64 from inodestat().
+// fd >= 0 looks up the open file's inode; fd < 0 looks up (ROOTDEV, inum).
+uint64
+sys_inodestat(void)
+{
+  int fd, inum;
+  uint64 addr, out[8];
+  struct file *f = 0;
+
+  argint(0, &fd);
+  argint(1, &inum);
+  argaddr(2, &addr);
+  if (fd >= 0) {
+    if (argfd(0, 0, &f) < 0)
+      return -1;
+    if (f->type != FD_INODE && f->type != FD_DEVICE)
+      return -1;
+  }
+  inodestat(f ? f->ip : 0, ROOTDEV, inum, out);
+  struct proc *p = myproc();
+  if (copyout(p->pagetable, p->sz, addr, (char *)out, sizeof(out)) < 0)
+    return -1;
+  return 0;
+}
+#endif
