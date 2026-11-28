@@ -53,20 +53,6 @@ struct slab_cache {
 };
 
 // S04a (#38): Snapshot thong ke theo tung class (doc duoi khoa tung class)
-struct slab_class_stats {
-  uint32 class_size;   // bytes: stride cua class (64 hoac 128)
-  uint32 cap_per_slab; // slots/slab: 63 (c64), 31 (c128), 15 (c256), 3 (c1280)
-  uint32 slab_pages;   // pages: tong so trang slab cache dang giu
-  uint32 empty_slabs;  // pages: so trang slab rong dang tai su dung
-  uint32 total_capacity;     // slots: slab_pages * cap_per_slab
-  uint32 live;               // objects: so object dang song
-  uint32 free_slots;         // slots: so slot dang ranh
-  uint32 page_bytes;         // bytes: slab_pages * PGSIZE (4096 B)
-  uint32 obj_capacity_bytes; // bytes: total_capacity * class_size
-  uint32 live_obj_bytes;     // bytes: live * class_size (tinh theo stride)
-  uint32 metadata_bytes;     // bytes: slab_pages * sizeof(slab_header) (32B)
-};
-
 static struct slab_cache slab_caches[SLAB_NCLASSES];
 static int slab_initialized = 0;
 static int slab_oom_sim = 0;
@@ -91,7 +77,8 @@ slab_FindClassIndex(uint64 size)
 }
 
 // S04a (#38): Getter chi goi sau kmalloc_init(), tra 0 hoac -1 neu tham so sai
-static int
+// Doc snapshot thong ke cua 1 class duoi khoa rieng cua class do
+int
 slab_get_class_stats(int idx, struct slab_class_stats *out)
 {
   if (!slab_initialized || idx < 0 || idx >= SLAB_NCLASSES || out == 0)
@@ -112,6 +99,9 @@ slab_get_class_stats(int idx, struct slab_class_stats *out)
   }
   release(&c->lock);
 
+  uint32 tail_per_slab =
+    PGSIZE - (uint32)sizeof(struct slab_header) - cap_per_slab * stride;
+
   out->class_size = stride;
   out->cap_per_slab = cap_per_slab;
   out->slab_pages = pages;
@@ -122,10 +112,40 @@ slab_get_class_stats(int idx, struct slab_class_stats *out)
   out->page_bytes = pages * PGSIZE;
   out->obj_capacity_bytes = total_cap * stride;
   out->live_obj_bytes = out->live * stride;
+  out->free_slot_bytes = free_s * stride;
   out->metadata_bytes = pages * (uint32)sizeof(struct slab_header);
+  out->tail_padding_bytes = pages * tail_per_slab;
+  out->retained_bytes = empty * PGSIZE;
   return 0;
 }
 
+// W06 (#57): Dump trang thai 4 class (snapshot tung class duoi khoa rieng,
+// KHONG tuyen bo snapshot toan kernel nguyen tu; nha het khoa truoc khi printk)
+void
+slab_dump_stats(const char *tag)
+{
+  struct slab_class_stats s[SLAB_NCLASSES];
+
+  for (int i = 0; i < SLAB_NCLASSES; i++) {
+    if (slab_get_class_stats(i, &s[i]) != 0)
+      panic("slab_dump_stats: getter failed");
+    if (s[i].live + s[i].free_slots != s[i].total_capacity)
+      panic("slab_dump_stats: live + free_slots != total_capacity");
+  }
+
+  printk("slab_dump [%s] (per-class lock snapshot, non-atomic across kernel; "
+         "hdr=%dB align=%dB; live_B=live*stride != req_payload):\n",
+         tag ? tag : "dump", (int)sizeof(struct slab_header), SLAB_ALIGN);
+  for (int i = 0; i < SLAB_NCLASSES; i++) {
+    printk(
+      "  c%d (cap=%d): slabs=%d empty=%d total_cap=%d live=%d free=%d | "
+      "page_B=%d cap_B=%d live_B=%d free_B=%d meta_B=%d tail_B=%d retained_B=%d\n",
+      s[i].class_size, s[i].cap_per_slab, s[i].slab_pages, s[i].empty_slabs,
+      s[i].total_capacity, s[i].live, s[i].free_slots, s[i].page_bytes,
+      s[i].obj_capacity_bytes, s[i].live_obj_bytes, s[i].free_slot_bytes,
+      s[i].metadata_bytes, s[i].tail_padding_bytes, s[i].retained_bytes);
+  }
+}
 // Dem tong so slot dang trong trong toan bo cac trang Slab hien co cua 1 class
 static int
 slab_ClassFreeSlots(int idx)
